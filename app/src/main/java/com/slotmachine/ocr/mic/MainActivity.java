@@ -84,6 +84,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public TextInputEditText progressive6;
     public TextInputEditText machineId;
 
+    public TextView navDrawerText1;
+    public TextView navDrawerText2;
+
     public Bitmap mBitmap;
     private DrawerLayout mDrawerLayout;
 
@@ -98,9 +101,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         if (firebaseAuth.getCurrentUser() == null) {
             finish();
             startActivity(new Intent(MainActivity.this, LoginActivity.class));
+            return;
         }
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = (Toolbar)findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
@@ -112,14 +116,20 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
         });
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        DrawerLayout drawer = (DrawerLayout)findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
         toggle.syncState();
 
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        NavigationView navigationView = (NavigationView)findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+        View headerView = navigationView.getHeaderView(0);
+        navDrawerText1 = headerView.findViewById(R.id.navDrawerText1);
+        navDrawerText2 = headerView.findViewById(R.id.navDrawerText2);
+        String userName = firebaseAuth.getCurrentUser().getDisplayName();
+        navDrawerText1.setText("Meter Image Capturing");
+        navDrawerText2.setText("Welcome " + userName + "!");
 
         mButton = (Button)findViewById(R.id.mButton);
         progressive1 = (TextInputEditText)findViewById(R.id.progressive1);
@@ -312,7 +322,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         } else if (id == R.id.nav_slideshow) {
 
         } else if (id == R.id.nav_settings) {
-
+            startActivity(new Intent(MainActivity.this, SettingsActivity.class));
         } else if (id == R.id.nav_share) {
 
         } else if (id == R.id.nav_send) {

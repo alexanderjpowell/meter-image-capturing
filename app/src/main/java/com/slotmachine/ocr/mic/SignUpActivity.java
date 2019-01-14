@@ -16,6 +16,8 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.UserProfileChangeRequest;
 
 public class SignUpActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -28,6 +30,8 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
     private TextView loginActivityTextView;
     private ProgressDialog progressDialog;
 
+    private String displayName;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -39,6 +43,8 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
             finish();
             startActivity(new Intent(SignUpActivity.this, MainActivity.class));
         }
+
+        displayName = "";
 
         nameEditText = (EditText)findViewById(R.id.nameEditText);
         emailEditText = (EditText)findViewById(R.id.emailEditText);
@@ -55,7 +61,11 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
 
     private void registerUser() {
 
-        //getting email and password from edit texts
+        if (!validate()) {
+            return;
+        }
+
+        displayName = nameEditText.getText().toString().trim();
         String email = emailEditText.getText().toString().trim();
         String password = passwordEditText.getText().toString().trim();
         String reenterPassword = reenterPasswordEditText.getText().toString().trim();
@@ -75,7 +85,7 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
             return;
         }
 
-        progressDialog.setMessage("Registering Please Wait...");
+        progressDialog.setMessage("Registering.  Please Wait...");
         progressDialog.show();
 
         //creating a new user
@@ -84,11 +94,16 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
+                            // Set user display name
+                            FirebaseUser user = firebaseAuth.getCurrentUser();
+                            UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
+                                    .setDisplayName(displayName).build();
+                            user.updateProfile(profileUpdates);
+
                             finish();
                             startActivity(new Intent(SignUpActivity.this, MainActivity.class));
-                            //showToast("Successfully registered");
                         } else {
-                            showToast("Registration Error");
+                            showToast(task.getException().getMessage());
                         }
                         progressDialog.dismiss();
                     }
@@ -109,5 +124,30 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
 
     private void showToast(String message) {
         Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG).show();
+    }
+
+    private boolean validate() {
+        boolean valid = true;
+
+        String email = emailEditText.getText().toString().trim();
+        String password = passwordEditText.getText().toString().trim();
+        String reenterPassword = reenterPasswordEditText.getText().toString().trim();
+
+        if (email.isEmpty() || !android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+            emailEditText.setError("Enter a valid email address");
+            valid = false;
+        }
+
+        if (password.isEmpty() || password.length() < 4) {
+            passwordEditText.setError("Password must be at least 4 characters");
+            valid = false;
+        }
+
+        if (!password.equals(reenterPassword)) {
+            passwordEditText.setError("Passwords don't match");
+            valid = false;
+        }
+
+        return valid;
     }
 }
