@@ -42,4 +42,12 @@
         <item name="android:colorButtonNormal">@color/primary_darker</item>
     </style>
 
+    <style name="TextInputLayoutStyle" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense">
+        <item name="boxStrokeColor">#2196F3</item>
+        <item name="android:textColorHint">#636363</item>
+        <item name="boxBackgroundColor">#90FFFFFF</item>
+
+        <!--<item name="android:colorControlNormal">@color/white</item>-->
+    </style>
+
 </resources>

@@ -99,4 +99,6 @@ public class TextParser {
         }
         return formattedProgressive.toString();
     }
+
+
 }

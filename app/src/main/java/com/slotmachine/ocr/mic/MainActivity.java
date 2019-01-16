@@ -1,21 +1,14 @@
 package com.slotmachine.ocr.mic;
 
+import android.app.ProgressDialog;
 import android.content.ActivityNotFoundException;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.text.Editable;
-import android.text.Layout;
 import android.text.TextWatcher;
 import android.view.Menu;
 import android.Manifest;
-import android.app.Activity;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Rect;
 import android.media.ExifInterface;
@@ -25,12 +18,9 @@ import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.TextInputEditText;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
@@ -39,40 +29,37 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.firebase.ui.auth.AuthUI;
-import com.firebase.ui.auth.IdpResponse;
-import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.ml.vision.FirebaseVision;
 import com.google.firebase.ml.vision.common.FirebaseVisionImage;
 import com.google.firebase.ml.vision.document.FirebaseVisionDocumentText;
 import com.google.firebase.ml.vision.document.FirebaseVisionDocumentTextRecognizer;
 import com.google.firebase.ml.vision.text.FirebaseVisionText;
 import com.google.firebase.ml.vision.text.FirebaseVisionTextRecognizer;
+
 import android.speech.RecognizerIntent;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, View.OnTouchListener {
 
-    public static final int REQUEST_TAKE_PHOTO = 0;
+    public static final int REQUEST_TAKE_PHOTO_PROGRESSIVES = 0;
     public static final int MY_PERMISSIONS_REQUEST_CODE = 1;
+    public static final int REQUEST_TAKE_PHOTO_MACHINE_ID = 2;
 
     private static final int REQ_CODE_SPEECH_INPUT = 100;
 
@@ -95,10 +82,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     private FirebaseAuth firebaseAuth;
 
+    private ProgressDialog progressDialog;
+
+    private String activityLabel = "Scan Machines";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        setTitle(activityLabel);
 
         firebaseAuth = FirebaseAuth.getInstance();
         if (firebaseAuth.getCurrentUser() == null) {
@@ -161,6 +153,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         progressive5.addTextChangedListener(new GenericTextWatcher(progressive5));
         progressive6.addTextChangedListener(new GenericTextWatcher(progressive6));
         machineId.addTextChangedListener(new GenericTextWatcher(machineId));
+
+        //progressDialog = new ProgressDialog(this);
+        //progressDialog.setMessage("Performing OCR");
+        //progressDialog.show();
+        progressDialog = new ProgressDialog(MainActivity.this);
     }
 
     @Override
@@ -326,7 +323,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         return true;
     }
 
-    private void dispatchTakePictureIntent() {
+    private void dispatchTakePictureIntent(Integer request) {
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         // Ensure that there's a camera activity to handle the intent
         if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
@@ -345,7 +342,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         "com.slotmachine.ocr.mic.fileprovider",
                         photoFile);
                 takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
-                startActivityForResult(takePictureIntent, REQUEST_TAKE_PHOTO);
+                startActivityForResult(takePictureIntent, request);
             }
         }
     }
@@ -355,7 +352,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         super.onActivityResult(requestCode, resultCode, intent);
         try {
             switch (requestCode) {
-                case 0: {
+                case REQUEST_TAKE_PHOTO_PROGRESSIVES: {
+
                     resetProgressives();
                     if (resultCode == RESULT_OK) {
                         File file = new File(mCurrentPhotoPath);
@@ -372,7 +370,32 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                             //setPic(matrix); // Used if need to display image to user
                             Bitmap newBitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
                             //newBitmap = convertToGrayscale(newBitmap);
-                            processOCR(newBitmap);
+                            processProgressivesOCR(newBitmap);
+
+
+                        } else {
+                            showToast("Bitmap is null");
+                        }
+                    }
+                    break;
+                }
+                case REQUEST_TAKE_PHOTO_MACHINE_ID: {
+                    if (resultCode == RESULT_OK) {
+                        File file = new File(mCurrentPhotoPath);
+                        Bitmap bitmap = MediaStore.Images.Media.getBitmap(getApplicationContext().getContentResolver(), Uri.fromFile(file));
+                        if (bitmap != null) {
+
+                            //mTextView.setText("Processing...");
+                            ExifInterface exif = new ExifInterface(mCurrentPhotoPath);
+                            int rotation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL);
+                            int rotationInDegrees = exifToDegrees(rotation);
+                            //showToast("Orientation: " + Integer.toString(rotationInDegrees));
+                            Matrix matrix = new Matrix();
+                            if (rotation != 0) { matrix.preRotate(rotationInDegrees); }
+                            //setPic(matrix); // Used if need to display image to user
+                            Bitmap newBitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
+                            //newBitmap = convertToGrayscale(newBitmap);
+                            processMachineOCR(newBitmap);
 
 
                         } else {
@@ -384,10 +407,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 case REQ_CODE_SPEECH_INPUT: {
                     if (resultCode == RESULT_OK && null != intent) {
                         ArrayList<String> result = intent.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
-                        //long progressive = intent.getIntExtra("progressive", 1);
-
-                        //int progressive = Integer.parseInt(getIntent().getExtras().get("progressive").toString());
-
                         if (progressive == 1) {
                             progressive1.setText(formatVoiceToSpeech(result.get(0)));
                         } else if (progressive == 2) {
@@ -431,7 +450,53 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         progressive6.clearFocus();
     }
 
-    private void processOCR(Bitmap bitmap) {
+    private void processMachineOCR(Bitmap bitmap) {
+        FirebaseVisionImage image = FirebaseVisionImage.fromBitmap(bitmap);
+        FirebaseVisionTextRecognizer detector = FirebaseVision.getInstance().getOnDeviceTextRecognizer();
+        Task<FirebaseVisionText> result =
+                detector.processImage(image)
+                        .addOnSuccessListener(new OnSuccessListener<FirebaseVisionText>() {
+                            @Override
+                            public void onSuccess(FirebaseVisionText firebaseVisionText) {
+                                if (firebaseVisionText == null) {
+                                    Log.d("ERROR", "firebaseVisionText is null");
+                                    showToast("No text detected.  Try again.  ");
+                                    return;
+                                }
+                                StringBuilder sb =  new StringBuilder();
+                                String resultText = firebaseVisionText.getText();
+                                for (FirebaseVisionText.TextBlock block: firebaseVisionText.getTextBlocks()) {
+                                    //String blockText = block.getText();
+                                    for (FirebaseVisionText.Line line: block.getLines()) {
+                                        for (FirebaseVisionText.Element element: line.getElements()) {
+                                            String text = element.getText().trim();
+                                            //Float elementConfidence = element.getConfidence();
+                                            if (isDigits(text) && (text.length() > 3)) {
+                                                //sb.append(text);
+                                                //sb.append("\n");
+                                                machineId.setText(text);
+                                            }
+                                        }
+                                    }
+                                }
+                                //showToast(sb.toString());
+                                //machineId.setText(resultText);
+                                //showToast(resultText);
+                            }
+                        })
+                        .addOnFailureListener(
+                                new OnFailureListener() {
+                                    @Override
+                                    public void onFailure(@NonNull Exception e) {
+                                        showToast("Error with OCR");
+                                    }
+                                });
+    }
+
+    private void processProgressivesOCR(Bitmap bitmap) {
+
+        progressDialog.setMessage("Processing...");
+        progressDialog.show();
 
         FirebaseVisionImage image = FirebaseVisionImage.fromBitmap(bitmap);
         FirebaseVisionDocumentTextRecognizer detector = FirebaseVision.getInstance().getCloudDocumentTextRecognizer();
@@ -516,6 +581,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                         showToast("Error with cloud OCR");
                                     }
                                 });
+
+        progressDialog.dismiss();
     }
 
     private static int exifToDegrees(int exifOrientation) {
@@ -525,8 +592,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         return 0;
     }
 
-    public void takePhoto(View view) {
-        dispatchTakePictureIntent();
+    public void scanProgressives(View view) {
+        dispatchTakePictureIntent(REQUEST_TAKE_PHOTO_PROGRESSIVES);
+    }
+
+    public void scanMachineId(View view) {
+        dispatchTakePictureIntent(REQUEST_TAKE_PHOTO_MACHINE_ID);
     }
 
     private void printRect(Rect rect) {
@@ -561,6 +632,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         return name.matches("[a-zA-Z]+");
     }
 
+    private boolean isDigits(String name) {
+        return name.matches("[0-9]+");
+    }
+
     public void submitOnClick(View view) {
         resetProgressives();
         showToast("Progressives submitted successfully");
@@ -578,7 +653,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         try {
             startActivityForResult(intent, REQ_CODE_SPEECH_INPUT);
         } catch (ActivityNotFoundException a) {
-
+            showToast("Voice recognition not supported on your device");
         }
     }
 
@@ -598,7 +673,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     private class GenericTextWatcher implements TextWatcher {
-
         private TextInputEditText textInputEditText;
         private GenericTextWatcher(TextInputEditText textInputEditText) {
             this.textInputEditText = textInputEditText;
@@ -612,6 +686,61 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 textInputEditText.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_mic, 0);
             } else {
                 textInputEditText.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_cancel_black_24dp, 0);
+            }
+        }
+    }
+
+    private boolean isDouble(String value) {
+        try {
+            Double.parseDouble(value);
+            return true;
+        } catch (Exception ex) {
+            return false;
+        }
+    }
+
+    public void sortProgressives(View view) {
+
+        List<Double> values = new ArrayList<Double>();
+
+        if (isDouble(progressive1.getText().toString())) {
+            values.add(Double.parseDouble(progressive1.getText().toString()));
+        }
+        if (isDouble(progressive2.getText().toString())) {
+            values.add(Double.parseDouble(progressive2.getText().toString()));
+        }
+        if (isDouble(progressive3.getText().toString())) {
+            values.add(Double.parseDouble(progressive3.getText().toString()));
+        }
+        if (isDouble(progressive4.getText().toString())) {
+            values.add(Double.parseDouble(progressive4.getText().toString()));
+        }
+        if (isDouble(progressive5.getText().toString())) {
+            values.add(Double.parseDouble(progressive5.getText().toString()));
+        }
+        if (isDouble(progressive6.getText().toString())) {
+            values.add(Double.parseDouble(progressive6.getText().toString()));
+        }
+
+        Collections.sort(values);
+        Collections.reverse(values);
+        DecimalFormat df = new DecimalFormat("0.00");
+
+        resetProgressives();
+
+        for (int i = 0; i < values.size(); i++) {
+            if (i == 0) {
+                progressive1.setText(df.format(values.get(i)));
+            } else if (i == 1) {
+                progressive2.setText(df.format(values.get(i)));
+            } else if (i == 2) {
+                progressive3.setText(df.format(values.get(i)));
+            } else if (i == 3) {
+                progressive4.setText(df.format(values.get(i)));
+            } else if (i == 4) {
+                progressive5.setText(df.format(values.get(i)));
+            } else if (i == 5) {
+                progressive6.setText(df.format(values.get(i)));
             }
         }
     }
