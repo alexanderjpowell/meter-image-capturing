@@ -3,8 +3,11 @@ package com.slotmachine.ocr.mic;
 import android.content.ActivityNotFoundException;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.text.Editable;
 import android.text.Layout;
+import android.text.TextWatcher;
 import android.view.Menu;
 import android.Manifest;
 import android.app.Activity;
@@ -66,7 +69,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
-public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
+public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, View.OnTouchListener {
 
     public static final int REQUEST_TAKE_PHOTO = 0;
     public static final int MY_PERMISSIONS_REQUEST_CODE = 1;
@@ -107,14 +110,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         Toolbar toolbar = (Toolbar)findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        /*FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
             }
-        });
+        });*/
 
         DrawerLayout drawer = (DrawerLayout)findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -131,7 +134,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         navDrawerText1.setText("Meter Image Capturing");
         navDrawerText2.setText("Welcome " + userName + "!");
 
-        mButton = (Button)findViewById(R.id.mButton);
+        mButton = (Button)findViewById(R.id.mButton1);
         progressive1 = (TextInputEditText)findViewById(R.id.progressive1);
         progressive2 = (TextInputEditText)findViewById(R.id.progressive2);
         progressive3 = (TextInputEditText)findViewById(R.id.progressive3);
@@ -143,131 +146,120 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         checkPermissions();
         resetProgressives();
 
-        progressive1.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View view, MotionEvent motionEvent) {
-                final int DRAWABLE_RIGHT = 2;
+        progressive1.setOnTouchListener(this);
+        progressive2.setOnTouchListener(this);
+        progressive3.setOnTouchListener(this);
+        progressive4.setOnTouchListener(this);
+        progressive5.setOnTouchListener(this);
+        progressive6.setOnTouchListener(this);
+        machineId.setOnTouchListener(this);
 
-                if(motionEvent.getAction() == MotionEvent.ACTION_UP) {
-                    if(motionEvent.getRawX() >= (progressive1.getRight() - progressive1.getCompoundDrawables()[DRAWABLE_RIGHT].getBounds().width())) {
-                        // your action here
-                        //progressive1.setText("");
-                        progressive = 1;
-                        startVoiceInput(1);
-                        return true;
+        progressive1.addTextChangedListener(new GenericTextWatcher(progressive1));
+        progressive2.addTextChangedListener(new GenericTextWatcher(progressive2));
+        progressive3.addTextChangedListener(new GenericTextWatcher(progressive3));
+        progressive4.addTextChangedListener(new GenericTextWatcher(progressive4));
+        progressive5.addTextChangedListener(new GenericTextWatcher(progressive5));
+        progressive6.addTextChangedListener(new GenericTextWatcher(progressive6));
+        machineId.addTextChangedListener(new GenericTextWatcher(machineId));
+    }
+
+    @Override
+    public boolean onTouch(View v, MotionEvent event) {
+        final int DRAWABLE_RIGHT = 2;
+        switch(v.getId()){
+            case R.id.progressive1:
+                if(event.getAction() == MotionEvent.ACTION_UP) {
+                    if(event.getRawX() >= (progressive1.getRight() - progressive1.getCompoundDrawables()[DRAWABLE_RIGHT].getBounds().width())) {
+                        if (progressive1.getText().toString().equals("")) {
+                            progressive = 1;
+                            startVoiceInput(1);
+                            return true;
+                        } else {
+                            progressive1.setText("");
+                        }
                     }
                 }
-                return false;
-            }
-        });
-
-        progressive2.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View view, MotionEvent motionEvent) {
-                final int DRAWABLE_RIGHT = 2;
-
-                if(motionEvent.getAction() == MotionEvent.ACTION_UP) {
-                    if(motionEvent.getRawX() >= (progressive2.getRight() - progressive2.getCompoundDrawables()[DRAWABLE_RIGHT].getBounds().width())) {
-                        // your action here
-                        //progressive2.setText("");
-                        progressive = 2;
-                        startVoiceInput(2);
-                        return true;
+                break;
+            case R.id.progressive2:
+                if(event.getAction() == MotionEvent.ACTION_UP) {
+                    if(event.getRawX() >= (progressive2.getRight() - progressive2.getCompoundDrawables()[DRAWABLE_RIGHT].getBounds().width())) {
+                        if (progressive2.getText().toString().equals("")) {
+                            progressive = 2;
+                            startVoiceInput(2);
+                            return true;
+                        } else {
+                            progressive2.setText("");
+                        }
                     }
                 }
-                return false;
-            }
-        });
-
-        progressive3.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View view, MotionEvent motionEvent) {
-                final int DRAWABLE_RIGHT = 2;
-
-                if(motionEvent.getAction() == MotionEvent.ACTION_UP) {
-                    if(motionEvent.getRawX() >= (progressive3.getRight() - progressive3.getCompoundDrawables()[DRAWABLE_RIGHT].getBounds().width())) {
-                        // your action here
-                        //progressive3.setText("");
-                        progressive = 3;
-                        startVoiceInput(3);
-                        return true;
+                break;
+            case R.id.progressive3:
+                if(event.getAction() == MotionEvent.ACTION_UP) {
+                    if(event.getRawX() >= (progressive3.getRight() - progressive3.getCompoundDrawables()[DRAWABLE_RIGHT].getBounds().width())) {
+                        if (progressive3.getText().toString().equals("")) {
+                            progressive = 3;
+                            startVoiceInput(3);
+                            return true;
+                        } else {
+                            progressive3.setText("");
+                        }
                     }
                 }
-                return false;
-            }
-        });
-
-        progressive4.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View view, MotionEvent motionEvent) {
-                final int DRAWABLE_RIGHT = 2;
-
-                if(motionEvent.getAction() == MotionEvent.ACTION_UP) {
-                    if(motionEvent.getRawX() >= (progressive4.getRight() - progressive4.getCompoundDrawables()[DRAWABLE_RIGHT].getBounds().width())) {
-                        // your action here
-                        //progressive4.setText("");
-                        progressive = 4;
-                        startVoiceInput(4);
-                        return true;
+                break;
+            case R.id.progressive4:
+                if(event.getAction() == MotionEvent.ACTION_UP) {
+                    if(event.getRawX() >= (progressive4.getRight() - progressive4.getCompoundDrawables()[DRAWABLE_RIGHT].getBounds().width())) {
+                        if (progressive4.getText().toString().equals("")) {
+                            progressive = 4;
+                            startVoiceInput(4);
+                            return true;
+                        } else {
+                            progressive4.setText("");
+                        }
                     }
                 }
-                return false;
-            }
-        });
-
-        progressive5.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View view, MotionEvent motionEvent) {
-                final int DRAWABLE_RIGHT = 2;
-
-                if(motionEvent.getAction() == MotionEvent.ACTION_UP) {
-                    if(motionEvent.getRawX() >= (progressive5.getRight() - progressive5.getCompoundDrawables()[DRAWABLE_RIGHT].getBounds().width())) {
-                        // your action here
-                        //progressive5.setText("");
-                        progressive = 5;
-                        startVoiceInput(5);
-                        return true;
+                break;
+            case R.id.progressive5:
+                if(event.getAction() == MotionEvent.ACTION_UP) {
+                    if(event.getRawX() >= (progressive5.getRight() - progressive5.getCompoundDrawables()[DRAWABLE_RIGHT].getBounds().width())) {
+                        if (progressive5.getText().toString().equals("")) {
+                            progressive = 5;
+                            startVoiceInput(5);
+                            return true;
+                        } else {
+                            progressive5.setText("");
+                        }
                     }
                 }
-                return false;
-            }
-        });
-
-        progressive6.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View view, MotionEvent motionEvent) {
-                final int DRAWABLE_RIGHT = 2;
-
-                if(motionEvent.getAction() == MotionEvent.ACTION_UP) {
-                    if(motionEvent.getRawX() >= (progressive6.getRight() - progressive6.getCompoundDrawables()[DRAWABLE_RIGHT].getBounds().width())) {
-                        // your action here
-                        //progressive6.setText("");
-                        progressive = 6;
-                        startVoiceInput(6);
-                        return true;
+                break;
+            case R.id.progressive6:
+                if(event.getAction() == MotionEvent.ACTION_UP) {
+                    if(event.getRawX() >= (progressive6.getRight() - progressive6.getCompoundDrawables()[DRAWABLE_RIGHT].getBounds().width())) {
+                        if (progressive6.getText().toString().equals("")) {
+                            progressive = 6;
+                            startVoiceInput(6);
+                            return true;
+                        } else {
+                            progressive6.setText("");
+                        }
                     }
                 }
-                return false;
-            }
-        });
-
-        machineId.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View view, MotionEvent motionEvent) {
-                final int DRAWABLE_RIGHT = 2;
-
-                if(motionEvent.getAction() == MotionEvent.ACTION_UP) {
-                    if(motionEvent.getRawX() >= (machineId.getRight() - machineId.getCompoundDrawables()[DRAWABLE_RIGHT].getBounds().width())) {
-                        // your action here
-                        //progressive6.setText("");
-                        progressive = 7;
-                        startVoiceInput(7);
-                        return true;
+                break;
+            case R.id.machineId:
+                if(event.getAction() == MotionEvent.ACTION_UP) {
+                    if(event.getRawX() >= (machineId.getRight() - machineId.getCompoundDrawables()[DRAWABLE_RIGHT].getBounds().width())) {
+                        if (machineId.getText().toString().equals("")) {
+                            progressive = 7;
+                            startVoiceInput(7);
+                            return true;
+                        } else {
+                            machineId.setText("");
+                        }
                     }
                 }
-                return false;
-            }
-        });
+                break;
+        }
+        return false;
     }
 
     private void checkPermissions() {
@@ -605,5 +597,22 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         return text;
     }
 
+    private class GenericTextWatcher implements TextWatcher {
 
+        private TextInputEditText textInputEditText;
+        private GenericTextWatcher(TextInputEditText textInputEditText) {
+            this.textInputEditText = textInputEditText;
+        }
+
+        public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
+        public void afterTextChanged(Editable editable) {}
+
+        public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+            if (textInputEditText.getText().toString().equals("")) {
+                textInputEditText.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_mic, 0);
+            } else {
+                textInputEditText.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_cancel_black_24dp, 0);
+            }
+        }
+    }
 }

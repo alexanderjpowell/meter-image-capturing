@@ -21,14 +21,34 @@
             android:paddingLeft="10dp"
             android:paddingRight="10dp">
 
-            <android.support.design.button.MaterialButton
-                android:id="@+id/mButton"
-                style="@style/Widget.MaterialComponents.Button.Icon"
-                app:icon="@drawable/ic_menu_camera"
-                android:text="Take Photo"
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:onClick="takePhoto"/>
+                android:orientation="horizontal">
+
+                <android.support.design.button.MaterialButton
+                    android:id="@+id/mButton1"
+                    style="@style/Widget.MaterialComponents.Button.Icon"
+                    app:icon="@drawable/ic_menu_camera"
+                    android:text="Machine ID"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:padding="10dp"
+                    android:onClick="takePhoto"/>
+
+                <android.support.design.button.MaterialButton
+                    android:id="@+id/mButton2"
+                    style="@style/Widget.MaterialComponents.Button.Icon"
+                    app:icon="@drawable/ic_menu_camera"
+                    android:text="Progressives"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:padding="10dp"
+                    android:onClick="takePhoto"/>
+
+            </LinearLayout>
 
             <android.support.design.widget.TextInputLayout
                 android:id="@+id/inputLayout0"
