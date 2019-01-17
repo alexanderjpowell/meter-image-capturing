@@ -63,6 +63,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     private static final int REQ_CODE_SPEECH_INPUT = 100;
 
+    private static final String EMPTY_PROGRESSIVE_VALUE = "";
+
     public String mCurrentPhotoPath;
     public Button mButton;
     public int progressive = 1;
@@ -380,6 +382,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     break;
                 }
                 case REQUEST_TAKE_PHOTO_MACHINE_ID: {
+                    resetMachineId();
                     if (resultCode == RESULT_OK) {
                         File file = new File(mCurrentPhotoPath);
                         Bitmap bitmap = MediaStore.Images.Media.getBitmap(getApplicationContext().getContentResolver(), Uri.fromFile(file));
@@ -432,16 +435,18 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
     }
 
-    private void resetProgressives() {
-        String emptyProgressiveValue = "";
-        machineId.setText(emptyProgressiveValue);
-        progressive1.setText(emptyProgressiveValue);
-        progressive2.setText(emptyProgressiveValue);
-        progressive3.setText(emptyProgressiveValue);
-        progressive4.setText(emptyProgressiveValue);
-        progressive5.setText(emptyProgressiveValue);
-        progressive6.setText(emptyProgressiveValue);
+    private void resetMachineId() {
+        machineId.setText("");
         machineId.clearFocus();
+    }
+
+    private void resetProgressives() {
+        progressive1.setText(EMPTY_PROGRESSIVE_VALUE);
+        progressive2.setText(EMPTY_PROGRESSIVE_VALUE);
+        progressive3.setText(EMPTY_PROGRESSIVE_VALUE);
+        progressive4.setText(EMPTY_PROGRESSIVE_VALUE);
+        progressive5.setText(EMPTY_PROGRESSIVE_VALUE);
+        progressive6.setText(EMPTY_PROGRESSIVE_VALUE);
         progressive1.clearFocus();
         progressive2.clearFocus();
         progressive3.clearFocus();
@@ -637,6 +642,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     public void submitOnClick(View view) {
+        resetMachineId();
         resetProgressives();
         showToast("Progressives submitted successfully");
     }

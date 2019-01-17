@@ -285,11 +285,12 @@
                 android:layout_height="wrap_content"
                 android:orientation="horizontal">
 
+                <!--android:layout_weight="0.85"-->
                 <android.support.design.button.MaterialButton
                     android:id="@+id/submit_button"
                     style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                     android:backgroundTint="@color/submit_button_color"
-                    android:layout_width="0dp"
+                    android:layout_width="320dp"
                     android:layout_height="60dp"
                     android:layout_weight="0.85"
                     android:enabled="true"
@@ -303,9 +304,8 @@
                     style="@style/Widget.MaterialComponents.Button.OutlinedButton.Icon"
                     android:backgroundTint="@color/submit_button_color"
                     app:icon="@drawable/baseline_sort_black_2"
-                    android:layout_width="0dp"
+                    android:layout_width="60dp"
                     android:layout_height="60dp"
-                    android:layout_weight="0.15"
                     android:textSize="15sp"
                     android:layout_marginLeft="5dp"
                     android:onClick="sortProgressives"/>
