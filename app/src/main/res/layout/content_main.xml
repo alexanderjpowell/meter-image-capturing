@@ -20,7 +20,9 @@
             android:orientation="vertical"
             android:layout_alignParentBottom="true"
             android:paddingLeft="10dp"
-            android:paddingRight="10dp">
+            android:paddingRight="10dp"
+            android:focusable="true"
+            android:focusableInTouchMode="true">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -90,7 +92,7 @@
                     android:id="@+id/inputLayout1"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Progessive 1"
+                    android:hint="Progressive 1"
                     style="@style/TextInputLayoutStyle">
 
                     <android.support.design.widget.TextInputEditText
@@ -98,6 +100,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:drawableEnd="@drawable/ic_mic"
+                        android:paddingRight="20dp"
                         android:textSize="25dp"
                         android:inputType="numberDecimal"
                         android:paddingStart="40dp"
@@ -123,7 +126,7 @@
                     android:id="@+id/inputLayout2"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Progessive 2"
+                    android:hint="Progressive 2"
                     style="@style/TextInputLayoutStyle">
 
                     <android.support.design.widget.TextInputEditText
@@ -156,7 +159,7 @@
                     android:id="@+id/inputLayout3"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Progessive 3"
+                    android:hint="Progressive 3"
                     style="@style/TextInputLayoutStyle">
 
                     <android.support.design.widget.TextInputEditText
@@ -189,7 +192,7 @@
                     android:id="@+id/inputLayout4"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Progessive 4"
+                    android:hint="Progressive 4"
                     style="@style/TextInputLayoutStyle">
 
                     <android.support.design.widget.TextInputEditText
@@ -222,7 +225,7 @@
                     android:id="@+id/inputLayout5"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Progessive 5"
+                    android:hint="Progressive 5"
                     style="@style/TextInputLayoutStyle">
 
                     <android.support.design.widget.TextInputEditText
@@ -255,7 +258,7 @@
                     android:id="@+id/inputLayout6"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Progessive 6"
+                    android:hint="Progressive 6"
                     style="@style/TextInputLayoutStyle">
 
                     <android.support.design.widget.TextInputEditText

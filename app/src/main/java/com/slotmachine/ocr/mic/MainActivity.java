@@ -160,15 +160,18 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         //progressDialog.setMessage("Performing OCR");
         //progressDialog.show();
         progressDialog = new ProgressDialog(MainActivity.this);
+
+
     }
 
     @Override
     public boolean onTouch(View v, MotionEvent event) {
+
         final int DRAWABLE_RIGHT = 2;
         switch(v.getId()){
             case R.id.progressive1:
                 if(event.getAction() == MotionEvent.ACTION_UP) {
-                    if(event.getRawX() >= (progressive1.getRight() - progressive1.getCompoundDrawables()[DRAWABLE_RIGHT].getBounds().width())) {
+                    if(event.getRawX() >= (progressive1.getRight() - progressive1.getCompoundDrawables()[DRAWABLE_RIGHT].getBounds().width() - 15)) {
                         if (progressive1.getText().toString().equals("")) {
                             progressive = 1;
                             startVoiceInput(1);
@@ -181,7 +184,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 break;
             case R.id.progressive2:
                 if(event.getAction() == MotionEvent.ACTION_UP) {
-                    if(event.getRawX() >= (progressive2.getRight() - progressive2.getCompoundDrawables()[DRAWABLE_RIGHT].getBounds().width())) {
+                    if(event.getRawX() >= (progressive2.getRight() - progressive2.getCompoundDrawables()[DRAWABLE_RIGHT].getBounds().width() - 15)) {
                         if (progressive2.getText().toString().equals("")) {
                             progressive = 2;
                             startVoiceInput(2);
@@ -194,7 +197,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 break;
             case R.id.progressive3:
                 if(event.getAction() == MotionEvent.ACTION_UP) {
-                    if(event.getRawX() >= (progressive3.getRight() - progressive3.getCompoundDrawables()[DRAWABLE_RIGHT].getBounds().width())) {
+                    if(event.getRawX() >= (progressive3.getRight() - progressive3.getCompoundDrawables()[DRAWABLE_RIGHT].getBounds().width() - 15)) {
                         if (progressive3.getText().toString().equals("")) {
                             progressive = 3;
                             startVoiceInput(3);
@@ -207,7 +210,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 break;
             case R.id.progressive4:
                 if(event.getAction() == MotionEvent.ACTION_UP) {
-                    if(event.getRawX() >= (progressive4.getRight() - progressive4.getCompoundDrawables()[DRAWABLE_RIGHT].getBounds().width())) {
+                    if(event.getRawX() >= (progressive4.getRight() - progressive4.getCompoundDrawables()[DRAWABLE_RIGHT].getBounds().width() - 15)) {
                         if (progressive4.getText().toString().equals("")) {
                             progressive = 4;
                             startVoiceInput(4);
@@ -220,7 +223,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 break;
             case R.id.progressive5:
                 if(event.getAction() == MotionEvent.ACTION_UP) {
-                    if(event.getRawX() >= (progressive5.getRight() - progressive5.getCompoundDrawables()[DRAWABLE_RIGHT].getBounds().width())) {
+                    if(event.getRawX() >= (progressive5.getRight() - progressive5.getCompoundDrawables()[DRAWABLE_RIGHT].getBounds().width() - 15)) {
                         if (progressive5.getText().toString().equals("")) {
                             progressive = 5;
                             startVoiceInput(5);
@@ -233,7 +236,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 break;
             case R.id.progressive6:
                 if(event.getAction() == MotionEvent.ACTION_UP) {
-                    if(event.getRawX() >= (progressive6.getRight() - progressive6.getCompoundDrawables()[DRAWABLE_RIGHT].getBounds().width())) {
+                    if(event.getRawX() >= (progressive6.getRight() - progressive6.getCompoundDrawables()[DRAWABLE_RIGHT].getBounds().width() - 15)) {
                         if (progressive6.getText().toString().equals("")) {
                             progressive = 6;
                             startVoiceInput(6);
@@ -246,7 +249,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 break;
             case R.id.machineId:
                 if(event.getAction() == MotionEvent.ACTION_UP) {
-                    if(event.getRawX() >= (machineId.getRight() - machineId.getCompoundDrawables()[DRAWABLE_RIGHT].getBounds().width())) {
+                    if(event.getRawX() >= (machineId.getRight() - machineId.getCompoundDrawables()[DRAWABLE_RIGHT].getBounds().width() - 15)) {
                         if (machineId.getText().toString().equals("")) {
                             progressive = 7;
                             startVoiceInput(7);
