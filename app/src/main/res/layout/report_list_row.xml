@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:clickable="true"
+    android:focusable="true"
+    android:orientation="vertical"
+    android:paddingBottom="10dp"
+    android:paddingLeft="16dp"
+    android:paddingRight="16dp"
+    android:paddingTop="10dp">
+
+    <TextView
+        android:id="@+id/machineIdTextView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:textSize="20sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/dateTextView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="18sp"
+        android:layout_below="@id/machineIdTextView" />
+
+    <TextView
+        android:id="@+id/numberOfProgressivesTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="14sp"
+        android:textColor="@color/green"
+        android:layout_alignParentRight="true" />
+
+    <TextView
+        android:id="@+id/numberOfProgressivesTextView1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="14sp"
+        android:textColor="@color/green"
+        android:layout_alignParentRight="true"
+        android:layout_below="@id/numberOfProgressivesTextView" />
+
+    <TextView
+        android:id="@+id/numberOfProgressivesTextView2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="14sp"
+        android:textColor="@color/green"
+        android:layout_alignParentRight="true"
+        android:layout_below="@id/numberOfProgressivesTextView1" />
+
+    <TextView
+        android:id="@+id/numberOfProgressivesTextView3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="14sp"
+        android:textColor="@color/green"
+        android:layout_alignParentRight="true"
+        android:layout_below="@id/numberOfProgressivesTextView2" />
+
+</RelativeLayout>

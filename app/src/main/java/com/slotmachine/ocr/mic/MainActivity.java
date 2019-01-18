@@ -312,7 +312,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         if (id == R.id.nav_camera) {
 
         } else if (id == R.id.nav_gallery) {
-
+            startActivity(new Intent(MainActivity.this, DataReportActivity.class));
         } else if (id == R.id.nav_slideshow) {
 
         } else if (id == R.id.nav_settings) {
