@@ -72,7 +72,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private static final String EMPTY_PROGRESSIVE_VALUE = "";
 
     public String mCurrentPhotoPath;
-    public Button mButton;
+    public Button submitButton;
     public int progressive = 1;
     public TextInputEditText progressive1;
     public TextInputEditText progressive2;
@@ -139,7 +139,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         navDrawerText1.setText("Meter Image Capturing");
         navDrawerText2.setText("Welcome " + userName + "!");
 
-        mButton = (Button)findViewById(R.id.mButton1);
         progressive1 = (TextInputEditText)findViewById(R.id.progressive1);
         progressive2 = (TextInputEditText)findViewById(R.id.progressive2);
         progressive3 = (TextInputEditText)findViewById(R.id.progressive3);
@@ -147,6 +146,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         progressive5 = (TextInputEditText)findViewById(R.id.progressive5);
         progressive6 = (TextInputEditText)findViewById(R.id.progressive6);
         machineId = (TextInputEditText)findViewById(R.id.machineId);
+        submitButton = (Button)findViewById(R.id.submit_button);
 
         checkPermissions();
         resetProgressives();
@@ -657,6 +657,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     public void submitOnClick(View view) {
 
+        submitButton.setEnabled(false);
+
         // Write to database
         String machineIdText = machineId.getText().toString().trim();
         String progressiveText1 = progressive1.getText().toString().trim();
@@ -685,6 +687,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     @Override
                     public void onSuccess(DocumentReference documentReference) {
                         Log.d("TAG", "DocumentSnapshot added with ID: " + documentReference.getId());
+                        submitButton.setEnabled(true);
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
