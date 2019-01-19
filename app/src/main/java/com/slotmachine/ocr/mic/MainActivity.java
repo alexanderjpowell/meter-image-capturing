@@ -36,6 +36,10 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.ml.vision.FirebaseVision;
 import com.google.firebase.ml.vision.common.FirebaseVisionImage;
 import com.google.firebase.ml.vision.document.FirebaseVisionDocumentText;
@@ -52,8 +56,10 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, View.OnTouchListener {
 
@@ -83,16 +89,17 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private DrawerLayout mDrawerLayout;
 
     private FirebaseAuth firebaseAuth;
+    private FirebaseFirestore database;
 
     private ProgressDialog progressDialog;
 
-    private String activityLabel = "Scan Machines";
+    private String ACTIVITY_LABEL = "Scan Machines";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        setTitle(activityLabel);
+        setTitle(ACTIVITY_LABEL);
 
         firebaseAuth = FirebaseAuth.getInstance();
         if (firebaseAuth.getCurrentUser() == null) {
@@ -103,6 +110,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         Toolbar toolbar = (Toolbar)findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        //
+        database = FirebaseFirestore.getInstance();
+        //
 
         /*FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -645,6 +656,44 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     public void submitOnClick(View view) {
+
+        // Write to database
+        String machineIdText = machineId.getText().toString().trim();
+        String progressiveText1 = progressive1.getText().toString().trim();
+        String progressiveText2 = progressive2.getText().toString().trim();
+        String progressiveText3 = progressive3.getText().toString().trim();
+        String progressiveText4 = progressive4.getText().toString().trim();
+        String progressiveText5 = progressive5.getText().toString().trim();
+        String progressiveText6 = progressive6.getText().toString().trim();
+        String displayNameText = firebaseAuth.getCurrentUser().getDisplayName().trim();
+        String emailText = firebaseAuth.getCurrentUser().getEmail().trim();
+
+        Map<String, Object> user = new HashMap<>();
+        user.put("name", displayNameText);
+        user.put("email", emailText);
+        user.put("progressive1", progressiveText1);
+        user.put("progressive2", progressiveText2);
+        user.put("progressive3", progressiveText3);
+        user.put("progressive4", progressiveText4);
+        user.put("progressive5", progressiveText5);
+        user.put("progressive6", progressiveText6);
+        user.put("machine_id", machineIdText);
+
+        database.collection("scans")
+                .add(user)
+                .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                    @Override
+                    public void onSuccess(DocumentReference documentReference) {
+                        Log.d("TAG", "DocumentSnapshot added with ID: " + documentReference.getId());
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception ex) {
+                        Log.w("TAG", "Error adding document", ex);
+                    }
+                });
+        //
         resetMachineId();
         resetProgressives();
         showToast("Progressives submitted successfully");
