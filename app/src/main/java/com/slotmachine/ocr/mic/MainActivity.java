@@ -38,7 +38,9 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.ml.vision.FirebaseVision;
 import com.google.firebase.ml.vision.common.FirebaseVisionImage;
@@ -101,12 +103,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         setContentView(R.layout.activity_main);
         setTitle(ACTIVITY_LABEL);
 
+        // Ensure user is signed in
         firebaseAuth = FirebaseAuth.getInstance();
         if (firebaseAuth.getCurrentUser() == null) {
             finish();
             startActivity(new Intent(MainActivity.this, LoginActivity.class));
             return;
         }
+        //
 
         Toolbar toolbar = (Toolbar)findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -657,7 +661,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     public void submitOnClick(View view) {
 
-        submitButton.setEnabled(false);
+        //submitButton.setEnabled(false);
 
         // Write to database
         String machineIdText = machineId.getText().toString().trim();
@@ -669,10 +673,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         String progressiveText6 = progressive6.getText().toString().trim();
         String displayNameText = firebaseAuth.getCurrentUser().getDisplayName().trim();
         String emailText = firebaseAuth.getCurrentUser().getEmail().trim();
+        String userId = firebaseAuth.getCurrentUser().getUid().trim();
 
         Map<String, Object> user = new HashMap<>();
         user.put("name", displayNameText);
         user.put("email", emailText);
+        user.put("uid", userId);
         user.put("progressive1", progressiveText1);
         user.put("progressive2", progressiveText2);
         user.put("progressive3", progressiveText3);
@@ -680,14 +686,17 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         user.put("progressive5", progressiveText5);
         user.put("progressive6", progressiveText6);
         user.put("machine_id", machineIdText);
+        user.put("timestamp", FieldValue.serverTimestamp());
 
-        database.collection("scans")
+        database.collection("scans").document().set(user);
+
+        /*database.collection("scans")
                 .add(user)
                 .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                     @Override
                     public void onSuccess(DocumentReference documentReference) {
                         Log.d("TAG", "DocumentSnapshot added with ID: " + documentReference.getId());
-                        submitButton.setEnabled(true);
+                        //submitButton.setEnabled(true);
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
@@ -695,7 +704,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     public void onFailure(@NonNull Exception ex) {
                         Log.w("TAG", "Error adding document", ex);
                     }
-                });
+                });*/
         //
         resetMachineId();
         resetProgressives();
