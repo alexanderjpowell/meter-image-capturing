@@ -1,24 +1,34 @@
 package com.slotmachine.ocr.mic;
 
+// POJO for scan data displayed to the user
 public class RowData {
 
-    private String machineId, date, numberOfProgressives, numberOfProgressives1, numberOfProgressives2, numberOfProgressives3;
+    private String machineId, date, progressive1, progressive2, progressive3, progressive4, progressive5, progressive6;
+    private boolean isSelected;
 
-    public RowData() { }
-
-    public RowData(String machineId, String date, String numberOfProgressives, String numberOfProgressives1, String numberOfProgressives2, String numberOfProgressives3) {
+    public RowData(String machineId,
+                   String date,
+                   String progressive1,
+                   String progressive2,
+                   String progressive3,
+                   String progressive4,
+                   String progressive5,
+                   String progressive6,
+                   boolean isSelected) {
         this.machineId = machineId;
         this.date = date;
-        this.numberOfProgressives = numberOfProgressives;
-        this.numberOfProgressives1 = numberOfProgressives1;
-        this.numberOfProgressives2 = numberOfProgressives2;
-        this.numberOfProgressives3 = numberOfProgressives3;
+        this.progressive1 = progressive1;
+        this.progressive2 = progressive2;
+        this.progressive3 = progressive3;
+        this.progressive4 = progressive4;
+        this.progressive5 = progressive5;
+        this.progressive6 = progressive6;
+        this.isSelected = isSelected;
     }
 
     public String getMachineId() {
         return this.machineId;
     }
-
     public void setMachineId(String machineId) {
         this.machineId = machineId;
     }
@@ -26,40 +36,54 @@ public class RowData {
     public String getDate() {
         return this.date;
     }
-
     public void setDate(String date) {
         this.date = date;
     }
 
-    public String getNumberOfProgressives() {
-        return this.numberOfProgressives;
+    public String getProgressive1() {
+        return this.progressive1;
+    }
+    public void setProgressive1(String progressive1) {
+        this.progressive1 = progressive1;
     }
 
-    public void setNumberOfProgressives(String numberOfProgressives) {
-        this.numberOfProgressives = numberOfProgressives;
+    public String getProgressive2() {
+        return this.progressive2;
+    }
+    public void setProgressive2(String progressive2) {
+        this.progressive2 = progressive2;
     }
 
-    public String getNumberOfProgressives1() {
-        return this.numberOfProgressives1;
+    public String getProgressive3() {
+        return this.progressive3;
+    }
+    public void setProgressive3(String progressive3) {
+        this.progressive3 = progressive3;
     }
 
-    public void setNumberOfProgressives1(String numberOfProgressives1) {
-        this.numberOfProgressives1 = numberOfProgressives1;
+    public String getProgressive4() {
+        return this.progressive4;
+    }
+    public void setProgressive4(String progressive4) {
+        this.progressive4 = progressive4;
     }
 
-    public String getNumberOfProgressives2() {
-        return this.numberOfProgressives2;
+    public String getProgressive5() {
+        return this.progressive5;
+    }
+    public void setProgressive5(String progressive5) {
+        this.progressive5 = progressive5;
     }
 
-    public void setNumberOfProgressives2(String numberOfProgressives2) {
-        this.numberOfProgressives2 = numberOfProgressives2;
+    public String getProgressive6() {
+        return this.progressive6;
+    }
+    public void setProgressive6(String progressive6) {
+        this.progressive6 = progressive6;
     }
 
-    public String getNumberOfProgressives3() {
-        return this.numberOfProgressives3;
-    }
-
-    public void setNumberOfProgressives3(String numberOfProgressives3) {
-        this.numberOfProgressives3 = numberOfProgressives3;
+    public boolean isSelected() { return isSelected; }
+    public void setSelected(boolean isSelected) {
+        this.isSelected = isSelected;
     }
 }
