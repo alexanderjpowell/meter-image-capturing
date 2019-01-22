@@ -82,7 +82,8 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                             finish();
                             startActivity(new Intent(LoginActivity.this, MainActivity.class));
                         } else {
-                            showToast("Unable to complete signin");
+                            showToast("Incorrect username or password.  Try again.");
+                            //showToast("Unable to complete signin");
                         }
                     }
                 });
