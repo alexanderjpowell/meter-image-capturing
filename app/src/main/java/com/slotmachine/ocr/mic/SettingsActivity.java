@@ -91,36 +91,7 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
                     .show();
 
         } else if (view == changePasswordButton) {
-
             startActivity(new Intent(SettingsActivity.this, ChangePasswordActivity.class));
-
-            /*String oldPassword = "password";
-            String email = firebaseAuth.getCurrentUser().getEmail();
-            firebaseAuth.signInWithEmailAndPassword(email, oldPassword)
-                    .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-                        @Override
-                        public void onComplete(@NonNull Task<AuthResult> task) {
-                            if (task.isSuccessful()) {
-                                String newPassword = "newpassword";
-                                firebaseAuth.getCurrentUser().updatePassword(newPassword)
-                                        .addOnCompleteListener(new OnCompleteListener<Void>() {
-                                            @Override
-                                            public void onComplete(@NonNull Task<Void> task) {
-                                                if (task.isSuccessful()) {
-                                                    showToast("Password changed successfully");
-                                                } else {
-                                                    showToast(task.getException().getMessage());
-                                                }
-                                            }
-                                        });
-                            } else {
-                                showToast("Current password is incorrect.  Try again.");
-                            }
-                        }
-                    });*/
-
-
-
         }
     }
 
