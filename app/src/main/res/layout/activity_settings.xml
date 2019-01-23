@@ -29,6 +29,15 @@
             android:textSize="15sp" />
 
         <android.support.design.button.MaterialButton
+            android:id="@+id/changePasswordButton"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:enabled="true"
+            android:text="Change Password"
+            android:textSize="15sp" />
+
+        <android.support.design.button.MaterialButton
             android:id="@+id/deleteAccountButton"
             style="@style/Widget.MaterialComponents.Button"
             android:layout_width="match_parent"

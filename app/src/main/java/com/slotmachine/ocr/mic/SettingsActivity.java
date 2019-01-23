@@ -16,6 +16,7 @@ import android.widget.Toast;
 import com.firebase.ui.auth.AuthUI;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
@@ -24,6 +25,7 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
     private FirebaseAuth firebaseAuth;
 
     private MaterialButton signOutButton;
+    private MaterialButton changePasswordButton;
     private MaterialButton deleteAccountButton;
 
     @Override
@@ -36,9 +38,11 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
         firebaseAuth = FirebaseAuth.getInstance();
 
         signOutButton = (MaterialButton)findViewById(R.id.signOutButton);
+        changePasswordButton = (MaterialButton)findViewById(R.id.changePasswordButton);
         deleteAccountButton = (MaterialButton)findViewById(R.id.deleteAccountButton);
 
         signOutButton.setOnClickListener(this);
+        changePasswordButton.setOnClickListener(this);
         deleteAccountButton.setOnClickListener(this);
     }
 
@@ -46,6 +50,7 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
     public void onClick(View view) {
 
         if (view == signOutButton) {
+
             AuthUI.getInstance()
                     .signOut(this)
                     .addOnCompleteListener(new OnCompleteListener<Void>() {
@@ -59,6 +64,7 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
                             }
                         }
                     });
+
         } else if (view == deleteAccountButton) {
 
             new AlertDialog.Builder(this)
@@ -83,6 +89,38 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
                     })
                     .setNegativeButton("No", null)
                     .show();
+
+        } else if (view == changePasswordButton) {
+
+            startActivity(new Intent(SettingsActivity.this, ChangePasswordActivity.class));
+
+            /*String oldPassword = "password";
+            String email = firebaseAuth.getCurrentUser().getEmail();
+            firebaseAuth.signInWithEmailAndPassword(email, oldPassword)
+                    .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+                        @Override
+                        public void onComplete(@NonNull Task<AuthResult> task) {
+                            if (task.isSuccessful()) {
+                                String newPassword = "newpassword";
+                                firebaseAuth.getCurrentUser().updatePassword(newPassword)
+                                        .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                            @Override
+                                            public void onComplete(@NonNull Task<Void> task) {
+                                                if (task.isSuccessful()) {
+                                                    showToast("Password changed successfully");
+                                                } else {
+                                                    showToast(task.getException().getMessage());
+                                                }
+                                            }
+                                        });
+                            } else {
+                                showToast("Current password is incorrect.  Try again.");
+                            }
+                        }
+                    });*/
+
+
+
         }
     }
 

@@ -12,6 +12,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.firebase.ui.auth.AuthUI;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
@@ -97,6 +98,15 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             finish();
             startActivity(new Intent(LoginActivity.this, SignUpActivity.class));
         }
+    }
+
+    // Prevent back press from logging user back in
+    @Override
+    public void onBackPressed() {
+        Intent startMain = new Intent(Intent.ACTION_MAIN);
+        startMain.addCategory(Intent.CATEGORY_HOME);
+        startMain.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(startMain);
     }
 
     private void showToast(String message) {
