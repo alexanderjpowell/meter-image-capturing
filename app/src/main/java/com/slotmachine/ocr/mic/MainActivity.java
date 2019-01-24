@@ -143,6 +143,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         navDrawerText1.setText("Meter Image Capturing");
         navDrawerText2.setText("Welcome " + userName + "!");
 
+        //
+        Menu menu = navigationView.getMenu();
+        //MenuItem item = menu.add("test");
+        menu.add(R.id.userGroup, Menu.NONE, 200, "test");
+        //item.setTitle("Users");
+        //
+
         progressive1 = (TextInputEditText)findViewById(R.id.progressive1);
         progressive2 = (TextInputEditText)findViewById(R.id.progressive2);
         progressive3 = (TextInputEditText)findViewById(R.id.progressive3);
@@ -310,8 +317,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
+            showToast("settings");
             return true;
         }
 
