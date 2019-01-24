@@ -55,6 +55,8 @@ public class ReportDataAdapter extends RecyclerView.Adapter<ReportDataAdapter.Re
                 rowDataList.get(position).setSelected(holder.checkBox.isChecked());
             }
         });
+
+
     }
 
     @Override

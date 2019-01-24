@@ -2,7 +2,9 @@ package com.slotmachine.ocr.mic;
 
 import android.app.ProgressDialog;
 import android.content.ActivityNotFoundException;
+import android.content.DialogInterface;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AlertDialog;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.Menu;
@@ -101,6 +103,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
         setTitle(ACTIVITY_LABEL);
 
         // Ensure user is signed in
@@ -118,15 +121,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         //
         database = FirebaseFirestore.getInstance();
         //
-
-        /*FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });*/
+        checkPermissions();
 
         DrawerLayout drawer = (DrawerLayout)findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -143,13 +138,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         navDrawerText1.setText("Meter Image Capturing");
         navDrawerText2.setText("Welcome " + userName + "!");
 
-        //
-        Menu menu = navigationView.getMenu();
-        //MenuItem item = menu.add("test");
-        menu.add(R.id.userGroup, Menu.NONE, 200, "test");
-        //item.setTitle("Users");
-        //
-
         progressive1 = (TextInputEditText)findViewById(R.id.progressive1);
         progressive2 = (TextInputEditText)findViewById(R.id.progressive2);
         progressive3 = (TextInputEditText)findViewById(R.id.progressive3);
@@ -159,7 +147,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         machineId = (TextInputEditText)findViewById(R.id.machineId);
         submitButton = (Button)findViewById(R.id.submit_button);
 
-        checkPermissions();
         resetProgressives();
 
         progressive1.setOnTouchListener(this);
@@ -183,7 +170,41 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         //progressDialog.show();
         progressDialog = new ProgressDialog(MainActivity.this);
 
+        /*String s = ((MyApplication)this.getApplication()).getUsername();
+        if (s == null) {
+            AlertDialog alertDialog = new AlertDialog.Builder(MainActivity.this).create();
+            alertDialog.setTitle("Select a username");
+            alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "OK",
+                    new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int i) {
+                            startActivity(new Intent(MainActivity.this, ManageUsersActivity.class));
+                            dialog.dismiss();
+                        }
+                    });
+            alertDialog.show();
+        } else {
+            setTitle(ACTIVITY_LABEL + " - " + s);
+        }*/
+        //showToast(s);
 
+        /*Intent intent = getIntent();
+        if (intent.hasExtra("user")) {
+            String user = intent.getStringExtra("user");
+            showToast("User: " + user);
+            setTitle(ACTIVITY_LABEL + " - " + user);
+        } else {
+            showToast("Select a user");
+            AlertDialog alertDialog = new AlertDialog.Builder(MainActivity.this).create();
+            alertDialog.setTitle("Select a username");
+            alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "OK",
+                    new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int i) {
+                            startActivity(new Intent(MainActivity.this, ManageUsersActivity.class));
+                            dialog.dismiss();
+                        }
+                    });
+            alertDialog.show();
+        }*/
     }
 
     @Override
@@ -336,7 +357,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         } else if (id == R.id.nav_gallery) {
             startActivity(new Intent(MainActivity.this, DataReportActivity.class));
         } else if (id == R.id.nav_slideshow) {
-
+            startActivity(new Intent(MainActivity.this, ManageUsersActivity.class));
         } else if (id == R.id.nav_settings) {
             startActivity(new Intent(MainActivity.this, SettingsActivity.class));
         } else if (id == R.id.nav_share) {

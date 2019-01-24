@@ -1,14 +1,23 @@
 package com.slotmachine.ocr.mic;
 
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.NotificationManagerCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.InputType;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -17,6 +26,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
 
@@ -87,6 +97,61 @@ public class DataReportActivity extends AppCompatActivity {// implements Adapter
             public void onLongClick(View view, int position) {
                 RowData rowData = rowDataList.get(position);
                 showToast("Long Click on " + rowData.getMachineId());
+
+                final EditText input = new EditText(DataReportActivity.this);
+                //final EditText input2 = new EditText(DataReportActivity.this);
+                AlertDialog alertDialog = new AlertDialog.Builder(DataReportActivity.this).create();
+                alertDialog.setTitle("Alert");
+                alertDialog.setMessage("Alert message to be shown");
+                alertDialog.setView(input, 100, 0, 100, 0);
+                //alertDialog.setView(input2, 100, 100, 100, 100);
+                alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int i) {
+                                dialog.dismiss();
+                            }
+                        });
+                alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "CLEAR",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int i) {
+                                dialog.dismiss();
+                            }
+                        });
+                alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, "DELETE",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int i) {
+                                dialog.dismiss();
+                            }
+                        });
+                alertDialog.show();
+
+                //final String m_Text;// = "";
+
+                /*AlertDialog builder = new AlertDialog.Builder(DataReportActivity.this).create();
+                builder.setTitle("Edit Name");
+                final EditText input = new EditText(DataReportActivity.this);
+                input.setInputType(InputType.TYPE_CLASS_TEXT);
+                //input.setPadding(0, 5, 0, 5);
+                builder.setView(input, 10, 0, 10, 0);
+                builder.setButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        // Clicked
+                    }
+                });*/
+                /*builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        //m_Text = input.getText().toString();
+                    }
+                });
+                builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+                    }
+                });*/
+                //builder.show();
             }
         }));
 
@@ -183,7 +248,7 @@ public class DataReportActivity extends AppCompatActivity {// implements Adapter
 
         String machine_id, timestamp, progressive1, progressive2, progressive3, progressive4, progressive5, progressive6;
         RowData rowData;
-        rowDataList.clear();
+        rowDataList.clear(); // reset the current data list
 
         for (QueryDocumentSnapshot document : snapshot) {
 
@@ -221,5 +286,34 @@ public class DataReportActivity extends AppCompatActivity {// implements Adapter
 
     public void generateReport(View view) {
         showSnackBar(view, "Report generated");
+
+        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this, "CHANNEL_ID")
+                //.setSmallIcon(R.mipmap.ic_stat_onesignal_default)
+                .setSmallIcon(R.drawable.ic_launcher)
+                .setContentTitle("Download")
+                .setContentText("Your download has completed");
+
+        createNotificationChannel();
+
+        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
+
+        notificationManager.notify(1, mBuilder.build());
+
+    }
+
+    private void createNotificationChannel() {
+        // Create the NotificationChannel, but only on API 26+ because
+        // the NotificationChannel class is new and not in the support library
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            CharSequence name = "channel name";
+            String description = "channel description";
+            int importance = NotificationManager.IMPORTANCE_DEFAULT;
+            NotificationChannel channel = new NotificationChannel("CHANNEL_ID", name, importance);
+            channel.setDescription(description);
+            // Register the channel with the system; you can't change the importance
+            // or other notification behaviors after this
+            NotificationManager notificationManager = getSystemService(NotificationManager.class);
+            notificationManager.createNotificationChannel(channel);
+        }
     }
 }
