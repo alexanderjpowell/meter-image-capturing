@@ -12,6 +12,7 @@ import android.support.v7.widget.CardView;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.InputType;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -88,17 +89,17 @@ public class ManageUsersActivity extends AppCompatActivity implements MyRecycler
             @Override
             public void onClick(View view, int position) {
                 //showToast("short click on " + Integer.toString(position));
-                ((MyApplication)ManageUsersActivity.this.getApplication()).setUsername(usersList.get(position));
-                Intent intent = new Intent(ManageUsersActivity.this, MainActivity.class);
-                intent.putExtra("user", usersList.get(position));
-                startActivity(intent);
+                //((MyApplication)ManageUsersActivity.this.getApplication()).setUsername(usersList.get(position));
+                //Intent intent = new Intent(ManageUsersActivity.this, MainActivity.class);
+                //intent.putExtra("user", usersList.get(position));
+                //startActivity(intent);
             }
 
             @Override
             public void onLongClick(View view, final int position) {
                 //showToast("long click on " + Integer.toString(position));
                 AlertDialog alertDialog = new AlertDialog.Builder(ManageUsersActivity.this).create();
-                alertDialog.setMessage("Do you want to user " + usersList.get(position) + "?");
+                alertDialog.setMessage("Do you want to delete " + usersList.get(position) + "?");
                 alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "YES",
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int i) {
@@ -127,6 +128,8 @@ public class ManageUsersActivity extends AppCompatActivity implements MyRecycler
 
     public void addNewUser(View view) {
         final EditText input = new EditText(ManageUsersActivity.this);
+        input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_CAP_SENTENCES);
+        input.requestFocus();
         input.setHint("Employee name");
         AlertDialog alertDialog = new AlertDialog.Builder(ManageUsersActivity.this).create();
         alertDialog.setView(input, 100, 70, 100, 0);
@@ -174,9 +177,6 @@ public class ManageUsersActivity extends AppCompatActivity implements MyRecycler
                 .collection("displayNames")
                 .document(name)
                 .delete();
-        /*usersList.remove(position);
-        adapter.notifyItemRemoved(position);
-        adapter.notifyItemRangeChanged(position, usersList.size());*/
     }
 
     private void showToast(String message) {

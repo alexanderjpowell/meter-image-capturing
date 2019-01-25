@@ -37,6 +37,7 @@ public class ReportDataAdapter extends RecyclerView.Adapter<ReportDataAdapter.Re
 
         holder.machineIdTextView.setText(rowData.getMachineId());
         holder.dateTextView.setText(rowData.getDate());
+        holder.userNameTextView.setText(rowData.getUser());
         holder.progressiveTextView1.setText(rowData.getProgressive1());
         holder.progressiveTextView2.setText(rowData.getProgressive2());
         holder.progressiveTextView3.setText(rowData.getProgressive3());
@@ -71,7 +72,7 @@ public class ReportDataAdapter extends RecyclerView.Adapter<ReportDataAdapter.Re
 
     public static class ReportDataHolder extends RecyclerView.ViewHolder{
 
-        TextView machineIdTextView, dateTextView;
+        TextView machineIdTextView, dateTextView, userNameTextView;
         TextView progressiveTextView1, progressiveTextView2, progressiveTextView3;
         TextView progressiveTextView4, progressiveTextView5, progressiveTextView6;
         CheckBox checkBox;
@@ -81,6 +82,7 @@ public class ReportDataAdapter extends RecyclerView.Adapter<ReportDataAdapter.Re
 
             machineIdTextView = itemView.findViewById(R.id.machineIdTextView);
             dateTextView = itemView.findViewById(R.id.dateTextView);
+            userNameTextView = itemView.findViewById(R.id.userNameTextView);
             progressiveTextView1 = itemView.findViewById(R.id.progressiveTextView1);
             progressiveTextView2 = itemView.findViewById(R.id.progressiveTextView2);
             progressiveTextView3 = itemView.findViewById(R.id.progressiveTextView3);

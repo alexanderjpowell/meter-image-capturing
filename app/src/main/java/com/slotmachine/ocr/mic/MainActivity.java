@@ -3,6 +3,7 @@ package com.slotmachine.ocr.mic;
 import android.app.ProgressDialog;
 import android.content.ActivityNotFoundException;
 import android.content.DialogInterface;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
 import android.text.Editable;
@@ -30,20 +31,28 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.PopupMenu;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.ml.vision.FirebaseVision;
 import com.google.firebase.ml.vision.common.FirebaseVisionImage;
 import com.google.firebase.ml.vision.document.FirebaseVisionDocumentText;
@@ -88,6 +97,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     public TextView navDrawerText1;
     public TextView navDrawerText2;
+    public Spinner spinner;
 
     public Bitmap mBitmap;
     private DrawerLayout mDrawerLayout;
@@ -97,7 +107,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     private ProgressDialog progressDialog;
 
-    private String ACTIVITY_LABEL = "Scan Machines";
+    private String ACTIVITY_LABEL = "User:";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -109,10 +119,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         // Ensure user is signed in
         firebaseAuth = FirebaseAuth.getInstance();
         if (firebaseAuth.getCurrentUser() == null) {
-            finish();
+            showToast("not logged in");
+            Log.d("AUTHENTICATION", "not logged in");
+
             startActivity(new Intent(MainActivity.this, LoginActivity.class));
+            finish();
             return;
         }
+        Log.d("AUTHENTICATION", "logged in");
         //
 
         Toolbar toolbar = (Toolbar)findViewById(R.id.toolbar);
@@ -205,7 +219,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     });
             alertDialog.show();
         }*/
+
+        //PopupMenu popup = new PopupMenu(getApplicationContext(), submitButton);
+        //popup.show();
     }
+
+
 
     @Override
     public boolean onTouch(View v, MotionEvent event) {
@@ -328,6 +347,41 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.main, menu);
+
+        if (firebaseAuth.getCurrentUser() == null) {
+            startActivity(new Intent(MainActivity.this, LoginActivity.class));
+            finish();
+            return false;
+        }
+        String uid = firebaseAuth.getCurrentUser().getUid();
+
+        MenuItem item = menu.findItem(R.id.action_bar_spinner);
+        spinner = (Spinner)MenuItemCompat.getActionView(item);
+        final List<String> spinnerArray = new ArrayList<>();
+        // Populate spinnerArray from database
+        database.collection("users")
+                .document(uid)
+                .collection("displayNames")
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            for (QueryDocumentSnapshot document : task.getResult()) {
+                                spinnerArray.add(document.get("displayName").toString());
+                            }
+                            if (spinnerArray.isEmpty()) {
+                                spinnerArray.add("No users created");
+                            }
+                            ArrayAdapter<String> adapter = new ArrayAdapter<String>(MainActivity.this, R.layout.spinner_item, spinnerArray);
+                            adapter.setDropDownViewResource(R.layout.spinner_item);
+                            spinner.setAdapter(adapter);
+                        } else {
+                            showToast("Error getting users");
+                        }
+                    }
+                });
+
         return true;
     }
 
@@ -339,7 +393,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         int id = item.getItemId();
 
         if (id == R.id.action_settings) {
-            showToast("settings");
+            showToast(spinner.getSelectedItem().toString());
+            return true;
+        } else if (id == R.id.action_bar_spinner) {
+            showToast(spinner.getSelectedItem().toString());
             return true;
         }
 
@@ -702,6 +759,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         String displayNameText = firebaseAuth.getCurrentUser().getDisplayName().trim();
         String emailText = firebaseAuth.getCurrentUser().getEmail().trim();
         String userId = firebaseAuth.getCurrentUser().getUid().trim();
+        String userName = spinner.getSelectedItem().toString();
 
         Map<String, Object> user = new HashMap<>();
         user.put("name", displayNameText);
@@ -715,25 +773,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         user.put("progressive6", progressiveText6);
         user.put("machine_id", machineIdText);
         user.put("timestamp", FieldValue.serverTimestamp());
+        user.put("userName", userName);
 
         database.collection("scans").document().set(user);
 
-        /*database.collection("scans")
-                .add(user)
-                .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
-                    @Override
-                    public void onSuccess(DocumentReference documentReference) {
-                        Log.d("TAG", "DocumentSnapshot added with ID: " + documentReference.getId());
-                        //submitButton.setEnabled(true);
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception ex) {
-                        Log.w("TAG", "Error adding document", ex);
-                    }
-                });*/
-        //
         resetMachineId();
         resetProgressives();
         showToast("Progressives submitted successfully");

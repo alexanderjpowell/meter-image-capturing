@@ -16,8 +16,7 @@
         android:id="@+id/checkMark"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@drawable/sharp_check_black_18dp"
-        android:visibility="invisible"/>
+        android:src="@drawable/sharp_person_black_18dp"/>
 
     <TextView
         android:id="@+id/userDisplayName"
