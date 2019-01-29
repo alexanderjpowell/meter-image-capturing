@@ -276,6 +276,8 @@ public class DataReportActivity extends AppCompatActivity {// implements Adapter
         String imageFileName = "report_" + timeStamp + "_";
         File storageDir = new File(Environment.getExternalStoragePublicDirectory(
                 Environment.DIRECTORY_DCIM), "Camera");
+        //File storageDir = new File(Environment.getExternalStoragePublicDirectory(
+        //        Environment.DIRECTORY_DOWNLOADS));
         File image = File.createTempFile(
                 imageFileName,   /* prefix */
                 ".csv",   /* suffix */
@@ -297,26 +299,76 @@ public class DataReportActivity extends AppCompatActivity {// implements Adapter
 
     private String createCsvFile() {
         StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("'Machine','Progressive1','Progressive2','Progressive3','Progressive4','Progressive5','Progressive6','Date',\n");
+        stringBuilder.append("\"Machine\",\"Progressive1\",\"Progressive2\",\"Progressive3\",\"Progressive4\",\"Progressive5\",\"Progressive6\",\"Date\"\n");
         for (RowData rowData : rowDataList) {
-            stringBuilder.append("'" + getMachineIdFromString(rowData.getMachineId()) + "',");
-            stringBuilder.append("'" + rowData.getProgressive1() + "',");
-            stringBuilder.append("'" + rowData.getProgressive2() + "',");
-            stringBuilder.append("'" + rowData.getProgressive3() + "',");
-            stringBuilder.append("'" + rowData.getProgressive4() + "',");
-            stringBuilder.append("'" + rowData.getProgressive5() + "',");
-            stringBuilder.append("'" + rowData.getProgressive6() + "',");
-            stringBuilder.append("'" + rowData.getDate() + "',\n");
+            stringBuilder.append("\"" + getMachineIdFromString(rowData.getMachineId()) + "\",");
+            stringBuilder.append("\"" + rowData.getProgressive1() + "\",");
+            stringBuilder.append("\"" + rowData.getProgressive2() + "\",");
+            stringBuilder.append("\"" + rowData.getProgressive3() + "\",");
+            stringBuilder.append("\"" + rowData.getProgressive4() + "\",");
+            stringBuilder.append("\"" + rowData.getProgressive5() + "\",");
+            stringBuilder.append("\"" + rowData.getProgressive6() + "\",");
+            stringBuilder.append("\"" + rowData.getDate() + "\"\n");
         }
         return stringBuilder.toString();
     }
 
     public void generateReport(View view) {
+        if (isExternalStorageWritable()) {
+            File csvFile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), "report.csv");
+            String fileContents = createCsvFile();
+            try {
+                FileOutputStream fos = new FileOutputStream(csvFile);
+                fos.write(fileContents.getBytes());
+                fos.close();
+
+                Uri uri = FileProvider.getUriForFile(this, "com.slotmachine.ocr.mic.fileprovider", csvFile);
+                Intent intent = new Intent(Intent.ACTION_SEND);
+                intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                intent.putExtra(Intent.EXTRA_STREAM, uri);
+                intent.setType("text/csv");
+                //intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+
+                startActivity(Intent.createChooser(intent, "Share to"));
+
+                /*Intent chooserIntent = Intent.createChooser(intent,"Send email");
+                chooserIntent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+
+                PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, chooserIntent, 0);
+
+                NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this, "CHANNEL_ID")
+                        //.setSmallIcon(R.mipmap.ic_stat_onesignal_default)
+                        //.setPriority(NotificationManager.IMPORTANCE_HIGH)
+                        .setSmallIcon(R.drawable.ic_launcher)
+                        .setContentTitle("Your download has completed")
+                        .setContentText("Share via email, text, or other")
+                        .setContentIntent(pendingIntent)
+                        .setColor(Color.argb(255, 0, 0, 255))
+                        .setAutoCancel(true);
+                //.setVibrate(new long[] { 1000, 1000, 1000, 1000, 1000 })
+                //.addAction(R.drawable.ic_launcher, "Share", pendingIntent);
+
+                createNotificationChannel();
+                NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
+                notificationManager.notify(1, mBuilder.build());*/
+
+                showToast("File created");
+            } catch (Exception ex) {
+                showToast(ex.getMessage());
+            }
+        } else {
+            showToast("Cannot write to external storage");
+        }
+    }
+
+    /*public void generateReportt(View view) {
         showSnackBar(view, "Download ");
 
         File file = new File("");
+        String fileContents = createCsvFile();
+        showToast(fileContents);
         try {
-            file = createImageFile(createCsvFile());
+            file = createImageFile(fileContents);
         } catch (Exception ex) {
             showToast(ex.getMessage());
             return;
@@ -349,7 +401,7 @@ public class DataReportActivity extends AppCompatActivity {// implements Adapter
         NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
         notificationManager.notify(1, mBuilder.build());
 
-    }
+    }*/
 
     private void createNotificationChannel() {
         // Create the NotificationChannel, but only on API 26+ because

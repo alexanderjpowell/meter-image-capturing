@@ -11,9 +11,7 @@ public class TextParser {
 
     private String text;
 
-    public TextParser() {
-
-    }
+    public TextParser() { }
 
     public static void main(String[] args) {
 

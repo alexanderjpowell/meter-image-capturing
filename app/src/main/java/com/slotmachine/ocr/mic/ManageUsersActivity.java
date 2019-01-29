@@ -122,6 +122,12 @@ public class ManageUsersActivity extends AppCompatActivity implements MyRecycler
     }
 
     @Override
+    public void onBackPressed() {
+        startActivity(new Intent(ManageUsersActivity.this, MainActivity.class));
+        finish();
+    }
+
+    @Override
     public void onItemClick(View view, int position) {
         //Toast.makeText(this, "You clicked " + adapter.getItem(position) + " on row number " + position, Toast.LENGTH_SHORT).show();
     }

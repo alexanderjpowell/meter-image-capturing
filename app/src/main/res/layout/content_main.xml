@@ -24,12 +24,24 @@
             android:focusable="true"
             android:focusableInTouchMode="true">
 
-            <LinearLayout
+            <android.support.design.button.MaterialButton
+                android:id="@+id/mButton2"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton.Icon"
+                android:backgroundTint="@color/submit_button_color"
+                app:icon="@drawable/ic_menu_camera"
+                android:text="Scan Progressives"
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp"
+                android:onClick="scanProgressives"/>
+
+            <!--<LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal">
 
-                <!--style="@style/Widget.MaterialComponents.Button.Icon"-->
+                style="@style/Widget.MaterialComponents.Button.Icon"
                 <android.support.design.button.MaterialButton
                     android:id="@+id/mButton1"
                     style="@style/Widget.MaterialComponents.Button.OutlinedButton.Icon"
@@ -43,6 +55,7 @@
                     android:padding="10dp"
                     android:onClick="scanMachineId"/>
 
+                android:layout_weight="0.8"
                 <android.support.design.button.MaterialButton
                     android:id="@+id/mButton2"
                     style="@style/Widget.MaterialComponents.Button.OutlinedButton.Icon"
@@ -51,12 +64,11 @@
                     android:text="Progressives"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_weight="0.8"
                     android:layout_marginLeft="5dp"
                     android:padding="10dp"
                     android:onClick="scanProgressives"/>
 
-            </LinearLayout>
+            </LinearLayout>-->
 
             <android.support.design.widget.TextInputLayout
                 android:id="@+id/inputLayout0"

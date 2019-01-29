@@ -74,6 +74,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import static android.Manifest.permission.RECORD_AUDIO;
+
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, View.OnTouchListener {
 
     public static final int REQUEST_TAKE_PHOTO_PROGRESSIVES = 0;
@@ -330,6 +332,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         this.requestPermissions(new String[] {Manifest.permission.CAMERA,
                         Manifest.permission.READ_EXTERNAL_STORAGE,
                         Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                        Manifest.permission.RECORD_AUDIO,
                         Manifest.permission.INTERNET},
                 MY_PERMISSIONS_REQUEST_CODE);
     }
@@ -463,6 +466,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     if (resultCode == RESULT_OK) {
                         File file = new File(mCurrentPhotoPath);
                         Bitmap bitmap = MediaStore.Images.Media.getBitmap(getApplicationContext().getContentResolver(), Uri.fromFile(file));
+
                         if (bitmap != null) {
 
                             //mTextView.setText("Processing...");
@@ -477,6 +481,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                             //newBitmap = convertToGrayscale(newBitmap);
                             processProgressivesOCR(newBitmap);
 
+                            if (file.exists())
+                                file.delete();
+
 
                         } else {
                             showToast("Bitmap is null");
@@ -484,11 +491,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     }
                     break;
                 }
-                case REQUEST_TAKE_PHOTO_MACHINE_ID: {
+                /*case REQUEST_TAKE_PHOTO_MACHINE_ID: {
                     resetMachineId();
                     if (resultCode == RESULT_OK) {
                         File file = new File(mCurrentPhotoPath);
                         Bitmap bitmap = MediaStore.Images.Media.getBitmap(getApplicationContext().getContentResolver(), Uri.fromFile(file));
+
                         if (bitmap != null) {
 
                             //mTextView.setText("Processing...");
@@ -503,13 +511,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                             //newBitmap = convertToGrayscale(newBitmap);
                             processMachineOCR(newBitmap);
 
+                            if (file.exists())
+                                file.delete();
 
                         } else {
                             showToast("Bitmap is null");
                         }
                     }
                     break;
-                }
+                }*/
                 case REQ_CODE_SPEECH_INPUT: {
                     if (resultCode == RESULT_OK && null != intent) {
                         ArrayList<String> result = intent.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
@@ -534,6 +544,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
         } catch (Exception error) {
             error.printStackTrace();
+            Log.d("ERROR", error.getMessage());
             showToast("Error");
         }
     }
@@ -625,7 +636,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                 showToast("Cloud OCR Successful");
                                 List<FirebaseVisionDocumentText.Block> blocks = firebaseVisionDocumentText.getBlocks();
                                 if (blocks.size() == 0) {
-                                    showToast("No text detected.  Try again.  ");
+                                    showToast("No text detected. Try again. ");
                                     return;
                                 }
                                 for (FirebaseVisionDocumentText.Block block : blocks) {
@@ -704,9 +715,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         dispatchTakePictureIntent(REQUEST_TAKE_PHOTO_PROGRESSIVES);
     }
 
-    public void scanMachineId(View view) {
+    /*public void scanMachineId(View view) {
         dispatchTakePictureIntent(REQUEST_TAKE_PHOTO_MACHINE_ID);
-    }
+    }*/
 
     private void printRect(Rect rect) {
         String left = Integer.toString(rect.left);
