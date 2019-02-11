@@ -18,6 +18,7 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
 import android.support.v4.content.FileProvider;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -72,6 +73,8 @@ public class DataReportActivity extends AppCompatActivity {// implements Adapter
     private FirebaseAuth firebaseAuth;
     private FirebaseFirestore database;
 
+    private SwipeRefreshLayout swipeRefreshLayout;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -88,6 +91,18 @@ public class DataReportActivity extends AppCompatActivity {// implements Adapter
         }
 
         database = FirebaseFirestore.getInstance();
+        swipeRefreshLayout = (SwipeRefreshLayout)findViewById(R.id.swipeRefresh);
+        swipeRefreshLayout.setOnRefreshListener(
+                new SwipeRefreshLayout.OnRefreshListener() {
+                    @Override
+                    public void onRefresh() {
+                        // This method performs the actual data-refresh operation.
+                        // The method calls setRefreshing(false) when it's finished.
+                        executeQuery("WEEK");
+                        //swipeRefreshLayout.setRefreshing(false);
+                    }
+                }
+        );
 
         rowDataList = new ArrayList<>();
 
@@ -143,7 +158,7 @@ public class DataReportActivity extends AppCompatActivity {// implements Adapter
         }));
 
         // Read from database
-        CollectionReference scansReference = database.collection("scans");
+        /*CollectionReference scansReference = database.collection("scans");
         Query query = scansReference.whereEqualTo("uid", firebaseAuth.getCurrentUser().getUid()).orderBy("timestamp", Query.Direction.DESCENDING).limit(100); // order and limit here
         query.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
@@ -154,7 +169,8 @@ public class DataReportActivity extends AppCompatActivity {// implements Adapter
                     Log.d("DBREADER", "Error getting documents: ", task.getException());
                 }
             }
-        });
+        });*/
+        executeQuery("WEEK");
     }
 
     @Override
@@ -215,6 +231,7 @@ public class DataReportActivity extends AppCompatActivity {// implements Adapter
                 } else {
                     showToast("Unable to refresh.  Check your connection.");
                 }
+                swipeRefreshLayout.setRefreshing(false);
             }
         });
     }
@@ -299,7 +316,7 @@ public class DataReportActivity extends AppCompatActivity {// implements Adapter
 
     private String createCsvFile() {
         StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("\"Machine\",\"Progressive1\",\"Progressive2\",\"Progressive3\",\"Progressive4\",\"Progressive5\",\"Progressive6\",\"Date\"\n");
+        stringBuilder.append("\"Machine\",\"Progressive1\",\"Progressive2\",\"Progressive3\",\"Progressive4\",\"Progressive5\",\"Progressive6\",\"Date\",\"User\"\n");
         for (RowData rowData : rowDataList) {
             stringBuilder.append("\"" + getMachineIdFromString(rowData.getMachineId()) + "\",");
             stringBuilder.append("\"" + rowData.getProgressive1() + "\",");
@@ -308,14 +325,16 @@ public class DataReportActivity extends AppCompatActivity {// implements Adapter
             stringBuilder.append("\"" + rowData.getProgressive4() + "\",");
             stringBuilder.append("\"" + rowData.getProgressive5() + "\",");
             stringBuilder.append("\"" + rowData.getProgressive6() + "\",");
-            stringBuilder.append("\"" + rowData.getDate() + "\"\n");
+            stringBuilder.append("\"" + rowData.getDate() + "\",");
+            stringBuilder.append("\"" + rowData.getUser() + "\"\n");
         }
         return stringBuilder.toString();
     }
 
     public void generateReport(View view) {
         if (isExternalStorageWritable()) {
-            File csvFile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), "report.csv");
+            //File csvFile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), "report.csv");
+            File csvFile = new File(getFilesDir(), "report.csv");
             String fileContents = createCsvFile();
             try {
                 FileOutputStream fos = new FileOutputStream(csvFile);
@@ -330,27 +349,6 @@ public class DataReportActivity extends AppCompatActivity {// implements Adapter
                 //intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
 
                 startActivity(Intent.createChooser(intent, "Share to"));
-
-                /*Intent chooserIntent = Intent.createChooser(intent,"Send email");
-                chooserIntent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-
-                PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, chooserIntent, 0);
-
-                NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this, "CHANNEL_ID")
-                        //.setSmallIcon(R.mipmap.ic_stat_onesignal_default)
-                        //.setPriority(NotificationManager.IMPORTANCE_HIGH)
-                        .setSmallIcon(R.drawable.ic_launcher)
-                        .setContentTitle("Your download has completed")
-                        .setContentText("Share via email, text, or other")
-                        .setContentIntent(pendingIntent)
-                        .setColor(Color.argb(255, 0, 0, 255))
-                        .setAutoCancel(true);
-                //.setVibrate(new long[] { 1000, 1000, 1000, 1000, 1000 })
-                //.addAction(R.drawable.ic_launcher, "Share", pendingIntent);
-
-                createNotificationChannel();
-                NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
-                notificationManager.notify(1, mBuilder.build());*/
 
                 showToast("File created");
             } catch (Exception ex) {

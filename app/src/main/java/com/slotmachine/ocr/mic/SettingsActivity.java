@@ -3,30 +3,37 @@ package com.slotmachine.ocr.mic;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.drawable.ColorDrawable;
 import android.support.annotation.NonNull;
 import android.support.design.button.MaterialButton;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.InputType;
 import android.view.View;
-import android.widget.Button;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import com.firebase.ui.auth.AuthUI;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class SettingsActivity extends AppCompatActivity implements View.OnClickListener{
 
     private FirebaseAuth firebaseAuth;
+    private FirebaseFirestore database;
 
     private MaterialButton signOutButton;
     private MaterialButton changePasswordButton;
     private MaterialButton deleteAccountButton;
+    private MaterialButton chooseMinValue;
+
+    private String minimumProgressiveValue;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,14 +43,36 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         firebaseAuth = FirebaseAuth.getInstance();
+        database = FirebaseFirestore.getInstance();
 
         signOutButton = (MaterialButton)findViewById(R.id.signOutButton);
         changePasswordButton = (MaterialButton)findViewById(R.id.changePasswordButton);
         deleteAccountButton = (MaterialButton)findViewById(R.id.deleteAccountButton);
+        chooseMinValue = (MaterialButton)findViewById(R.id.chooseMinValue);
 
         signOutButton.setOnClickListener(this);
         changePasswordButton.setOnClickListener(this);
         deleteAccountButton.setOnClickListener(this);
+        chooseMinValue.setOnClickListener(this);
+
+        database.collection("users")
+                .document(firebaseAuth.getCurrentUser().getUid())
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                        if (task.isSuccessful()) {
+                            if (task.getResult().get("minimumProgressiveValue") != null) {
+                                minimumProgressiveValue = task.getResult().get("minimumProgressiveValue").toString();
+                            } else {
+                                minimumProgressiveValue = "0";
+                            }
+                            chooseMinValue.setText("Min Value - $" + minimumProgressiveValue);
+                        } else {
+                            showToast("No connection");
+                        }
+                    }
+                });
     }
 
     @Override
@@ -92,6 +121,49 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
 
         } else if (view == changePasswordButton) {
             startActivity(new Intent(SettingsActivity.this, ChangePasswordActivity.class));
+        } else if (view == chooseMinValue) {
+            final EditText input = new EditText(SettingsActivity.this);
+            input.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
+            input.requestFocus();
+            input.setHint("Enter a value");
+            android.support.v7.app.AlertDialog alertDialog = new android.support.v7.app.AlertDialog.Builder(SettingsActivity.this).create();
+            alertDialog.setView(input, 100, 70, 100, 0);
+            alertDialog.setMessage("What is the minimum value you'd like recorded?");
+            alertDialog.setButton(android.support.v7.app.AlertDialog.BUTTON_POSITIVE, "ADD",
+                    new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int i) {
+                            String minValue = input.getText().toString().trim();
+                            if (minValue.equals("")) {
+                                return;
+                            }
+                            if (isDouble(minValue)) {
+                                chooseMinValue.setText("Min Value - $" + minValue);
+
+                                Map<String, Object> user = new HashMap<>();
+                                user.put("minimumProgressiveValue", Double.parseDouble(minValue));
+                                database.collection("users")
+                                        .document(firebaseAuth.getCurrentUser().getUid())
+                                        .set(user);
+                            }
+                            dialog.dismiss();
+                        }
+                    });
+            alertDialog.show();
+        }
+    }
+
+    @Override
+    public void onBackPressed() {
+        startActivity(new Intent(SettingsActivity.this, MainActivity.class));
+        finish();
+    }
+
+    private boolean isDouble(String value) {
+        try {
+            Double.parseDouble(value);
+            return true;
+        } catch (Exception ex) {
+            return false;
         }
     }
 

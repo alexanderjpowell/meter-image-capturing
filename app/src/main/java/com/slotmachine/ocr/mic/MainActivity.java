@@ -1,8 +1,12 @@
 package com.slotmachine.ocr.mic;
 
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.ActivityNotFoundException;
+import android.content.Context;
 import android.content.DialogInterface;
+import android.content.EntityIterator;
+import android.support.constraint.ConstraintLayout;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
@@ -31,9 +35,12 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.PopupMenu;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -49,6 +56,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
@@ -107,9 +115,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private FirebaseAuth firebaseAuth;
     private FirebaseFirestore database;
 
-    private ProgressDialog progressDialog;
+    //private ProgressDialog progressDialog;
 
     private String ACTIVITY_LABEL = "User:";
+
+    private Double minimumProgressiveValue;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -181,49 +191,24 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         progressive6.addTextChangedListener(new GenericTextWatcher(progressive6));
         machineId.addTextChangedListener(new GenericTextWatcher(machineId));
 
-        //progressDialog = new ProgressDialog(this);
-        //progressDialog.setMessage("Performing OCR");
-        //progressDialog.show();
-        progressDialog = new ProgressDialog(MainActivity.this);
+        //progressDialog = new ProgressDialog(MainActivity.this);
 
-        /*String s = ((MyApplication)this.getApplication()).getUsername();
-        if (s == null) {
-            AlertDialog alertDialog = new AlertDialog.Builder(MainActivity.this).create();
-            alertDialog.setTitle("Select a username");
-            alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "OK",
-                    new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int i) {
-                            startActivity(new Intent(MainActivity.this, ManageUsersActivity.class));
-                            dialog.dismiss();
+        // Get minimum progressive amount
+        database.collection("users")
+                .document(firebaseAuth.getCurrentUser().getUid())
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                        if (task.isSuccessful()) {
+                            if (task.getResult().get("minimumProgressiveValue") != null) {
+                                minimumProgressiveValue = Double.parseDouble(task.getResult().get("minimumProgressiveValue").toString());
+                            } else {
+                                minimumProgressiveValue = 0.0;
+                            }
                         }
-                    });
-            alertDialog.show();
-        } else {
-            setTitle(ACTIVITY_LABEL + " - " + s);
-        }*/
-        //showToast(s);
-
-        /*Intent intent = getIntent();
-        if (intent.hasExtra("user")) {
-            String user = intent.getStringExtra("user");
-            showToast("User: " + user);
-            setTitle(ACTIVITY_LABEL + " - " + user);
-        } else {
-            showToast("Select a user");
-            AlertDialog alertDialog = new AlertDialog.Builder(MainActivity.this).create();
-            alertDialog.setTitle("Select a username");
-            alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "OK",
-                    new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int i) {
-                            startActivity(new Intent(MainActivity.this, ManageUsersActivity.class));
-                            dialog.dismiss();
-                        }
-                    });
-            alertDialog.show();
-        }*/
-
-        //PopupMenu popup = new PopupMenu(getApplicationContext(), submitButton);
-        //popup.show();
+                    }
+                });
     }
 
 
@@ -236,12 +221,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             case R.id.progressive1:
                 if(event.getAction() == MotionEvent.ACTION_UP) {
                     if(event.getRawX() >= (progressive1.getRight() - progressive1.getCompoundDrawables()[DRAWABLE_RIGHT].getBounds().width() - 15)) {
-                        if (progressive1.getText().toString().equals("")) {
-                            progressive = 1;
-                            startVoiceInput(1);
-                            return true;
-                        } else {
-                            progressive1.setText("");
+                        if (progressive1.getError() == null) {
+                            if (progressive1.getText().toString().equals("")) {
+                                progressive = 1;
+                                startVoiceInput(1);
+                                return true;
+                            } else {
+                                event.setAction(MotionEvent.ACTION_CANCEL);
+                                progressive1.setText("");
+                            }
                         }
                     }
                 }
@@ -249,12 +237,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             case R.id.progressive2:
                 if(event.getAction() == MotionEvent.ACTION_UP) {
                     if(event.getRawX() >= (progressive2.getRight() - progressive2.getCompoundDrawables()[DRAWABLE_RIGHT].getBounds().width() - 15)) {
-                        if (progressive2.getText().toString().equals("")) {
-                            progressive = 2;
-                            startVoiceInput(2);
-                            return true;
-                        } else {
-                            progressive2.setText("");
+                        if (progressive2.getError() == null) {
+                            if (progressive2.getText().toString().equals("")) {
+                                progressive = 2;
+                                startVoiceInput(2);
+                                return true;
+                            } else {
+                                event.setAction(MotionEvent.ACTION_CANCEL);
+                                progressive2.setText("");
+                            }
                         }
                     }
                 }
@@ -262,12 +253,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             case R.id.progressive3:
                 if(event.getAction() == MotionEvent.ACTION_UP) {
                     if(event.getRawX() >= (progressive3.getRight() - progressive3.getCompoundDrawables()[DRAWABLE_RIGHT].getBounds().width() - 15)) {
-                        if (progressive3.getText().toString().equals("")) {
-                            progressive = 3;
-                            startVoiceInput(3);
-                            return true;
-                        } else {
-                            progressive3.setText("");
+                        if (progressive3.getError() == null) {
+                            if (progressive3.getText().toString().equals("")) {
+                                progressive = 3;
+                                startVoiceInput(3);
+                                return true;
+                            } else {
+                                event.setAction(MotionEvent.ACTION_CANCEL);
+                                progressive3.setText("");
+                            }
                         }
                     }
                 }
@@ -275,12 +269,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             case R.id.progressive4:
                 if(event.getAction() == MotionEvent.ACTION_UP) {
                     if(event.getRawX() >= (progressive4.getRight() - progressive4.getCompoundDrawables()[DRAWABLE_RIGHT].getBounds().width() - 15)) {
-                        if (progressive4.getText().toString().equals("")) {
-                            progressive = 4;
-                            startVoiceInput(4);
-                            return true;
-                        } else {
-                            progressive4.setText("");
+                        if (progressive4.getError() == null) {
+                            if (progressive4.getText().toString().equals("")) {
+                                progressive = 4;
+                                startVoiceInput(4);
+                                return true;
+                            } else {
+                                event.setAction(MotionEvent.ACTION_CANCEL);
+                                progressive4.setText("");
+                            }
                         }
                     }
                 }
@@ -288,12 +285,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             case R.id.progressive5:
                 if(event.getAction() == MotionEvent.ACTION_UP) {
                     if(event.getRawX() >= (progressive5.getRight() - progressive5.getCompoundDrawables()[DRAWABLE_RIGHT].getBounds().width() - 15)) {
-                        if (progressive5.getText().toString().equals("")) {
-                            progressive = 5;
-                            startVoiceInput(5);
-                            return true;
-                        } else {
-                            progressive5.setText("");
+                        if (progressive5.getError() == null) {
+                            if (progressive5.getText().toString().equals("")) {
+                                progressive = 5;
+                                startVoiceInput(5);
+                                return true;
+                            } else {
+                                event.setAction(MotionEvent.ACTION_CANCEL);
+                                progressive5.setText("");
+                            }
                         }
                     }
                 }
@@ -301,12 +301,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             case R.id.progressive6:
                 if(event.getAction() == MotionEvent.ACTION_UP) {
                     if(event.getRawX() >= (progressive6.getRight() - progressive6.getCompoundDrawables()[DRAWABLE_RIGHT].getBounds().width() - 15)) {
-                        if (progressive6.getText().toString().equals("")) {
-                            progressive = 6;
-                            startVoiceInput(6);
-                            return true;
-                        } else {
-                            progressive6.setText("");
+                        if (progressive6.getError() == null) {
+                            if (progressive6.getText().toString().equals("")) {
+                                progressive = 6;
+                                startVoiceInput(6);
+                                return true;
+                            } else {
+                                event.setAction(MotionEvent.ACTION_CANCEL);
+                                progressive6.setText("");
+                            }
                         }
                     }
                 }
@@ -314,12 +317,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             case R.id.machineId:
                 if(event.getAction() == MotionEvent.ACTION_UP) {
                     if(event.getRawX() >= (machineId.getRight() - machineId.getCompoundDrawables()[DRAWABLE_RIGHT].getBounds().width() - 15)) {
-                        if (machineId.getText().toString().equals("")) {
-                            progressive = 7;
-                            startVoiceInput(7);
-                            return true;
-                        } else {
-                            machineId.setText("");
+                        if (machineId.getError() == null) {
+                            if (machineId.getText().toString().equals("")) {
+                                progressive = 7;
+                                startVoiceInput(7);
+                                return true;
+                            } else {
+                                event.setAction(MotionEvent.ACTION_CANCEL);
+                                machineId.setText("");
+                            }
                         }
                     }
                 }
@@ -412,18 +418,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        if (id == R.id.nav_camera) {
-
-        } else if (id == R.id.nav_gallery) {
+        if (id == R.id.nav_gallery) {
             startActivity(new Intent(MainActivity.this, DataReportActivity.class));
         } else if (id == R.id.nav_slideshow) {
             startActivity(new Intent(MainActivity.this, ManageUsersActivity.class));
         } else if (id == R.id.nav_settings) {
             startActivity(new Intent(MainActivity.this, SettingsActivity.class));
-        } else if (id == R.id.nav_share) {
-
-        } else if (id == R.id.nav_send) {
-
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -481,8 +481,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                             //newBitmap = convertToGrayscale(newBitmap);
                             processProgressivesOCR(newBitmap);
 
-                            if (file.exists())
-                                file.delete();
+                            if (file.exists()) {
+                                boolean deleted = file.delete();
+                                /*if (deleted) {
+                                    showToast("deleted");
+                                } else {
+                                    showToast("failed to delete after use");
+                                }*/
+                            }
 
 
                         } else {
@@ -491,52 +497,23 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     }
                     break;
                 }
-                /*case REQUEST_TAKE_PHOTO_MACHINE_ID: {
-                    resetMachineId();
-                    if (resultCode == RESULT_OK) {
-                        File file = new File(mCurrentPhotoPath);
-                        Bitmap bitmap = MediaStore.Images.Media.getBitmap(getApplicationContext().getContentResolver(), Uri.fromFile(file));
-
-                        if (bitmap != null) {
-
-                            //mTextView.setText("Processing...");
-                            ExifInterface exif = new ExifInterface(mCurrentPhotoPath);
-                            int rotation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL);
-                            int rotationInDegrees = exifToDegrees(rotation);
-                            //showToast("Orientation: " + Integer.toString(rotationInDegrees));
-                            Matrix matrix = new Matrix();
-                            if (rotation != 0) { matrix.preRotate(rotationInDegrees); }
-                            //setPic(matrix); // Used if need to display image to user
-                            Bitmap newBitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
-                            //newBitmap = convertToGrayscale(newBitmap);
-                            processMachineOCR(newBitmap);
-
-                            if (file.exists())
-                                file.delete();
-
-                        } else {
-                            showToast("Bitmap is null");
-                        }
-                    }
-                    break;
-                }*/
                 case REQ_CODE_SPEECH_INPUT: {
                     if (resultCode == RESULT_OK && null != intent) {
                         ArrayList<String> result = intent.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
                         if (progressive == 1) {
-                            progressive1.setText(formatVoiceToSpeech(result.get(0)));
+                            progressive1.setText(formatVoiceToSpeech(result.get(0), true));
                         } else if (progressive == 2) {
-                            progressive2.setText(formatVoiceToSpeech(result.get(0)));
+                            progressive2.setText(formatVoiceToSpeech(result.get(0), true));
                         } else if (progressive == 3) {
-                            progressive3.setText(formatVoiceToSpeech(result.get(0)));
+                            progressive3.setText(formatVoiceToSpeech(result.get(0), true));
                         } else if (progressive == 4) {
-                            progressive4.setText(formatVoiceToSpeech(result.get(0)));
+                            progressive4.setText(formatVoiceToSpeech(result.get(0), true));
                         } else if (progressive == 5) {
-                            progressive5.setText(formatVoiceToSpeech(result.get(0)));
+                            progressive5.setText(formatVoiceToSpeech(result.get(0), true));
                         } else if (progressive == 6) {
-                            progressive6.setText(formatVoiceToSpeech(result.get(0)));
+                            progressive6.setText(formatVoiceToSpeech(result.get(0), true));
                         } else if (progressive == 7) {
-                            machineId.setText(formatVoiceToSpeech(result.get(0)));
+                            machineId.setText(formatVoiceToSpeech(result.get(0), false));
                         }
                     }
                     break;
@@ -614,8 +591,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     private void processProgressivesOCR(Bitmap bitmap) {
 
-        progressDialog.setMessage("Processing...");
-        progressDialog.show();
+        //.setMessage("Processing...");
+        //progressDialog.show();
 
         FirebaseVisionImage image = FirebaseVisionImage.fromBitmap(bitmap);
         FirebaseVisionDocumentTextRecognizer detector = FirebaseVision.getInstance().getCloudDocumentTextRecognizer();
@@ -633,7 +610,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                 List<FirebaseVisionDocumentText.Word> filteredWords = new ArrayList<FirebaseVisionDocumentText.Word>();
                                 List<Rect> wordDimensions = new ArrayList<Rect>();
                                 TextParser parser = new TextParser();
-                                showToast("Cloud OCR Successful");
+                                String machineCode = "";
+                                //showToast("Cloud OCR Successful");
                                 List<FirebaseVisionDocumentText.Block> blocks = firebaseVisionDocumentText.getBlocks();
                                 if (blocks.size() == 0) {
                                     showToast("No text detected. Try again. ");
@@ -643,7 +621,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                     List<FirebaseVisionDocumentText.Paragraph> paragraphs = block.getParagraphs();
                                     for (FirebaseVisionDocumentText.Paragraph paragraph : paragraphs) {
                                         List<FirebaseVisionDocumentText.Word> words = paragraph.getWords();
+                                        Log.d("PARAGRAPTH", paragraph.getText());
+                                        if (getNumberOfOccurences(paragraph.getText()) == 2) {
+                                            int firstIndex = paragraph.getText().indexOf('#');
+                                            int secondIndex = paragraph.getText().indexOf('#', firstIndex + 1);
+                                            machineCode = paragraph.getText().substring(firstIndex+1, secondIndex).trim();
+                                        }
                                         for (FirebaseVisionDocumentText.Word word : words) {
+                                            //Log.d("WORDS", word.getText());
                                             if (!isAlpha(word.getText())) {
                                                 sb.append(word.getText().trim());
                                                 filteredWords.add(word);
@@ -657,19 +642,30 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                 Log.d("StringBuilder: ", sb.toString());
 
                                 List<String> dollarValues = TextParser.parse(filteredWords);
-                                StringBuilder builder = new StringBuilder();
-                                for (String dollar : dollarValues) {
-                                    builder.append(dollar + "\n");
+                                if (minimumProgressiveValue != null) {
+                                    List<String> newDollarValues = new ArrayList<String>() {};
+                                    for (int i = 0; i < dollarValues.size(); i++) {
+                                        if (Double.parseDouble(dollarValues.get(i)) >= minimumProgressiveValue) {
+                                            newDollarValues.add(dollarValues.get(i));
+                                        }
+                                    }
+                                    dollarValues = newDollarValues;
                                 }
+                                //StringBuilder builder = new StringBuilder();
+                                //for (String dollar : dollarValues) {
+                                //    builder.append(dollar + "\n");
+                                //}
                                 //mTextView.setText(builder.toString());
 
-                                Log.d("WORD: ", Integer.toString(filteredWords.size()));
+                                //Log.d("WORD: ", Integer.toString(filteredWords.size()));
 
-                                for (FirebaseVisionDocumentText.Word word : filteredWords) {
-                                    Log.d("WORD: ", word.getText() + " :: " + word.getBoundingBox().toString());
-                                }
+                                //for (FirebaseVisionDocumentText.Word word : filteredWords) {
+                                //    Log.d("WORD: ", word.getText() + " :: " + word.getBoundingBox().toString());
+                                //}
 
                                 // Add to TextViews
+                                machineId.setText(machineCode);
+
                                 for (int i = 0; i < dollarValues.size(); i++) {
                                     if (i == 0) {
                                         progressive1.setText(dollarValues.get(i));
@@ -701,7 +697,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                     }
                                 });
 
-        progressDialog.dismiss();
+        //progressDialog.dismiss();
     }
 
     private static int exifToDegrees(int exifOrientation) {
@@ -729,14 +725,27 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     private File createImageFile() throws IOException {
         // Create an image file name
-        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-        String imageFileName = "JPEG_" + timeStamp + "_";
-        File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+        //String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        //String imageFileName = "JPEG_" + timeStamp + "_";
+        String imageFileName = "tempMICImage";
+        File storageDir = getFilesDir();
+        //File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
         File image = File.createTempFile(
                 imageFileName,   /* prefix    */
                 ".jpg",   /* suffix    */
                 storageDir      /* directory */
         );
+
+        // Add .nomedia file to storageDir - this prevents photos being automatically saved to image gallery
+        File nomedia = new File(storageDir, ".nomedia");
+        if (!nomedia.exists()) {
+            boolean created = nomedia.createNewFile();
+            if (created)
+                showToast(".nomedia successfully created");
+            else
+                showToast("failed to create .nomedia");
+        }
+        //
 
         // Save a file: path for use with ACTION_VIEW intents
         mCurrentPhotoPath = image.getAbsolutePath();
@@ -747,6 +756,16 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG).show();
     }
 
+    private int getNumberOfOccurences(String input) {
+        int ret = 0;
+        for (int i = 0; i < input.length(); i++) {
+            if (input.charAt(i) == '#') {
+                ret++;
+            }
+        }
+        return ret;
+    }
+
     private boolean isAlpha(String name) {
         return name.matches("[a-zA-Z]+");
     }
@@ -755,11 +774,20 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         return name.matches("[0-9]+");
     }
 
+    private boolean allProgressivesEmpty() {
+        return (progressive1.getText().toString().trim().isEmpty()
+                && progressive2.getText().toString().trim().isEmpty()
+                && progressive3.getText().toString().trim().isEmpty()
+                && progressive4.getText().toString().trim().isEmpty()
+                && progressive5.getText().toString().trim().isEmpty()
+                && progressive6.getText().toString().trim().isEmpty());
+    }
+
     public void submitOnClick(View view) {
 
-        //submitButton.setEnabled(false);
+        sortProgressives();
 
-        // Write to database
+        // Get data points
         String machineIdText = machineId.getText().toString().trim();
         String progressiveText1 = progressive1.getText().toString().trim();
         String progressiveText2 = progressive2.getText().toString().trim();
@@ -770,7 +798,36 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         String displayNameText = firebaseAuth.getCurrentUser().getDisplayName().trim();
         String emailText = firebaseAuth.getCurrentUser().getEmail().trim();
         String userId = firebaseAuth.getCurrentUser().getUid().trim();
-        String userName = spinner.getSelectedItem().toString();
+        String userName = (spinner.getSelectedItem() == null) ? "No user selected" : spinner.getSelectedItem().toString();
+
+        // First, make sure machine id isn't blank
+        if (machineIdText.isEmpty()) {
+            //machineId.setError("Required");
+            //showToast("Please add machine id");
+            AlertDialog alertDialog = new AlertDialog.Builder(MainActivity.this).create();
+            alertDialog.setMessage("Please add machine ID");
+            alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "OK",
+                    new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int i) {
+                            dialog.dismiss();
+                        }
+                    });
+            alertDialog.show();
+            return;
+        }
+        if (allProgressivesEmpty()) {
+            //showToast("Please enter at lease one progressive value");
+            AlertDialog alertDialog = new AlertDialog.Builder(MainActivity.this).create();
+            alertDialog.setMessage("Please enter at lease one progressive value");
+            alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "OK",
+                    new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int i) {
+                            dialog.dismiss();
+                        }
+                    });
+            alertDialog.show();
+            return;
+        }
 
         Map<String, Object> user = new HashMap<>();
         user.put("name", displayNameText);
@@ -791,6 +848,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         resetMachineId();
         resetProgressives();
         showToast("Progressives submitted successfully");
+        hideKeyboard();
+    }
+
+    public void hideKeyboard() {
+        //ConstraintLayout layout = (ConstraintLayout)findViewById(R.id.mainConstraintLayout);
+        LinearLayout layout = findViewById(R.id.mainLinearLayout);
+        InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(layout.getWindowToken(), 0);
     }
 
     private void startVoiceInput(int progressive) {
@@ -801,6 +866,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             intent.putExtra(RecognizerIntent.EXTRA_PROMPT, "What is the slot machine ID number?");
         else
             intent.putExtra(RecognizerIntent.EXTRA_PROMPT, "What is the current progressive value?");
+
         intent.putExtra("progressive", progressive);
         try {
             startActivityForResult(intent, REQ_CODE_SPEECH_INPUT);
@@ -809,19 +875,51 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
     }
 
-    private String formatVoiceToSpeech(String text) {
+    private String formatVoiceToSpeech(String text, boolean isProgressive) {
+        showToast(text);
         text = text.toLowerCase();
         String original = text;
+        StringBuilder newText = new StringBuilder();
+        String[] words = text.split("\\s");
+        for (int i = 0; i < words.length; i++) {
+            //words[i] = convertString(words[i]);
+            newText.append(convertString(words[i]));
+        }
+        text = newText.toString();
+
         text = text.replaceAll("\\s",""); // Removes all spaces
         text = text.replaceAll("[^0-9]",""); // Removes all but digits
-        if (original.contains("progressive")) {
-            if (original.length() >= 3) {
+        if (original.contains("progressive") || isProgressive) {
+            if (text.length() >= 3) {
                 return text.substring(0, text.length() - 2) + "." + text.substring(text.length() - 2);
             }
         } else if (original.contains("machine")) {
             return text;
         }
         return text;
+    }
+
+    private String convertString(String number) {
+        if (number.trim().equals("one")) {
+            return "1";
+        } else if (number.trim().equals("two")) {
+            return "2";
+        } else if (number.trim().equals("three")) {
+            return "3";
+        } else if (number.trim().equals("four")) {
+            return "4";
+        } else if (number.trim().equals("five")) {
+            return "5";
+        } else if (number.trim().equals("six")) {
+            return "6";
+        } else if (number.trim().equals("seven")) {
+            return "7";
+        } else if (number.trim().equals("eight")) {
+            return "8";
+        } else if (number.trim().equals("nine")) {
+            return "9";
+        }
+        return number.trim(); // return original string if no match
     }
 
     private class GenericTextWatcher implements TextWatcher {
@@ -851,7 +949,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
     }
 
-    public void sortProgressives(View view) {
+    public void sortProgressives() {
 
         List<Double> values = new ArrayList<Double>();
 

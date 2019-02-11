@@ -1,74 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context=".MainActivity"
-    tools:showIn="@layout/app_bar_main"
-    android:background="@drawable/background">
+    android:fillViewport="true"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
 
     <LinearLayout
+        android:id="@+id/mainLinearLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical"
-            android:layout_alignParentBottom="true"
-            android:paddingLeft="10dp"
-            android:paddingRight="10dp"
-            android:focusable="true"
-            android:focusableInTouchMode="true">
-
-            <android.support.design.button.MaterialButton
-                android:id="@+id/mButton2"
-                style="@style/Widget.MaterialComponents.Button.OutlinedButton.Icon"
-                android:backgroundTint="@color/submit_button_color"
-                app:icon="@drawable/ic_menu_camera"
-                android:text="Scan Progressives"
-                android:layout_width="match_parent"
-                android:layout_height="60dp"
-                android:paddingLeft="10dp"
-                android:paddingRight="10dp"
-                android:onClick="scanProgressives"/>
-
-            <!--<LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal">
-
-                style="@style/Widget.MaterialComponents.Button.Icon"
-                <android.support.design.button.MaterialButton
-                    android:id="@+id/mButton1"
-                    style="@style/Widget.MaterialComponents.Button.OutlinedButton.Icon"
-                    android:backgroundTint="@color/submit_button_color"
-                    app:icon="@drawable/ic_menu_camera"
-                    android:text="Machine"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="0.8"
-                    android:layout_marginRight="5dp"
-                    android:padding="10dp"
-                    android:onClick="scanMachineId"/>
-
-                android:layout_weight="0.8"
-                <android.support.design.button.MaterialButton
-                    android:id="@+id/mButton2"
-                    style="@style/Widget.MaterialComponents.Button.OutlinedButton.Icon"
-                    android:backgroundTint="@color/submit_button_color"
-                    app:icon="@drawable/ic_menu_camera"
-                    android:text="Progressives"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="5dp"
-                    android:padding="10dp"
-                    android:onClick="scanProgressives"/>
-
-            </LinearLayout>-->
+        android:orientation="vertical"
+        android:paddingTop="10dp"
+        android:paddingBottom="10dp"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
+        android:background="@color/jet">
 
             <android.support.design.widget.TextInputLayout
                 android:id="@+id/inputLayout0"
@@ -77,13 +28,12 @@
                 android:hint="Machine ID"
                 style="@style/TextInputLayoutStyle">
 
-                <!--android:drawableEnd="@android:drawable/ic_menu_close_clear_cancel"-->
                 <android.support.design.widget.TextInputEditText
                     android:id="@+id/machineId"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:drawableEnd="@drawable/ic_mic"
-                    android:textSize="25dp"
+                    android:textSize="25sp"
                     android:inputType="numberDecimal"
                     android:paddingStart="20dp"
                     android:maxLines="1"/>
@@ -295,40 +245,46 @@
 
             </RelativeLayout>
 
-            <LinearLayout
+            <View
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal">
+                android:layout_height="1dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="10dp"
+                android:background="@android:color/darker_gray"/>
 
-                <!--android:layout_weight="0.85"-->
-                <android.support.design.button.MaterialButton
-                    android:id="@+id/submit_button"
-                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                    android:backgroundTint="@color/submit_button_color"
-                    android:layout_width="320dp"
-                    android:layout_height="60dp"
-                    android:layout_weight="0.85"
-                    android:enabled="true"
-                    android:text="Submit"
-                    android:onClick="submitOnClick"
-                    android:textSize="15sp"
-                    android:layout_marginRight="5dp"/>
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
 
-                <android.support.design.button.MaterialButton
-                    android:id="@+id/sortButton"
-                    style="@style/Widget.MaterialComponents.Button.OutlinedButton.Icon"
-                    android:backgroundTint="@color/submit_button_color"
-                    app:icon="@drawable/baseline_sort_black_2"
-                    android:layout_width="60dp"
-                    android:layout_height="60dp"
-                    android:textSize="15sp"
-                    android:layout_marginLeft="5dp"
-                    android:onClick="sortProgressives"/>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal">
 
-            </LinearLayout>
+                    <android.support.design.button.MaterialButton
+                        android:id="@+id/mButton2"
+                        style="@style/Widget.MaterialComponents.Button.OutlinedButton.Icon"
+                        android:backgroundTint="@color/submit_button_color"
+                        app:icon="@drawable/ic_menu_camera"
+                        android:text="Scan Progressives"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:onClick="scanProgressives"
+                        android:layout_marginRight="5dp"/>
 
-        </LinearLayout>
+                    <android.support.design.button.MaterialButton
+                        android:id="@+id/submit_button"
+                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                        android:backgroundTint="@color/submit_button_color"
+                        android:text="Submit"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:onClick="submitOnClick"
+                        android:layout_marginLeft="5dp"/>
 
+                </LinearLayout>
+            </RelativeLayout>
     </LinearLayout>
-
-</android.support.constraint.ConstraintLayout>
+</ScrollView>
