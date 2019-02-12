@@ -9,6 +9,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.InputType;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -63,7 +64,7 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
                     public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                         if (task.isSuccessful()) {
                             if (task.getResult().get("minimumProgressiveValue") != null) {
-                                minimumProgressiveValue = task.getResult().get("minimumProgressiveValue").toString();
+                                minimumProgressiveValue = formatDollarValue(task.getResult().get("minimumProgressiveValue").toString());
                             } else {
                                 minimumProgressiveValue = "0";
                             }
@@ -129,6 +130,7 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
             android.support.v7.app.AlertDialog alertDialog = new android.support.v7.app.AlertDialog.Builder(SettingsActivity.this).create();
             alertDialog.setView(input, 100, 70, 100, 0);
             alertDialog.setMessage("What is the minimum value you'd like recorded?");
+            alertDialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
             alertDialog.setButton(android.support.v7.app.AlertDialog.BUTTON_POSITIVE, "ADD",
                     new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int i) {
@@ -169,5 +171,14 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
 
     private void showToast(String message) {
         Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG).show();
+    }
+
+    private String formatDollarValue(String text) {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < text.length(); i++) {
+            if (text.charAt(i) == '.') break;
+            sb.append(text.charAt(i));
+        }
+        return sb.toString();
     }
 }

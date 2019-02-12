@@ -591,9 +591,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     private void processProgressivesOCR(Bitmap bitmap) {
 
-        //.setMessage("Processing...");
-        //progressDialog.show();
-
         FirebaseVisionImage image = FirebaseVisionImage.fromBitmap(bitmap);
         FirebaseVisionDocumentTextRecognizer detector = FirebaseVision.getInstance().getCloudDocumentTextRecognizer();
         Task<FirebaseVisionDocumentText> result =
@@ -609,9 +606,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                 StringBuilder sb = new StringBuilder();
                                 List<FirebaseVisionDocumentText.Word> filteredWords = new ArrayList<FirebaseVisionDocumentText.Word>();
                                 List<Rect> wordDimensions = new ArrayList<Rect>();
-                                TextParser parser = new TextParser();
-                                String machineCode = "";
-                                //showToast("Cloud OCR Successful");
+                                String machineCode = machineId.getText().toString();
                                 List<FirebaseVisionDocumentText.Block> blocks = firebaseVisionDocumentText.getBlocks();
                                 if (blocks.size() == 0) {
                                     showToast("No text detected. Try again. ");
@@ -621,7 +616,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                     List<FirebaseVisionDocumentText.Paragraph> paragraphs = block.getParagraphs();
                                     for (FirebaseVisionDocumentText.Paragraph paragraph : paragraphs) {
                                         List<FirebaseVisionDocumentText.Word> words = paragraph.getWords();
-                                        Log.d("PARAGRAPTH", paragraph.getText());
+                                        Log.d("PARAGRAPH", paragraph.getText());
                                         if (getNumberOfOccurences(paragraph.getText()) == 2) {
                                             int firstIndex = paragraph.getText().indexOf('#');
                                             int secondIndex = paragraph.getText().indexOf('#', firstIndex + 1);
@@ -785,70 +780,71 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     public void submitOnClick(View view) {
 
-        sortProgressives();
+        try {
+            sortProgressives();
 
-        // Get data points
-        String machineIdText = machineId.getText().toString().trim();
-        String progressiveText1 = progressive1.getText().toString().trim();
-        String progressiveText2 = progressive2.getText().toString().trim();
-        String progressiveText3 = progressive3.getText().toString().trim();
-        String progressiveText4 = progressive4.getText().toString().trim();
-        String progressiveText5 = progressive5.getText().toString().trim();
-        String progressiveText6 = progressive6.getText().toString().trim();
-        String displayNameText = firebaseAuth.getCurrentUser().getDisplayName().trim();
-        String emailText = firebaseAuth.getCurrentUser().getEmail().trim();
-        String userId = firebaseAuth.getCurrentUser().getUid().trim();
-        String userName = (spinner.getSelectedItem() == null) ? "No user selected" : spinner.getSelectedItem().toString();
+            // Get data points
+            String machineIdText = machineId.getText().toString().trim();
+            String progressiveText1 = progressive1.getText().toString().trim();
+            String progressiveText2 = progressive2.getText().toString().trim();
+            String progressiveText3 = progressive3.getText().toString().trim();
+            String progressiveText4 = progressive4.getText().toString().trim();
+            String progressiveText5 = progressive5.getText().toString().trim();
+            String progressiveText6 = progressive6.getText().toString().trim();
+            String displayNameText = firebaseAuth.getCurrentUser().getDisplayName().trim();
+            String emailText = firebaseAuth.getCurrentUser().getEmail().trim();
+            String userId = firebaseAuth.getCurrentUser().getUid().trim();
+            String userName = (spinner.getSelectedItem() == null) ? "No user selected" : spinner.getSelectedItem().toString();
 
-        // First, make sure machine id isn't blank
-        if (machineIdText.isEmpty()) {
-            //machineId.setError("Required");
-            //showToast("Please add machine id");
-            AlertDialog alertDialog = new AlertDialog.Builder(MainActivity.this).create();
-            alertDialog.setMessage("Please add machine ID");
-            alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "OK",
-                    new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int i) {
-                            dialog.dismiss();
-                        }
-                    });
-            alertDialog.show();
-            return;
+            // First, make sure machine id isn't blank
+            if (machineIdText.isEmpty()) {
+                AlertDialog alertDialog = new AlertDialog.Builder(MainActivity.this).create();
+                alertDialog.setMessage("Please add machine ID");
+                alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "OK",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int i) {
+                                dialog.dismiss();
+                            }
+                        });
+                alertDialog.show();
+                return;
+            }
+            if (allProgressivesEmpty()) {
+                AlertDialog alertDialog = new AlertDialog.Builder(MainActivity.this).create();
+                alertDialog.setMessage("Please enter at lease one progressive value");
+                alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "OK",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int i) {
+                                dialog.dismiss();
+                            }
+                        });
+                alertDialog.show();
+                return;
+            }
+
+            Map<String, Object> user = new HashMap<>();
+            user.put("name", displayNameText);
+            user.put("email", emailText);
+            user.put("uid", userId);
+            user.put("progressive1", progressiveText1);
+            user.put("progressive2", progressiveText2);
+            user.put("progressive3", progressiveText3);
+            user.put("progressive4", progressiveText4);
+            user.put("progressive5", progressiveText5);
+            user.put("progressive6", progressiveText6);
+            user.put("machine_id", machineIdText);
+            user.put("timestamp", FieldValue.serverTimestamp());
+            user.put("userName", userName);
+
+            database.collection("scans").document().set(user);
+
+            resetMachineId();
+            resetProgressives();
+            showToast("Progressives submitted successfully");
+            hideKeyboard();
+        } catch (Exception ex) {
+            showToast("No connection");
         }
-        if (allProgressivesEmpty()) {
-            //showToast("Please enter at lease one progressive value");
-            AlertDialog alertDialog = new AlertDialog.Builder(MainActivity.this).create();
-            alertDialog.setMessage("Please enter at lease one progressive value");
-            alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "OK",
-                    new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int i) {
-                            dialog.dismiss();
-                        }
-                    });
-            alertDialog.show();
-            return;
-        }
-
-        Map<String, Object> user = new HashMap<>();
-        user.put("name", displayNameText);
-        user.put("email", emailText);
-        user.put("uid", userId);
-        user.put("progressive1", progressiveText1);
-        user.put("progressive2", progressiveText2);
-        user.put("progressive3", progressiveText3);
-        user.put("progressive4", progressiveText4);
-        user.put("progressive5", progressiveText5);
-        user.put("progressive6", progressiveText6);
-        user.put("machine_id", machineIdText);
-        user.put("timestamp", FieldValue.serverTimestamp());
-        user.put("userName", userName);
-
-        database.collection("scans").document().set(user);
-
-        resetMachineId();
-        resetProgressives();
-        showToast("Progressives submitted successfully");
-        hideKeyboard();
     }
 
     public void hideKeyboard() {

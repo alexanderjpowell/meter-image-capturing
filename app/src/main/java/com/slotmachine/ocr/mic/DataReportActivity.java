@@ -37,6 +37,7 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -50,6 +51,8 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+
+import org.w3c.dom.Text;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -105,7 +108,6 @@ public class DataReportActivity extends AppCompatActivity {// implements Adapter
         );
 
         rowDataList = new ArrayList<>();
-
         recyclerView = (RecyclerView)findViewById(R.id.recycler_view);
         mAdapter = new ReportDataAdapter(DataReportActivity.this, rowDataList);
 
@@ -118,36 +120,31 @@ public class DataReportActivity extends AppCompatActivity {// implements Adapter
         recyclerView.addOnItemTouchListener(new RecyclerTouchListener(getApplicationContext(), recyclerView, new RecyclerTouchListener.ClickListener() {
             @Override
             public void onClick(View view, int position) {
-                RowData rowData = rowDataList.get(position);
-                showToast(rowData.getMachineId() + " is selected");
-                startActivity(new Intent(DataReportActivity.this, EditScanActivity.class));
+                //RowData rowData = rowDataList.get(position);
+                //showToast(rowData.getMachineId() + " is selected");
+                //startActivity(new Intent(DataReportActivity.this, EditScanActivity.class));
             }
 
             @Override
-            public void onLongClick(View view, int position) {
-                RowData rowData = rowDataList.get(position);
-                showToast("Long Click on " + rowData.getMachineId());
+            public void onLongClick(View view, final int position) {
+                final RowData rowData = rowDataList.get(position);
+                showToast(rowData.getDocumentId());
 
-                final EditText input = new EditText(DataReportActivity.this);
-                //final EditText input2 = new EditText(DataReportActivity.this);
+                //final EditText input = new EditText(DataReportActivity.this);
                 AlertDialog alertDialog = new AlertDialog.Builder(DataReportActivity.this).create();
-                alertDialog.setTitle("Alert");
-                alertDialog.setMessage("Alert message to be shown");
-                alertDialog.setView(input, 100, 0, 100, 0);
-                //alertDialog.setView(input2, 100, 100, 100, 100);
-                alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
+                alertDialog.setMessage("Are you sure you want to delete this scan?");
+                //alertDialog.setView(input, 100, 0, 100, 0);
+                alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "Yes",
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int i) {
+                                deleteScanFromDatabase(rowData.getDocumentId());
+                                rowDataList.remove(position);
+                                mAdapter.notifyItemRemoved(position);
+                                mAdapter.notifyItemRangeChanged(position, rowDataList.size());
                                 dialog.dismiss();
                             }
                         });
-                alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "CLEAR",
-                        new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int i) {
-                                dialog.dismiss();
-                            }
-                        });
-                alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, "DELETE",
+                alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, "CANCEL",
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int i) {
                                 dialog.dismiss();
@@ -157,19 +154,6 @@ public class DataReportActivity extends AppCompatActivity {// implements Adapter
             }
         }));
 
-        // Read from database
-        /*CollectionReference scansReference = database.collection("scans");
-        Query query = scansReference.whereEqualTo("uid", firebaseAuth.getCurrentUser().getUid()).orderBy("timestamp", Query.Direction.DESCENDING).limit(100); // order and limit here
-        query.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                if (task.isSuccessful()) {
-                    prepareData(task.getResult());
-                } else {
-                    Log.d("DBREADER", "Error getting documents: ", task.getException());
-                }
-            }
-        });*/
         executeQuery("WEEK");
     }
 
@@ -209,6 +193,10 @@ public class DataReportActivity extends AppCompatActivity {// implements Adapter
         return super.onOptionsItemSelected(item);
     }
 
+    private void deleteScanFromDatabase(String document_id) {
+        database.collection("scans").document(document_id).delete();
+    }
+
     private void executeQuery(String dateRange) {
         int offset = 0;
         if (dateRange.equals("HOUR"))
@@ -246,7 +234,6 @@ public class DataReportActivity extends AppCompatActivity {// implements Adapter
 
             machine_id = document.get("machine_id").toString();
             timestamp = document.get("timestamp").toString();
-            //user = "Alex";
             user = (document.get("userName") == null) ? "User not specified" : document.get("userName").toString();
             progressive1 = document.get("progressive1").toString().trim().isEmpty() ? "" : "$" + document.get("progressive1").toString().trim();
             progressive2 = document.get("progressive2").toString().trim().isEmpty() ? "" : "$" + document.get("progressive2").toString().trim();
@@ -255,7 +242,8 @@ public class DataReportActivity extends AppCompatActivity {// implements Adapter
             progressive5 = document.get("progressive5").toString().trim().isEmpty() ? "" : "$" + document.get("progressive5").toString().trim();
             progressive6 = document.get("progressive6").toString().trim().isEmpty() ? "" : "$" + document.get("progressive6").toString().trim();
 
-            rowData = new RowData("Machine ID: " + machine_id,
+            rowData = new RowData(document.getId(),
+                    "Machine ID: " + machine_id,
                     timestamp,
                     user,
                     progressive1,
@@ -275,37 +263,9 @@ public class DataReportActivity extends AppCompatActivity {// implements Adapter
         Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG).show();
     }
 
-    private void showSnackBar(View view, String message) {
-        Snackbar.make(view, message, Snackbar.LENGTH_LONG).show();
-    }
-
     public boolean isExternalStorageWritable() {
         String state = Environment.getExternalStorageState();
-        if (Environment.MEDIA_MOUNTED.equals(state)) {
-            return true;
-        }
-        return false;
-    }
-
-    private File createImageFile(String data) throws IOException {
-        // Create an image file name
-        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-        String imageFileName = "report_" + timeStamp + "_";
-        File storageDir = new File(Environment.getExternalStoragePublicDirectory(
-                Environment.DIRECTORY_DCIM), "Camera");
-        //File storageDir = new File(Environment.getExternalStoragePublicDirectory(
-        //        Environment.DIRECTORY_DOWNLOADS));
-        File image = File.createTempFile(
-                imageFileName,   /* prefix */
-                ".csv",   /* suffix */
-                storageDir      /* directory */
-        );
-        FileWriter fw = new FileWriter(image, true);
-        fw.write(data);
-        fw.flush();
-        fw.close();
-
-        return image;
+        return Environment.MEDIA_MOUNTED.equals(state);
     }
 
     private String getMachineIdFromString(String text) {
@@ -333,7 +293,6 @@ public class DataReportActivity extends AppCompatActivity {// implements Adapter
 
     public void generateReport(View view) {
         if (isExternalStorageWritable()) {
-            //File csvFile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), "report.csv");
             File csvFile = new File(getFilesDir(), "report.csv");
             String fileContents = createCsvFile();
             try {
@@ -346,7 +305,6 @@ public class DataReportActivity extends AppCompatActivity {// implements Adapter
                 intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
                 intent.putExtra(Intent.EXTRA_STREAM, uri);
                 intent.setType("text/csv");
-                //intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
 
                 startActivity(Intent.createChooser(intent, "Share to"));
 
@@ -356,64 +314,6 @@ public class DataReportActivity extends AppCompatActivity {// implements Adapter
             }
         } else {
             showToast("Cannot write to external storage");
-        }
-    }
-
-    /*public void generateReportt(View view) {
-        showSnackBar(view, "Download ");
-
-        File file = new File("");
-        String fileContents = createCsvFile();
-        showToast(fileContents);
-        try {
-            file = createImageFile(fileContents);
-        } catch (Exception ex) {
-            showToast(ex.getMessage());
-            return;
-        }
-
-        // Share with other apps
-        Uri contentUri = getUriForFile(getApplicationContext(), "com.slotmachine.ocr.mic.fileprovider", file);
-        Intent intentToEmailFile = new Intent(Intent.ACTION_SEND);
-        intentToEmailFile.setType("text/plain");
-        intentToEmailFile.putExtra(Intent.EXTRA_STREAM, contentUri);
-        intentToEmailFile.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-        intentToEmailFile.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);//
-        Intent chooserIntent = Intent.createChooser(intentToEmailFile,"Send email");
-        //startActivityForResult(chooserIntent, 1);
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, chooserIntent, 0);
-
-        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this, "CHANNEL_ID")
-                //.setSmallIcon(R.mipmap.ic_stat_onesignal_default)
-                //.setPriority(NotificationManager.IMPORTANCE_HIGH)
-                .setSmallIcon(R.drawable.ic_launcher)
-                .setContentTitle("Your download has completed")
-                .setContentText("Share via email, text, or other")
-                .setContentIntent(pendingIntent)
-                .setColor(Color.argb(255, 0, 0, 255))
-                .setAutoCancel(true);
-                //.setVibrate(new long[] { 1000, 1000, 1000, 1000, 1000 })
-                //.addAction(R.drawable.ic_launcher, "Share", pendingIntent);
-
-        createNotificationChannel();
-        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
-        notificationManager.notify(1, mBuilder.build());
-
-    }*/
-
-    private void createNotificationChannel() {
-        // Create the NotificationChannel, but only on API 26+ because
-        // the NotificationChannel class is new and not in the support library
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            CharSequence name = "Reports generated";
-            String description = "channel description";
-            int importance = NotificationManager.IMPORTANCE_HIGH;
-            NotificationChannel channel = new NotificationChannel("CHANNEL_ID", name, importance);
-            channel.setDescription(description);
-            // Register the channel with the system; you can't change the importance
-            // or other notification behaviors after this
-            NotificationManager notificationManager = getSystemService(NotificationManager.class);
-            notificationManager.createNotificationChannel(channel);
         }
     }
 }
