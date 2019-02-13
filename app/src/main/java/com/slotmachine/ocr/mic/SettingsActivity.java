@@ -11,6 +11,7 @@ import android.text.InputType;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.firebase.ui.auth.AuthUI;
@@ -18,6 +19,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.UserProfileChangeRequest;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
@@ -33,6 +35,8 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
     private MaterialButton changePasswordButton;
     private MaterialButton deleteAccountButton;
     private MaterialButton chooseMinValue;
+    private MaterialButton changeEmailButton;
+    private TextView emailTextView;
 
     private String minimumProgressiveValue;
 
@@ -44,17 +48,25 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         firebaseAuth = FirebaseAuth.getInstance();
+        if (firebaseAuth.getCurrentUser() == null) {
+            startActivity(new Intent(SettingsActivity.this, LoginActivity.class));
+            finish();
+            return;
+        }
         database = FirebaseFirestore.getInstance();
 
         signOutButton = (MaterialButton)findViewById(R.id.signOutButton);
         changePasswordButton = (MaterialButton)findViewById(R.id.changePasswordButton);
         deleteAccountButton = (MaterialButton)findViewById(R.id.deleteAccountButton);
         chooseMinValue = (MaterialButton)findViewById(R.id.chooseMinValue);
+        //changeEmailButton = (MaterialButton)findViewById(R.id.changeEmailButton);
+        emailTextView = (TextView)findViewById(R.id.emailTextView);
 
         signOutButton.setOnClickListener(this);
         changePasswordButton.setOnClickListener(this);
         deleteAccountButton.setOnClickListener(this);
         chooseMinValue.setOnClickListener(this);
+        //changeEmailButton.setOnClickListener(this);
 
         database.collection("users")
                 .document(firebaseAuth.getCurrentUser().getUid())
@@ -74,6 +86,8 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
                         }
                     }
                 });
+
+        emailTextView.setText("email: " + firebaseAuth.getCurrentUser().getEmail());
     }
 
     @Override
@@ -109,7 +123,7 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
                                 public void onComplete(@NonNull Task<Void> task) {
                                     if (task.isSuccessful()) {
                                         finish();
-                                        startActivity(new Intent(SettingsActivity.this, SignUpActivity.class));
+                                        startActivity(new Intent(SettingsActivity.this, LoginActivity.class));
                                     } else {
                                         showToast(task.getException().getMessage());
                                     }
@@ -151,6 +165,11 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
                         }
                     });
             alertDialog.show();
+        } else if (view == changeEmailButton) {
+            showToast("clicked");
+
+            FirebaseUser user = firebaseAuth.getCurrentUser();
+            //user.updateEmail("<email>")
         }
     }
 

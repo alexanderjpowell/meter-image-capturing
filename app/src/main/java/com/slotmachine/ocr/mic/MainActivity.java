@@ -158,11 +158,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         NavigationView navigationView = (NavigationView)findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
         View headerView = navigationView.getHeaderView(0);
-        navDrawerText1 = headerView.findViewById(R.id.navDrawerText1);
-        navDrawerText2 = headerView.findViewById(R.id.navDrawerText2);
-        String userName = firebaseAuth.getCurrentUser().getDisplayName();
-        navDrawerText1.setText("Meter Image Capturing");
-        navDrawerText2.setText("Welcome " + userName + "!");
+        //navDrawerText1 = headerView.findViewById(R.id.navDrawerText1);
+        //navDrawerText2 = headerView.findViewById(R.id.navDrawerText2);
+        //String userName = firebaseAuth.getCurrentUser().getDisplayName();
+        //navDrawerText1.setText("Meter Image Capturing");
+        //navDrawerText2.setText("Welcome " + userName + "!");
 
         progressive1 = (TextInputEditText)findViewById(R.id.progressive1);
         progressive2 = (TextInputEditText)findViewById(R.id.progressive2);
@@ -190,8 +190,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         progressive5.addTextChangedListener(new GenericTextWatcher(progressive5));
         progressive6.addTextChangedListener(new GenericTextWatcher(progressive6));
         machineId.addTextChangedListener(new GenericTextWatcher(machineId));
-
-        //progressDialog = new ProgressDialog(MainActivity.this);
 
         // Get minimum progressive amount
         database.collection("users")
@@ -791,7 +789,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             String progressiveText4 = progressive4.getText().toString().trim();
             String progressiveText5 = progressive5.getText().toString().trim();
             String progressiveText6 = progressive6.getText().toString().trim();
-            String displayNameText = firebaseAuth.getCurrentUser().getDisplayName().trim();
+            //String displayNameText = firebaseAuth.getCurrentUser().getDisplayName().trim();
             String emailText = firebaseAuth.getCurrentUser().getEmail().trim();
             String userId = firebaseAuth.getCurrentUser().getUid().trim();
             String userName = (spinner.getSelectedItem() == null) ? "No user selected" : spinner.getSelectedItem().toString();
@@ -823,7 +821,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
 
             Map<String, Object> user = new HashMap<>();
-            user.put("name", displayNameText);
+            //user.put("name", displayNameText);
             user.put("email", emailText);
             user.put("uid", userId);
             user.put("progressive1", progressiveText1);

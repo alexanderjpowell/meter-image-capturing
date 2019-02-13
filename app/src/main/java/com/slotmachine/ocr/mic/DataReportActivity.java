@@ -120,9 +120,20 @@ public class DataReportActivity extends AppCompatActivity {// implements Adapter
         recyclerView.addOnItemTouchListener(new RecyclerTouchListener(getApplicationContext(), recyclerView, new RecyclerTouchListener.ClickListener() {
             @Override
             public void onClick(View view, int position) {
-                //RowData rowData = rowDataList.get(position);
-                //showToast(rowData.getMachineId() + " is selected");
-                //startActivity(new Intent(DataReportActivity.this, EditScanActivity.class));
+                RowData rowData = rowDataList.get(position);
+                //showToast(rowData.getDocumentId());
+
+                Intent intent = new Intent(DataReportActivity.this, EditScanActivity.class);
+                intent.putExtra("MACHINE_ID", getMachineIdFromString(rowData.getMachineId()));
+                intent.putExtra("PROGRESSIVE_1", removeDollarSignFromString(rowData.getProgressive1()));
+                intent.putExtra("PROGRESSIVE_2", removeDollarSignFromString(rowData.getProgressive2()));
+                intent.putExtra("PROGRESSIVE_3", removeDollarSignFromString(rowData.getProgressive3()));
+                intent.putExtra("PROGRESSIVE_4", removeDollarSignFromString(rowData.getProgressive4()));
+                intent.putExtra("PROGRESSIVE_5", removeDollarSignFromString(rowData.getProgressive5()));
+                intent.putExtra("PROGRESSIVE_6", removeDollarSignFromString(rowData.getProgressive6()));
+                intent.putExtra("DOCUMENT_ID", rowData.getDocumentId());
+
+                startActivity(intent);
             }
 
             @Override
@@ -271,6 +282,11 @@ public class DataReportActivity extends AppCompatActivity {// implements Adapter
     private String getMachineIdFromString(String text) {
         //Machine ID: 9792// <- Example of what text looks like
         text = text.replace("Machine ID: ", "");
+        return text;
+    }
+
+    private String removeDollarSignFromString(String text) {
+        text = text.replace("$", "");
         return text;
     }
 

@@ -33,7 +33,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:drawableEnd="@drawable/ic_mic"
-                    android:textSize="25sp"
+                    android:textSize="30sp"
                     android:inputType="numberDecimal"
                     android:paddingStart="20dp"
                     android:maxLines="1"/>
@@ -63,7 +63,7 @@
                         android:layout_height="wrap_content"
                         android:drawableEnd="@drawable/ic_mic"
                         android:paddingRight="20dp"
-                        android:textSize="25dp"
+                        android:textSize="30sp"
                         android:inputType="numberDecimal"
                         android:paddingStart="40dp"
                         android:maxLines="1"/>
@@ -73,8 +73,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:paddingStart="15dp"
-                    android:paddingTop="17dp"
-                    android:textSize="25dp"
+                    android:paddingTop="16dp"
+                    android:textSize="30sp"
                     android:text="$"
                     android:textColor="#FF000000"/>
 
@@ -96,7 +96,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:drawableEnd="@drawable/ic_mic"
-                        android:textSize="25dp"
+                        android:textSize="30sp"
                         android:inputType="numberDecimal"
                         android:paddingStart="40dp"
                         android:maxLines="1"/>
@@ -106,8 +106,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:paddingStart="15dp"
-                    android:paddingTop="17dp"
-                    android:textSize="25dp"
+                    android:paddingTop="16dp"
+                    android:textSize="30sp"
                     android:text="$"
                     android:textColor="#FF000000"/>
 
@@ -129,7 +129,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:drawableEnd="@drawable/ic_mic"
-                        android:textSize="25dp"
+                        android:textSize="30sp"
                         android:inputType="numberDecimal"
                         android:paddingStart="40dp"
                         android:maxLines="1"/>
@@ -139,8 +139,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:paddingStart="15dp"
-                    android:paddingTop="17dp"
-                    android:textSize="25dp"
+                    android:paddingTop="16dp"
+                    android:textSize="30sp"
                     android:text="$"
                     android:textColor="#FF000000"/>
 
@@ -162,7 +162,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:drawableEnd="@drawable/ic_mic"
-                        android:textSize="25dp"
+                        android:textSize="30sp"
                         android:inputType="numberDecimal"
                         android:paddingStart="40dp"
                         android:maxLines="1"/>
@@ -172,8 +172,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:paddingStart="15dp"
-                    android:paddingTop="17dp"
-                    android:textSize="25dp"
+                    android:paddingTop="16dp"
+                    android:textSize="30sp"
                     android:text="$"
                     android:textColor="#FF000000"/>
 
@@ -195,7 +195,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:drawableEnd="@drawable/ic_mic"
-                        android:textSize="25dp"
+                        android:textSize="30sp"
                         android:inputType="numberDecimal"
                         android:paddingStart="40dp"
                         android:maxLines="1"/>
@@ -205,8 +205,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:paddingStart="15dp"
-                    android:paddingTop="17dp"
-                    android:textSize="25dp"
+                    android:paddingTop="16dp"
+                    android:textSize="30sp"
                     android:text="$"
                     android:textColor="#FF000000"/>
 
@@ -228,7 +228,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:drawableEnd="@drawable/ic_mic"
-                        android:textSize="25dp"
+                        android:textSize="30sp"
                         android:inputType="numberDecimal"
                         android:paddingStart="40dp"
                         android:maxLines="1"/>
@@ -238,8 +238,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:paddingStart="15dp"
-                    android:paddingTop="17dp"
-                    android:textSize="25dp"
+                    android:paddingTop="16dp"
+                    android:textSize="30sp"
                     android:text="$"
                     android:textColor="#FF000000"/>
 
@@ -252,40 +252,36 @@
                 android:layout_marginBottom="10dp"
                 android:background="@android:color/darker_gray"/>
 
-            <RelativeLayout
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="horizontal">
 
-                <LinearLayout
-                    android:layout_width="match_parent"
+                <android.support.design.button.MaterialButton
+                    android:id="@+id/mButton2"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton.Icon"
+                    android:backgroundTint="@color/submit_button_color"
+                    app:icon="@drawable/ic_menu_camera"
+                    android:text="Scan Progressives"
+                    android:layout_width="0dp"
                     android:layout_height="match_parent"
-                    android:orientation="horizontal">
+                    android:layout_weight="1"
+                    android:onClick="scanProgressives"
+                    android:layout_marginRight="5dp"/>
 
-                    <android.support.design.button.MaterialButton
-                        android:id="@+id/mButton2"
-                        style="@style/Widget.MaterialComponents.Button.OutlinedButton.Icon"
-                        android:backgroundTint="@color/submit_button_color"
-                        app:icon="@drawable/ic_menu_camera"
-                        android:text="Scan Progressives"
-                        android:layout_width="0dp"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1"
-                        android:onClick="scanProgressives"
-                        android:layout_marginRight="5dp"/>
+                <android.support.design.button.MaterialButton
+                    android:id="@+id/submit_button"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    android:backgroundTint="@color/submit_button_color"
+                    android:text="Submit"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:onClick="submitOnClick"
+                    android:layout_marginLeft="5dp"/>
 
-                    <android.support.design.button.MaterialButton
-                        android:id="@+id/submit_button"
-                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                        android:backgroundTint="@color/submit_button_color"
-                        android:text="Submit"
-                        android:layout_width="0dp"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1"
-                        android:onClick="submitOnClick"
-                        android:layout_marginLeft="5dp"/>
-
-                </LinearLayout>
-            </RelativeLayout>
+            </LinearLayout>
 
             <View
                 android:layout_width="match_parent"

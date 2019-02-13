@@ -27,7 +27,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     private EditText emailEditText;
     private EditText passwordEditText;
     private Button loginButton;
-    private TextView signinActivityTextView;
+    //private TextView signinActivityTextView;
 
     private ProgressDialog progressDialog;
 
@@ -46,12 +46,12 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         emailEditText = (EditText)findViewById(R.id.emailEditText);
         passwordEditText = (EditText)findViewById(R.id.passwordEditText);
         loginButton = (Button)findViewById(R.id.loginButton);
-        signinActivityTextView = (TextView)findViewById(R.id.signinActivityTextView);
+        //signinActivityTextView = (TextView)findViewById(R.id.signinActivityTextView);
 
         progressDialog = new ProgressDialog(this);
 
         loginButton.setOnClickListener(this);
-        signinActivityTextView.setOnClickListener(this);
+        //signinActivityTextView.setOnClickListener(this);
     }
 
     private void userLogin() {
@@ -94,10 +94,10 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     public void onClick(View view) {
         if (view == loginButton) {
             userLogin();
-        } else if (view == signinActivityTextView) {
-            finish();
-            startActivity(new Intent(LoginActivity.this, SignUpActivity.class));
-        }
+        } //else if (view == signinActivityTextView) {
+            //finish();
+            //startActivity(new Intent(LoginActivity.this, SignUpActivity.class));
+        //}
     }
 
     // Prevent back press from logging user back in

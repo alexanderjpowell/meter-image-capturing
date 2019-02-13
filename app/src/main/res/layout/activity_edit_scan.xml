@@ -4,6 +4,253 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/jet"
     tools:context=".EditScanActivity">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:padding="10dp"
+            android:orientation="vertical">
+
+            <android.support.design.widget.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Machine ID"
+                style="@style/TextInputLayoutStyle">
+
+                <android.support.design.widget.TextInputEditText
+                    android:id="@+id/machineId"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="25sp"
+                    android:inputType="numberDecimal"
+                    android:paddingStart="20dp"
+                    android:maxLines="1"/>
+            </android.support.design.widget.TextInputLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="10dp"
+                android:background="@android:color/darker_gray"/>
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <android.support.design.widget.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Progressive 1"
+                    style="@style/TextInputLayoutStyle">
+
+                    <android.support.design.widget.TextInputEditText
+                        android:id="@+id/progressive1"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:paddingRight="20dp"
+                        android:textSize="25dp"
+                        android:inputType="numberDecimal"
+                        android:paddingStart="40dp"
+                        android:maxLines="1"/>
+                </android.support.design.widget.TextInputLayout>
+
+                <android.support.v7.widget.AppCompatTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingStart="15dp"
+                    android:paddingTop="17dp"
+                    android:textSize="25dp"
+                    android:text="$"
+                    android:textColor="#FF000000"/>
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <android.support.design.widget.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Progressive 2"
+                    style="@style/TextInputLayoutStyle">
+
+                    <android.support.design.widget.TextInputEditText
+                        android:id="@+id/progressive2"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:paddingRight="20dp"
+                        android:textSize="25dp"
+                        android:inputType="numberDecimal"
+                        android:paddingStart="40dp"
+                        android:maxLines="1"/>
+                </android.support.design.widget.TextInputLayout>
+
+                <android.support.v7.widget.AppCompatTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingStart="15dp"
+                    android:paddingTop="17dp"
+                    android:textSize="25dp"
+                    android:text="$"
+                    android:textColor="#FF000000"/>
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <android.support.design.widget.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Progressive 3"
+                    style="@style/TextInputLayoutStyle">
+
+                    <android.support.design.widget.TextInputEditText
+                        android:id="@+id/progressive3"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:paddingRight="20dp"
+                        android:textSize="25dp"
+                        android:inputType="numberDecimal"
+                        android:paddingStart="40dp"
+                        android:maxLines="1"/>
+                </android.support.design.widget.TextInputLayout>
+
+                <android.support.v7.widget.AppCompatTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingStart="15dp"
+                    android:paddingTop="17dp"
+                    android:textSize="25dp"
+                    android:text="$"
+                    android:textColor="#FF000000"/>
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <android.support.design.widget.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Progressive 4"
+                    style="@style/TextInputLayoutStyle">
+
+                    <android.support.design.widget.TextInputEditText
+                        android:id="@+id/progressive4"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:paddingRight="20dp"
+                        android:textSize="25dp"
+                        android:inputType="numberDecimal"
+                        android:paddingStart="40dp"
+                        android:maxLines="1"/>
+                </android.support.design.widget.TextInputLayout>
+
+                <android.support.v7.widget.AppCompatTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingStart="15dp"
+                    android:paddingTop="17dp"
+                    android:textSize="25dp"
+                    android:text="$"
+                    android:textColor="#FF000000"/>
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <android.support.design.widget.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Progressive 5"
+                    style="@style/TextInputLayoutStyle">
+
+                    <android.support.design.widget.TextInputEditText
+                        android:id="@+id/progressive5"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:paddingRight="20dp"
+                        android:textSize="25dp"
+                        android:inputType="numberDecimal"
+                        android:paddingStart="40dp"
+                        android:maxLines="1"/>
+                </android.support.design.widget.TextInputLayout>
+
+                <android.support.v7.widget.AppCompatTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingStart="15dp"
+                    android:paddingTop="17dp"
+                    android:textSize="25dp"
+                    android:text="$"
+                    android:textColor="#FF000000"/>
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <android.support.design.widget.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Progressive 6"
+                    style="@style/TextInputLayoutStyle">
+
+                    <android.support.design.widget.TextInputEditText
+                        android:id="@+id/progressive6"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:paddingRight="20dp"
+                        android:textSize="25dp"
+                        android:inputType="numberDecimal"
+                        android:paddingStart="40dp"
+                        android:maxLines="1"/>
+                </android.support.design.widget.TextInputLayout>
+
+                <android.support.v7.widget.AppCompatTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingStart="15dp"
+                    android:paddingTop="17dp"
+                    android:textSize="25dp"
+                    android:text="$"
+                    android:textColor="#FF000000"/>
+
+            </RelativeLayout>
+
+            <android.support.design.widget.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:hint="Notes"
+                style="@style/TextInputLayoutStyle">
+
+                <android.support.design.widget.TextInputEditText
+                    android:id="@+id/notes"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:textSize="25dp"
+                    android:inputType="textMultiLine"
+                    android:paddingStart="20dp"
+                    android:minLines="5"
+                    android:gravity="start"/>
+            </android.support.design.widget.TextInputLayout>
+
+        </LinearLayout>
+
+    </ScrollView>
 
 </android.support.constraint.ConstraintLayout>
