@@ -14,6 +14,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.InputType;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -139,6 +140,7 @@ public class ManageUsersActivity extends AppCompatActivity implements MyRecycler
         input.setHint("Employee name");
         AlertDialog alertDialog = new AlertDialog.Builder(ManageUsersActivity.this).create();
         alertDialog.setView(input, 100, 70, 100, 0);
+        alertDialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
         alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "ADD",
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int i) {

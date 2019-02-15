@@ -6,6 +6,7 @@ import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.EntityIterator;
+import android.graphics.Color;
 import android.support.constraint.ConstraintLayout;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -143,6 +144,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         Toolbar toolbar = (Toolbar)findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        // Set nav header color
+        int color = Color.parseColor("#2196F3");
+        NavigationView navView = findViewById(R.id.nav_view);
+        View header = navView.getHeaderView(0);
+        header.setBackgroundColor(color);
 
         //
         database = FirebaseFirestore.getInstance();
@@ -399,10 +406,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        if (id == R.id.action_settings) {
-            showToast(spinner.getSelectedItem().toString());
-            return true;
-        } else if (id == R.id.action_bar_spinner) {
+        //if (id == R.id.action_settings) {
+            //showToast(spinner.getSelectedItem().toString());
+            //return true;
+         if (id == R.id.action_bar_spinner) {
             showToast(spinner.getSelectedItem().toString());
             return true;
         }
