@@ -33,6 +33,11 @@ public class ChangePasswordActivity extends AppCompatActivity implements View.On
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         firebaseAuth = FirebaseAuth.getInstance();
+        if (firebaseAuth.getCurrentUser() == null) {
+            startActivity(new Intent(ChangePasswordActivity.this, LoginActivity.class));
+            finish();
+            return;
+        }
 
         currentPasswordEditText = (EditText)findViewById(R.id.currentPasswordEditText);
         newPassword1EditText = (EditText)findViewById(R.id.newPassword1EditText);

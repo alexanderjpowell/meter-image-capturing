@@ -27,6 +27,7 @@ import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.InputType;
+import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -61,9 +62,11 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 
 import static android.support.v4.content.FileProvider.getUriForFile;
 
@@ -94,7 +97,7 @@ public class DataReportActivity extends AppCompatActivity {// implements Adapter
         }
 
         database = FirebaseFirestore.getInstance();
-        swipeRefreshLayout = (SwipeRefreshLayout)findViewById(R.id.swipeRefresh);
+        swipeRefreshLayout = findViewById(R.id.swipeRefresh);
         swipeRefreshLayout.setOnRefreshListener(
                 new SwipeRefreshLayout.OnRefreshListener() {
                     @Override
@@ -108,7 +111,7 @@ public class DataReportActivity extends AppCompatActivity {// implements Adapter
         );
 
         rowDataList = new ArrayList<>();
-        recyclerView = (RecyclerView)findViewById(R.id.recycler_view);
+        recyclerView = findViewById(R.id.recycler_view);
         mAdapter = new ReportDataAdapter(DataReportActivity.this, rowDataList);
 
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
@@ -243,8 +246,10 @@ public class DataReportActivity extends AppCompatActivity {// implements Adapter
 
         for (QueryDocumentSnapshot document : snapshot) {
 
+            //document.getTimestamp("timestamp").toDate().toString()
+
             machine_id = document.get("machine_id").toString();
-            timestamp = document.get("timestamp").toString();
+            timestamp = document.getTimestamp("timestamp").toDate().toString();
             user = (document.get("userName") == null) ? "User not specified" : document.get("userName").toString();
             progressive1 = document.get("progressive1").toString().trim().isEmpty() ? "" : "$" + document.get("progressive1").toString().trim();
             progressive2 = document.get("progressive2").toString().trim().isEmpty() ? "" : "$" + document.get("progressive2").toString().trim();

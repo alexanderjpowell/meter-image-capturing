@@ -132,14 +132,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         // Ensure user is signed in
         firebaseAuth = FirebaseAuth.getInstance();
         if (firebaseAuth.getCurrentUser() == null) {
-            showToast("not logged in");
-            Log.d("AUTHENTICATION", "not logged in");
-
             startActivity(new Intent(MainActivity.this, LoginActivity.class));
             finish();
             return;
         }
-        Log.d("AUTHENTICATION", "logged in");
         //
 
         Toolbar toolbar = (Toolbar)findViewById(R.id.toolbar);
