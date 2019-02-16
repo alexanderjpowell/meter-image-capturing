@@ -61,5 +61,12 @@
             android:gravity="center"
             android:textSize="16dip"/>-->
 
+        <!--<TextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="More Info"
+            android:gravity="center"
+            android:textSize="16sp"/>-->
+
     </LinearLayout>
 </ScrollView>
