@@ -44,6 +44,7 @@ public class ReportDataAdapter extends RecyclerView.Adapter<ReportDataAdapter.Re
         holder.progressiveTextView4.setText(rowData.getProgressive4());
         holder.progressiveTextView5.setText(rowData.getProgressive5());
         holder.progressiveTextView6.setText(rowData.getProgressive6());
+        holder.notesTextView.setText(rowData.getNotes());
 
         holder.checkBox.setChecked(rowData.isSelected());
         holder.checkBox.setTag(rowDataList.get(position));
@@ -75,6 +76,7 @@ public class ReportDataAdapter extends RecyclerView.Adapter<ReportDataAdapter.Re
         TextView machineIdTextView, dateTextView, userNameTextView;
         TextView progressiveTextView1, progressiveTextView2, progressiveTextView3;
         TextView progressiveTextView4, progressiveTextView5, progressiveTextView6;
+        TextView notesTextView;
         CheckBox checkBox;
 
         public ReportDataHolder(View itemView) {
@@ -89,6 +91,7 @@ public class ReportDataAdapter extends RecyclerView.Adapter<ReportDataAdapter.Re
             progressiveTextView4 = itemView.findViewById(R.id.progressiveTextView4);
             progressiveTextView5 = itemView.findViewById(R.id.progressiveTextView5);
             progressiveTextView6 = itemView.findViewById(R.id.progressiveTextView6);
+            notesTextView = itemView.findViewById(R.id.notesTextView);
             checkBox = itemView.findViewById(R.id.checkBox);
         }
     }

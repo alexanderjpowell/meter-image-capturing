@@ -134,6 +134,7 @@ public class DataReportActivity extends AppCompatActivity {// implements Adapter
                 intent.putExtra("PROGRESSIVE_4", removeDollarSignFromString(rowData.getProgressive4()));
                 intent.putExtra("PROGRESSIVE_5", removeDollarSignFromString(rowData.getProgressive5()));
                 intent.putExtra("PROGRESSIVE_6", removeDollarSignFromString(rowData.getProgressive6()));
+                intent.putExtra("NOTES", rowData.getNotes());
                 intent.putExtra("DOCUMENT_ID", rowData.getDocumentId());
 
                 startActivity(intent);
@@ -142,7 +143,7 @@ public class DataReportActivity extends AppCompatActivity {// implements Adapter
             @Override
             public void onLongClick(View view, final int position) {
                 final RowData rowData = rowDataList.get(position);
-                showToast(rowData.getDocumentId());
+                //showToast(rowData.getDocumentId());
 
                 //final EditText input = new EditText(DataReportActivity.this);
                 AlertDialog alertDialog = new AlertDialog.Builder(DataReportActivity.this).create();
@@ -196,7 +197,7 @@ public class DataReportActivity extends AppCompatActivity {// implements Adapter
                 }
                 count++;
             }
-            showToast(data);
+            //showToast(data);
         } else if (id == R.id.action_past_hour) {
             executeQuery("HOUR");
         } else if (id == R.id.action_past_day) {
@@ -240,13 +241,11 @@ public class DataReportActivity extends AppCompatActivity {// implements Adapter
 
     private void prepareData(QuerySnapshot snapshot) {
 
-        String machine_id, timestamp, user, progressive1, progressive2, progressive3, progressive4, progressive5, progressive6;
+        String machine_id, timestamp, user, progressive1, progressive2, progressive3, progressive4, progressive5, progressive6, notes;
         RowData rowData;
         rowDataList.clear(); // reset the current data list
 
         for (QueryDocumentSnapshot document : snapshot) {
-
-            //document.getTimestamp("timestamp").toDate().toString()
 
             machine_id = document.get("machine_id").toString();
             timestamp = document.getTimestamp("timestamp").toDate().toString();
@@ -257,6 +256,7 @@ public class DataReportActivity extends AppCompatActivity {// implements Adapter
             progressive4 = document.get("progressive4").toString().trim().isEmpty() ? "" : "$" + document.get("progressive4").toString().trim();
             progressive5 = document.get("progressive5").toString().trim().isEmpty() ? "" : "$" + document.get("progressive5").toString().trim();
             progressive6 = document.get("progressive6").toString().trim().isEmpty() ? "" : "$" + document.get("progressive6").toString().trim();
+            notes = (document.get("notes") == null) ? "" : document.get("notes").toString().trim();
 
             rowData = new RowData(document.getId(),
                     "Machine ID: " + machine_id,
@@ -268,6 +268,7 @@ public class DataReportActivity extends AppCompatActivity {// implements Adapter
                     progressive4,
                     progressive5,
                     progressive6,
+                    notes,
                     false);
             rowDataList.add(rowData);
         }
@@ -329,7 +330,7 @@ public class DataReportActivity extends AppCompatActivity {// implements Adapter
 
                 startActivity(Intent.createChooser(intent, "Share to"));
 
-                showToast("File created");
+                //showToast("File created");
             } catch (Exception ex) {
                 showToast(ex.getMessage());
             }

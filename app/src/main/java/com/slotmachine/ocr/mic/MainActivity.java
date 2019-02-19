@@ -736,10 +736,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         File nomedia = new File(storageDir, ".nomedia");
         if (!nomedia.exists()) {
             boolean created = nomedia.createNewFile();
-            if (created)
+            /*if (created)
                 showToast(".nomedia successfully created");
             else
-                showToast("failed to create .nomedia");
+                showToast("failed to create .nomedia");*/
         }
         //
 
@@ -836,6 +836,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             user.put("machine_id", machineIdText);
             user.put("timestamp", FieldValue.serverTimestamp());
             user.put("userName", userName);
+            user.put("notes", "");
 
             database.collection("scans").document().set(user);
 
@@ -873,7 +874,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     private String formatVoiceToSpeech(String text, boolean isProgressive) {
-        showToast(text);
+        //showToast(text);
         text = text.toLowerCase();
         String original = text;
         StringBuilder newText = new StringBuilder();

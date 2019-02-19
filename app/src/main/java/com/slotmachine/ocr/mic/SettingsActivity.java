@@ -166,7 +166,7 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
                     });
             alertDialog.show();
         } else if (view == changeEmailButton) {
-            showToast("clicked");
+            //showToast("clicked");
 
             FirebaseUser user = firebaseAuth.getCurrentUser();
             //user.updateEmail("<email>")

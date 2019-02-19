@@ -3,7 +3,7 @@ package com.slotmachine.ocr.mic;
 // POJO for scan data displayed to the user
 public class RowData {
 
-    private String documentId, machineId, date, user, progressive1, progressive2, progressive3, progressive4, progressive5, progressive6;
+    private String documentId, machineId, date, user, progressive1, progressive2, progressive3, progressive4, progressive5, progressive6, notes;
     private boolean isSelected;
 
     public RowData(String documentId,
@@ -16,6 +16,7 @@ public class RowData {
                    String progressive4,
                    String progressive5,
                    String progressive6,
+                   String notes,
                    boolean isSelected) {
         this.documentId = documentId;
         this.machineId = machineId;
@@ -27,6 +28,7 @@ public class RowData {
         this.progressive4 = progressive4;
         this.progressive5 = progressive5;
         this.progressive6 = progressive6;
+        this.notes = notes;
         this.isSelected = isSelected;
     }
 
@@ -95,6 +97,9 @@ public class RowData {
     public void setProgressive6(String progressive6) {
         this.progressive6 = progressive6;
     }
+
+    public String getNotes() { return this.notes; }
+    public void setNotes(String notes) { this.notes = notes; }
 
     public boolean isSelected() { return isSelected; }
     public void setSelected(boolean isSelected) {

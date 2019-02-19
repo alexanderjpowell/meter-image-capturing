@@ -41,6 +41,7 @@ public class EditScanActivity extends AppCompatActivity {
     private String progressive_4;
     private String progressive_5;
     private String progressive_6;
+    private String notes_text;
     private String document_id;
 
     @Override
@@ -77,6 +78,7 @@ public class EditScanActivity extends AppCompatActivity {
         progressive_4 = intent.getStringExtra("PROGRESSIVE_4");
         progressive_5 = intent.getStringExtra("PROGRESSIVE_5");
         progressive_6 = intent.getStringExtra("PROGRESSIVE_6");
+        notes_text = intent.getStringExtra("NOTES");
         document_id = intent.getStringExtra("DOCUMENT_ID");
 
         machineId.setText(machine_id);
@@ -86,6 +88,7 @@ public class EditScanActivity extends AppCompatActivity {
         progressive4.setText(progressive_4);
         progressive5.setText(progressive_5);
         progressive6.setText(progressive_6);
+        notes.setText(notes_text);
     }
 
     @Override
@@ -107,7 +110,6 @@ public class EditScanActivity extends AppCompatActivity {
         int id = item.getItemId();
 
         if (id == R.id.action_save_changes) {
-            showToast("clicked");
             saveToDatabase();
             return true;
         }
