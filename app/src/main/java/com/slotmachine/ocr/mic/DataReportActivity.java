@@ -298,7 +298,7 @@ public class DataReportActivity extends AppCompatActivity {// implements Adapter
 
     private String createCsvFile() {
         StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("\"Machine\",\"Progressive1\",\"Progressive2\",\"Progressive3\",\"Progressive4\",\"Progressive5\",\"Progressive6\",\"Date\",\"User\"\n");
+        stringBuilder.append("\"Machine\",\"Progressive1\",\"Progressive2\",\"Progressive3\",\"Progressive4\",\"Progressive5\",\"Progressive6\", \"Notes\",\"Date\",\"User\"\n");
         for (RowData rowData : rowDataList) {
             stringBuilder.append("\"" + getMachineIdFromString(rowData.getMachineId()) + "\",");
             stringBuilder.append("\"" + rowData.getProgressive1() + "\",");
@@ -307,6 +307,7 @@ public class DataReportActivity extends AppCompatActivity {// implements Adapter
             stringBuilder.append("\"" + rowData.getProgressive4() + "\",");
             stringBuilder.append("\"" + rowData.getProgressive5() + "\",");
             stringBuilder.append("\"" + rowData.getProgressive6() + "\",");
+            stringBuilder.append("\"" + rowData.getNotes() + "\",");
             stringBuilder.append("\"" + rowData.getDate() + "\",");
             stringBuilder.append("\"" + rowData.getUser() + "\"\n");
         }

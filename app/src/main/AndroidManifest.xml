@@ -43,7 +43,8 @@
             android:name=".SettingsActivity"
             android:label="Settings"
             android:parentActivityName=".MainActivity"
-            android:theme="@style/SettingsTheme">
+            android:theme="@style/SettingsTheme"
+            android:screenOrientation="portrait">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".MainActivity" />
@@ -52,7 +53,8 @@
             android:name=".ChangePasswordActivity"
             android:label="Change Password"
             android:parentActivityName=".SettingsActivity"
-            android:theme="@style/SettingsTheme">
+            android:theme="@style/SettingsTheme"
+            android:screenOrientation="portrait">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".SettingsActivity" />
@@ -61,7 +63,8 @@
             android:name=".DataReportActivity"
             android:label="Completed Scans"
             android:parentActivityName=".MainActivity"
-            android:theme="@style/SettingsTheme">
+            android:theme="@style/SettingsTheme"
+            android:screenOrientation="portrait">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".MainActivity" />
@@ -70,7 +73,8 @@
             android:name=".ManageUsersActivity"
             android:label="Manage Users"
             android:parentActivityName=".MainActivity"
-            android:theme="@style/SettingsTheme">
+            android:theme="@style/SettingsTheme"
+            android:screenOrientation="portrait">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".MainActivity" />
@@ -79,7 +83,8 @@
             android:name=".EditScanActivity"
             android:label="Edit Data"
             android:parentActivityName=".DataReportActivity"
-            android:theme="@style/SettingsTheme">
+            android:theme="@style/SettingsTheme"
+            android:screenOrientation="portrait">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".DataReportActivity" />
