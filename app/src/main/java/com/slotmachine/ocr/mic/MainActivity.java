@@ -90,6 +90,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public static final int REQUEST_TAKE_PHOTO_PROGRESSIVES = 0;
     public static final int MY_PERMISSIONS_REQUEST_CODE = 1;
     public static final int REQUEST_TAKE_PHOTO_MACHINE_ID = 2;
+    public static final int REQUEST_SETTINGS_ACTIVITY = 3;
+    public static final int REQUEST_DATA_REPORT_ACTIVITY = 4;
 
     private static final int REQ_CODE_SPEECH_INPUT = 100;
 
@@ -383,52 +385,20 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                             if (spinnerArray.isEmpty()) {
                                 spinnerArray.add("No users created");
                             }
+                            Collections.sort(spinnerArray);
                             ArrayAdapter<String> adapter = new ArrayAdapter<String>(MainActivity.this, R.layout.spinner_item, spinnerArray);
                             adapter.setDropDownViewResource(R.layout.spinner_item);
                             spinner.setAdapter(adapter);
+
+                            MyApplication app = (MyApplication)getApplication();
+                            int userNameIndex = app.getUsernameIndex() == null ? 0 : app.getUsernameIndex();
+                            spinner.setSelection(userNameIndex);
                         } else {
                             showToast("Error getting users");
                         }
                     }
                 });
 
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //if (id == R.id.action_settings) {
-            //showToast(spinner.getSelectedItem().toString());
-            //return true;
-         if (id == R.id.action_bar_spinner) {
-            showToast(spinner.getSelectedItem().toString());
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
-
-    @SuppressWarnings("StatementWithEmptyBody")
-    @Override
-    public boolean onNavigationItemSelected(MenuItem item) {
-        // Handle navigation view item clicks here.
-        int id = item.getItemId();
-
-        if (id == R.id.nav_gallery) {
-            startActivity(new Intent(MainActivity.this, DataReportActivity.class));
-        } else if (id == R.id.nav_slideshow) {
-            startActivity(new Intent(MainActivity.this, ManageUsersActivity.class));
-        } else if (id == R.id.nav_settings) {
-            startActivity(new Intent(MainActivity.this, SettingsActivity.class));
-        }
-
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        drawer.closeDrawer(GravityCompat.START);
         return true;
     }
 
@@ -457,8 +427,56 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+
+        //showToast("testing");
+
+        //if (id == R.id.action_settings) {
+            //showToast(spinner.getSelectedItem().toString());
+            //return true;
+        if (id == R.id.action_bar_spinner) {
+            //showToast("spinner");
+            showToast(spinner.getSelectedItem().toString());
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+    @SuppressWarnings("StatementWithEmptyBody")
+    @Override
+    public boolean onNavigationItemSelected(MenuItem item) {
+        // Handle navigation view item clicks here.
+        int id = item.getItemId();
+
+        Intent intent;
+        MyApplication app = (MyApplication)getApplication();
+        app.setUsernameIndex(spinner.getSelectedItemPosition());
+
+        if (id == R.id.nav_gallery) {
+            intent = new Intent(MainActivity.this, DataReportActivity.class);
+            startActivity(intent);
+        } else if (id == R.id.nav_slideshow) {
+            intent = new Intent(MainActivity.this, ManageUsersActivity.class);
+            startActivity(intent);
+        } else if (id == R.id.nav_settings) {
+            intent = new Intent(MainActivity.this, SettingsActivity.class);
+            startActivity(intent);
+        }
+
+        DrawerLayout drawer = (DrawerLayout)findViewById(R.id.drawer_layout);
+        drawer.closeDrawer(GravityCompat.START);
+        return true;
+    }
+
+    @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
         super.onActivityResult(requestCode, resultCode, intent);
+        //showToast("onActivityResult");
         try {
             switch (requestCode) {
                 case REQUEST_TAKE_PHOTO_PROGRESSIVES: {
@@ -470,25 +488,17 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
                         if (bitmap != null) {
 
-                            //mTextView.setText("Processing...");
                             ExifInterface exif = new ExifInterface(mCurrentPhotoPath);
                             int rotation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL);
                             int rotationInDegrees = exifToDegrees(rotation);
-                            //showToast("Orientation: " + Integer.toString(rotationInDegrees));
                             Matrix matrix = new Matrix();
                             if (rotation != 0) { matrix.preRotate(rotationInDegrees); }
                             //setPic(matrix); // Used if need to display image to user
                             Bitmap newBitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
-                            //newBitmap = convertToGrayscale(newBitmap);
                             processProgressivesOCR(newBitmap);
 
                             if (file.exists()) {
                                 boolean deleted = file.delete();
-                                /*if (deleted) {
-                                    showToast("deleted");
-                                } else {
-                                    showToast("failed to delete after use");
-                                }*/
                             }
 
 
@@ -517,6 +527,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                             machineId.setText(formatVoiceToSpeech(result.get(0), false));
                         }
                     }
+                    break;
+                }
+                case REQUEST_SETTINGS_ACTIVITY: {
+                    //showToast("coming from settings activity");
                     break;
                 }
             }

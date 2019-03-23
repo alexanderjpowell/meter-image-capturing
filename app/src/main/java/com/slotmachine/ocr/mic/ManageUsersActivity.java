@@ -31,6 +31,7 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -67,7 +68,6 @@ public class ManageUsersActivity extends AppCompatActivity implements MyRecycler
         DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(recyclerView.getContext(),
                 layoutManager.getOrientation());
         recyclerView.addItemDecoration(dividerItemDecoration);
-        //adapter = new MyRecyclerViewAdapter(this, usersList);
         adapter.setClickListener(this);
         recyclerView.setAdapter(adapter);
 
@@ -89,11 +89,7 @@ public class ManageUsersActivity extends AppCompatActivity implements MyRecycler
         recyclerView.addOnItemTouchListener(new RecyclerTouchListener(getApplicationContext(), recyclerView, new RecyclerTouchListener.ClickListener() {
             @Override
             public void onClick(View view, int position) {
-                //showToast("short click on " + Integer.toString(position));
-                //((MyApplication)ManageUsersActivity.this.getApplication()).setUsername(usersList.get(position));
-                //Intent intent = new Intent(ManageUsersActivity.this, MainActivity.class);
-                //intent.putExtra("user", usersList.get(position));
-                //startActivity(intent);
+                // Add action here
             }
 
             @Override
@@ -175,6 +171,7 @@ public class ManageUsersActivity extends AppCompatActivity implements MyRecycler
         for (QueryDocumentSnapshot document : snapshot) {
             usersList.add(document.get("displayName").toString());
         }
+        Collections.sort(usersList);
         adapter.notifyDataSetChanged();
     }
 
@@ -185,6 +182,9 @@ public class ManageUsersActivity extends AppCompatActivity implements MyRecycler
                 .collection("displayNames")
                 .document(name)
                 .delete();
+
+        MyApplication app = (MyApplication)getApplication();
+        app.setUsernameIndex(0); // Hacky fix for indexOutOfRangeException
     }
 
     private void showToast(String message) {
