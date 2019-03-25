@@ -10,7 +10,9 @@ import android.os.Bundle;
 import android.text.InputType;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -31,12 +33,13 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
     private FirebaseAuth firebaseAuth;
     private FirebaseFirestore database;
 
+    private Switch sortProgressivesSwitch;
     private MaterialButton signOutButton;
     private MaterialButton changePasswordButton;
     private MaterialButton deleteAccountButton;
     private MaterialButton chooseMinValue;
     private MaterialButton changeEmailButton;
-    private TextView emailTextView;
+    //private TextView emailTextView;
 
     private String minimumProgressiveValue;
 
@@ -55,12 +58,23 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
         }
         database = FirebaseFirestore.getInstance();
 
+        sortProgressivesSwitch = (Switch)findViewById(R.id.sortProgressivesSwitch);
         signOutButton = (MaterialButton)findViewById(R.id.signOutButton);
         changePasswordButton = (MaterialButton)findViewById(R.id.changePasswordButton);
         deleteAccountButton = (MaterialButton)findViewById(R.id.deleteAccountButton);
         chooseMinValue = (MaterialButton)findViewById(R.id.chooseMinValue);
         //changeEmailButton = (MaterialButton)findViewById(R.id.changeEmailButton);
-        emailTextView = (TextView)findViewById(R.id.emailTextView);
+        //emailTextView = (TextView)findViewById(R.id.emailTextView);
+
+
+        sortProgressivesSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (sortProgressivesSwitch.isChecked())
+                    setSortProgressives(true);
+                else
+                    setSortProgressives(false);
+            }
+        });
 
         signOutButton.setOnClickListener(this);
         changePasswordButton.setOnClickListener(this);
@@ -75,19 +89,41 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
                     @Override
                     public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                         if (task.isSuccessful()) {
+
                             if (task.getResult().get("minimumProgressiveValue") != null) {
                                 minimumProgressiveValue = formatDollarValue(task.getResult().get("minimumProgressiveValue").toString());
                             } else {
                                 minimumProgressiveValue = "0";
                             }
                             chooseMinValue.setText("Min Value - $" + minimumProgressiveValue);
+
+                            if (task.getResult().get("sortProgressives") != null) {
+                                boolean sort = (boolean)task.getResult().get("sortProgressives");
+                                if (sort)
+                                    sortProgressivesSwitch.setChecked(true);
+                                else
+                                    sortProgressivesSwitch.setChecked(false);
+                            } else {
+                                setSortProgressives(true);
+                                sortProgressivesSwitch.setChecked(true);
+                            }
                         } else {
                             showToast("No connection");
                         }
                     }
                 });
 
-        emailTextView.setText("email: " + firebaseAuth.getCurrentUser().getEmail());
+        //emailTextView.setText("email: " + firebaseAuth.getCurrentUser().getEmail());
+
+
+    }
+
+    private void setSortProgressives(boolean isSort) {
+        Map<String, Boolean> user = new HashMap<>();
+        user.put("sortProgressives", isSort);
+        database.collection("users")
+                .document(firebaseAuth.getCurrentUser().getUid())
+                .set(user);
     }
 
     @Override

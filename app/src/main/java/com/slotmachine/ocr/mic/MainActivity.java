@@ -123,6 +123,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private String ACTIVITY_LABEL = "User:";
 
     private Double minimumProgressiveValue;
+    private Boolean autoSortProgressives = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -208,6 +209,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                 minimumProgressiveValue = Double.parseDouble(task.getResult().get("minimumProgressiveValue").toString());
                             } else {
                                 minimumProgressiveValue = 0.0;
+                            }
+
+                            if (task.getResult().get("sortProgressives") != null) {
+                                autoSortProgressives = (boolean)task.getResult().get("sortProgressives");
+                            } else {
+                                autoSortProgressives = true;
                             }
                         }
                     }
@@ -806,7 +813,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             String progressiveText4 = progressive4.getText().toString().trim();
             String progressiveText5 = progressive5.getText().toString().trim();
             String progressiveText6 = progressive6.getText().toString().trim();
-            //String displayNameText = firebaseAuth.getCurrentUser().getDisplayName().trim();
             String emailText = firebaseAuth.getCurrentUser().getEmail().trim();
             String userId = firebaseAuth.getCurrentUser().getUid().trim();
             String userName = (spinner.getSelectedItem() == null) ? "No user selected" : spinner.getSelectedItem().toString();
@@ -864,7 +870,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     public void hideKeyboard() {
-        //ConstraintLayout layout = (ConstraintLayout)findViewById(R.id.mainConstraintLayout);
         LinearLayout layout = findViewById(R.id.mainLinearLayout);
         InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
         imm.hideSoftInputFromWindow(layout.getWindowToken(), 0);
@@ -963,7 +968,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     public void sortProgressives() {
 
-        List<Double> values = new ArrayList<Double>();
+        final List<Double> values = new ArrayList<Double>();
 
         if (isDouble(progressive1.getText().toString())) {
             values.add(Double.parseDouble(progressive1.getText().toString()));
@@ -984,8 +989,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             values.add(Double.parseDouble(progressive6.getText().toString()));
         }
 
-        Collections.sort(values);
-        Collections.reverse(values);
+        if (autoSortProgressives) {
+            Collections.sort(values);
+            Collections.reverse(values);
+        }
         DecimalFormat df = new DecimalFormat("0.00");
 
         resetProgressives();
@@ -1005,5 +1012,24 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 progressive6.setText(df.format(values.get(i)));
             }
         }
+
+        /*database.collection("users")
+                .document(firebaseAuth.getCurrentUser().getUid())
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                        if (task.isSuccessful()) {
+                            if (task.getResult().get("sortProgressives") != null) {
+                                boolean sort = (boolean)task.getResult().get("sortProgressives");
+                                if (sort) {
+                                }
+                            } else {
+                            }
+                        } else {
+                            showToast("No connection");
+                        }
+                    }
+                });*/
     }
 }
