@@ -31,12 +31,13 @@ users
 
 Indexes - There is a composite index on the scans collection with uid ascending and timestamp descending.  
 
-`service cloud.firestore {
+```
+service cloud.firestore {
     match /databases/{database}/documents {
         match /{document=**} {
             allow read, write: if request.auth.uid != null;
         }
     }
-}`
-
+}
+```
 
