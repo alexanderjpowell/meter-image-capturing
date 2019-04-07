@@ -2,7 +2,7 @@
 
 MiC is a mobile application designed for the Android operating system written in the Java programming language.  An iOS version does not exist at this time.  The main use case for the app is to use OCR (optical character recognition) to extract the progressive dollar values from images of slot machines.  The objective here is to save the casino employees time so they don't have to manually log all progressive values for each slot machine they monitor.  
 
-##OCR##
+## OCR ##
 
 The main backend logic behind the OCR comes from Google's ML Kit SDK.  The SDK provides a number of machine learning APIs; MiC uses the text recognition API originally optimized for recognizing text in documents.  While the SDK provides support for text recogntion both on-device and by making a call to the cloud, the cloud model is the one used in the application.  This means that some sort of network connection (Wifi or Data) is required to make a successfull call.  Note: progressive values can still be inputted manually through the keyboard and submitted to the database without a network connection.  In this case the values will be stored in a queue until the next time the device connects to the internet, at which point they'll be pushed to the database.  The quality of the image the user captures correlates to the accuracy of the progressive text detected.  For best results ensure that the camera is properly focused and is not blurry.  
 
