@@ -25,9 +25,12 @@ scans
  * timestamp
  * uid
  * userName
+
 users
  * displayNames
  * sortProgressives
+
+Note the current version of cloud firestore used by the application is 18.1.0.  
 
 ### Indexes ###
 There is a composite index on the scans collection with uid ascending and timestamp descending.  
@@ -46,6 +49,10 @@ service cloud.firestore {
 ```
 
 ## Authentication ##
+
+MiC uses the Firebase authentication SDK to handle user registration and sign in.  Passwords are encrypted and completely handled by Google's API.  The developers of MiC have no access to a user's password, only the email they are using as a username.  Note that this information is not stored in the Cloud Firestore discussed above.  Completely separate processes are used for authentication and database management.  
+
+
 
 
 
