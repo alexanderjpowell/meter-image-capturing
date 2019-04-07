@@ -8,7 +8,7 @@ The main backend logic behind the OCR comes from Google's ML Kit SDK.  The SDK p
 
 Note the current version of ML Kit used by the application is 19.0.2.  Also, MiC requires at least Android API level 23, or version 6.0 (Marshmallow).  
 
-##Database##
+## Database ##
 
 The backend database is powered by Cloud Firestore which is a NoSQL cloud database provided by Google Firebase.  It is document based and designed to be fast and scalable.  In the Firestore model, documents are stored in collections and can contain fields as well as other collections.  The current schema contains two collections: scans and users.  The scans collection contains documents with details about each image capture, and the users collection stores data specific to each user account.  
 
@@ -29,9 +29,10 @@ users
  * displayNames
  * sortProgressives
 
-###Indexes### - There is a composite index on the scans collection with uid ascending and timestamp descending.  
+### Indexes ###
+There is a composite index on the scans collection with uid ascending and timestamp descending.  
 
-###Rules###
+### Rules ###
 The following security rules are in place to ensure data stored in our database is secure.  
 
 ```
@@ -44,7 +45,7 @@ service cloud.firestore {
 }
 ```
 
-##Authentication##
+## Authentication ##
 
 
 
