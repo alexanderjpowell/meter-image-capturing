@@ -20,14 +20,14 @@
         android:focusableInTouchMode="true"
         android:background="@color/jet">
 
-            <android.support.design.widget.TextInputLayout
+            <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/inputLayout0"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="Machine ID"
                 style="@style/TextInputLayoutStyle">
 
-                <android.support.design.widget.TextInputEditText
+                <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/machineId"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -36,7 +36,7 @@
                     android:inputType="numberDecimal"
                     android:paddingStart="20dp"
                     android:maxLines="1"/>
-            </android.support.design.widget.TextInputLayout>
+            </com.google.android.material.textfield.TextInputLayout>
 
             <View
                 android:layout_width="match_parent"
@@ -49,14 +49,14 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
-                <android.support.design.widget.TextInputLayout
+                <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/inputLayout1"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="Progressive 1"
                     style="@style/TextInputLayoutStyle">
 
-                    <android.support.design.widget.TextInputEditText
+                    <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/progressive1"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -66,9 +66,9 @@
                         android:inputType="numberDecimal"
                         android:paddingStart="40dp"
                         android:maxLines="1"/>
-                </android.support.design.widget.TextInputLayout>
+                </com.google.android.material.textfield.TextInputLayout>
 
-                <android.support.v7.widget.AppCompatTextView
+                <androidx.appcompat.widget.AppCompatTextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:paddingStart="15dp"
@@ -83,14 +83,14 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
-                <android.support.design.widget.TextInputLayout
+                <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/inputLayout2"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="Progressive 2"
                     style="@style/TextInputLayoutStyle">
 
-                    <android.support.design.widget.TextInputEditText
+                    <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/progressive2"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -99,9 +99,9 @@
                         android:inputType="numberDecimal"
                         android:paddingStart="40dp"
                         android:maxLines="1"/>
-                </android.support.design.widget.TextInputLayout>
+                </com.google.android.material.textfield.TextInputLayout>
 
-                <android.support.v7.widget.AppCompatTextView
+                <androidx.appcompat.widget.AppCompatTextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:paddingStart="15dp"
@@ -116,14 +116,14 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
-                <android.support.design.widget.TextInputLayout
+                <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/inputLayout3"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="Progressive 3"
                     style="@style/TextInputLayoutStyle">
 
-                    <android.support.design.widget.TextInputEditText
+                    <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/progressive3"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -132,9 +132,9 @@
                         android:inputType="numberDecimal"
                         android:paddingStart="40dp"
                         android:maxLines="1"/>
-                </android.support.design.widget.TextInputLayout>
+                </com.google.android.material.textfield.TextInputLayout>
 
-                <android.support.v7.widget.AppCompatTextView
+                <androidx.appcompat.widget.AppCompatTextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:paddingStart="15dp"
@@ -149,14 +149,14 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
-                <android.support.design.widget.TextInputLayout
+                <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/inputLayout4"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="Progressive 4"
                     style="@style/TextInputLayoutStyle">
 
-                    <android.support.design.widget.TextInputEditText
+                    <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/progressive4"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -165,9 +165,9 @@
                         android:inputType="numberDecimal"
                         android:paddingStart="40dp"
                         android:maxLines="1"/>
-                </android.support.design.widget.TextInputLayout>
+                </com.google.android.material.textfield.TextInputLayout>
 
-                <android.support.v7.widget.AppCompatTextView
+                <androidx.appcompat.widget.AppCompatTextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:paddingStart="15dp"
@@ -182,14 +182,14 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
-                <android.support.design.widget.TextInputLayout
+                <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/inputLayout5"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="Progressive 5"
                     style="@style/TextInputLayoutStyle">
 
-                    <android.support.design.widget.TextInputEditText
+                    <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/progressive5"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -198,9 +198,9 @@
                         android:inputType="numberDecimal"
                         android:paddingStart="40dp"
                         android:maxLines="1"/>
-                </android.support.design.widget.TextInputLayout>
+                </com.google.android.material.textfield.TextInputLayout>
 
-                <android.support.v7.widget.AppCompatTextView
+                <androidx.appcompat.widget.AppCompatTextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:paddingStart="15dp"
@@ -215,14 +215,14 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
-                <android.support.design.widget.TextInputLayout
+                <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/inputLayout6"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="Progressive 6"
                     style="@style/TextInputLayoutStyle">
 
-                    <android.support.design.widget.TextInputEditText
+                    <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/progressive6"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -231,9 +231,9 @@
                         android:inputType="numberDecimal"
                         android:paddingStart="40dp"
                         android:maxLines="1"/>
-                </android.support.design.widget.TextInputLayout>
+                </com.google.android.material.textfield.TextInputLayout>
 
-                <android.support.v7.widget.AppCompatTextView
+                <androidx.appcompat.widget.AppCompatTextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:paddingStart="15dp"
@@ -257,7 +257,7 @@
                 android:layout_weight="1"
                 android:orientation="horizontal">
 
-                <android.support.design.button.MaterialButton
+                <com.google.android.material.button.MaterialButton
                     android:id="@+id/mButton2"
                     style="@style/Widget.MaterialComponents.Button.OutlinedButton.Icon"
                     android:backgroundTint="@color/submit_button_color"
@@ -269,7 +269,7 @@
                     android:onClick="scanProgressives"
                     android:layout_marginRight="3dp"/>
 
-                <android.support.design.button.MaterialButton
+                <com.google.android.material.button.MaterialButton
                     android:id="@+id/submit_button"
                     style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                     android:backgroundTint="@color/submit_button_color"

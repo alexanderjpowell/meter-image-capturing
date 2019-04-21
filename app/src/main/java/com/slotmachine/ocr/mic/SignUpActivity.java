@@ -2,8 +2,8 @@ package com.slotmachine.ocr.mic;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
-import android.support.annotation.NonNull;
-import android.support.v7.app.AppCompatActivity;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
@@ -46,12 +46,12 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
 
         displayName = "";
 
-        nameEditText = (EditText)findViewById(R.id.nameEditText);
-        emailEditText = (EditText)findViewById(R.id.emailEditText);
-        passwordEditText = (EditText)findViewById(R.id.passwordEditText);
-        reenterPasswordEditText = (EditText)findViewById(R.id.reenterPasswordEditText);
-        signUpButton = (Button)findViewById(R.id.signUpButton);
-        loginActivityTextView = (TextView)findViewById(R.id.loginActivityTextView);
+        nameEditText = findViewById(R.id.nameEditText);
+        emailEditText = findViewById(R.id.emailEditText);
+        passwordEditText = findViewById(R.id.passwordEditText);
+        reenterPasswordEditText = findViewById(R.id.reenterPasswordEditText);
+        signUpButton = findViewById(R.id.signUpButton);
+        loginActivityTextView = findViewById(R.id.loginActivityTextView);
 
         progressDialog = new ProgressDialog(this);
 
