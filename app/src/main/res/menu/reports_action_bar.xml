@@ -4,20 +4,20 @@
     <item
         android:id="@+id/action_delete"
         android:icon="@drawable/baseline_delete_white_18dp"
-        android:title="Delete"
+        android:title="@string/delete_text"
         app:showAsAction="ifRoom"
         android:visible="false"/>
 
     <item android:id="@+id/action_past_hour"
-        android:title="1 Hour"
+        android:title="@string/one_hour_text"
         app:showAsAction="never"/>
 
     <item android:id="@+id/action_past_day"
-        android:title="1 Day"
+        android:title="@string/one_day_text"
         app:showAsAction="never"/>
 
     <item android:id="@+id/action_past_week"
-        android:title="1 Week"
+        android:title="@string/one_week_text"
         app:showAsAction="never"/>
 
 </menu>

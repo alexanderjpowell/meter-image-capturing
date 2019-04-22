@@ -3,7 +3,7 @@
 xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
         android:id="@+id/action_save_changes"
-        android:title="Save Changes"
+        android:title="@string/save_changes_text"
         android:icon="@drawable/sharp_done_white_48"
         android:orderInCategory="1"
         app:showAsAction="always" />

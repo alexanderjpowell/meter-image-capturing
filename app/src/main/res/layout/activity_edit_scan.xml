@@ -20,7 +20,7 @@
             <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Machine ID"
+                android:hint="@string/machine_id_text"
                 style="@style/TextInputLayoutStyle">
 
                 <com.google.android.material.textfield.TextInputEditText
@@ -47,7 +47,7 @@
                 <com.google.android.material.textfield.TextInputLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Progressive 1"
+                    android:hint="@string/progressive_1_text"
                     style="@style/TextInputLayoutStyle">
 
                     <com.google.android.material.textfield.TextInputEditText
@@ -67,7 +67,7 @@
                     android:paddingStart="15dp"
                     android:paddingTop="17dp"
                     android:textSize="25dp"
-                    android:text="$"
+                    android:text="@string/dollar_sign_text"
                     android:textColor="#FF000000"/>
 
             </RelativeLayout>
@@ -79,7 +79,7 @@
                 <com.google.android.material.textfield.TextInputLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Progressive 2"
+                    android:hint="@string/progressive_2_text"
                     style="@style/TextInputLayoutStyle">
 
                     <com.google.android.material.textfield.TextInputEditText
@@ -99,7 +99,7 @@
                     android:paddingStart="15dp"
                     android:paddingTop="17dp"
                     android:textSize="25dp"
-                    android:text="$"
+                    android:text="@string/dollar_sign_text"
                     android:textColor="#FF000000"/>
 
             </RelativeLayout>
@@ -111,7 +111,7 @@
                 <com.google.android.material.textfield.TextInputLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Progressive 3"
+                    android:hint="@string/progressive_3_text"
                     style="@style/TextInputLayoutStyle">
 
                     <com.google.android.material.textfield.TextInputEditText
@@ -131,7 +131,7 @@
                     android:paddingStart="15dp"
                     android:paddingTop="17dp"
                     android:textSize="25dp"
-                    android:text="$"
+                    android:text="@string/dollar_sign_text"
                     android:textColor="#FF000000"/>
 
             </RelativeLayout>
@@ -143,7 +143,7 @@
                 <com.google.android.material.textfield.TextInputLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Progressive 4"
+                    android:hint="@string/progressive_4_text"
                     style="@style/TextInputLayoutStyle">
 
                     <com.google.android.material.textfield.TextInputEditText
@@ -163,7 +163,7 @@
                     android:paddingStart="15dp"
                     android:paddingTop="17dp"
                     android:textSize="25dp"
-                    android:text="$"
+                    android:text="@string/dollar_sign_text"
                     android:textColor="#FF000000"/>
 
             </RelativeLayout>
@@ -175,7 +175,7 @@
                 <com.google.android.material.textfield.TextInputLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Progressive 5"
+                    android:hint="@string/progressive_5_text"
                     style="@style/TextInputLayoutStyle">
 
                     <com.google.android.material.textfield.TextInputEditText
@@ -195,7 +195,7 @@
                     android:paddingStart="15dp"
                     android:paddingTop="17dp"
                     android:textSize="25dp"
-                    android:text="$"
+                    android:text="@string/dollar_sign_text"
                     android:textColor="#FF000000"/>
 
             </RelativeLayout>
@@ -207,7 +207,7 @@
                 <com.google.android.material.textfield.TextInputLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Progressive 6"
+                    android:hint="@string/progressive_6_text"
                     style="@style/TextInputLayoutStyle">
 
                     <com.google.android.material.textfield.TextInputEditText
@@ -227,7 +227,7 @@
                     android:paddingStart="15dp"
                     android:paddingTop="17dp"
                     android:textSize="25dp"
-                    android:text="$"
+                    android:text="@string/dollar_sign_text"
                     android:textColor="#FF000000"/>
 
             </RelativeLayout>
@@ -235,7 +235,7 @@
             <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:hint="Notes"
+                android:hint="@string/notes_text"
                 style="@style/TextInputLayoutStyle">
 
                 <com.google.android.material.textfield.TextInputEditText

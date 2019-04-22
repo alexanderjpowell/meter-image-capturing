@@ -8,4 +8,47 @@
     <string name="action_settings">Settings</string>
     <string name="title_activity_edit_scan">EditScanActivity</string>
     <string name="title_activity_manage_users">ManageUsersActivity</string>
+
+    <string name="current_password_text">Current Password</string>
+    <string name="new_password_text">New Password</string>
+    <string name="reenter_password_text">Re-enter Password</string>
+    <string name="save_changes_text">Save Changes</string>
+
+    <string name="machine_id_text">Machine ID</string>
+
+    <string name="dollar_sign_text">$</string>
+
+    <string name="progressive_1_text">Progressive 1</string>
+    <string name="progressive_2_text">Progressive 2</string>
+    <string name="progressive_3_text">Progressive 3</string>
+    <string name="progressive_4_text">Progressive 4</string>
+    <string name="progressive_5_text">Progressive 5</string>
+    <string name="progressive_6_text">Progressive 6</string>
+    <string name="notes_text">Notes</string>
+
+    <string name="name_text">Name</string>
+    <string name="email_text">Email</string>
+    <string name="password_text">Password</string>
+    <string name="login_text">Login</string>
+
+    <string name="autosort_label_text">Autosort Progressive Values</string>
+    <string name="minimum_value_label">Min Value</string>
+    <string name="sign_out_text">minimum_value_label</string>
+
+    <string name="change_password_text">Change Password</string>
+    <string name="delete_account_text">Delete Account</string>
+    <string name="delete_text">Delete</string>
+
+    <string name="create_account_text">Create Account</string>
+    <string name="switch_to_login_text">Already a member? Login</string>
+
+    <string name="scan_text">Scan</string>
+    <string name="submit_text">Submit</string>
+
+    <string name="spinner_text">Spinner</string>
+
+    <string name="one_hour_text">1 Hour</string>
+    <string name="one_day_text">1 Day</string>
+    <string name="one_week_text">1 Week</string>
+
 </resources>

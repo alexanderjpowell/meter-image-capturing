@@ -13,42 +13,13 @@
         android:paddingStart="10dp"
         android:paddingEnd="10dp">
 
-        <!--<TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Instructions/Disclaimers/About "
-            android:textSize="25sp"/>
-
-        <TextView
-            android:id="@+id/emailTextView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="email: "
-            android:textSize="25sp"/>-->
-
-        <!--<LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Test"/>
-
-            <Switch
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
-
-        </LinearLayout>-->
-
         <Switch
             android:id="@+id/sortProgressivesSwitch"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="5dp"
             android:layout_marginBottom="5dp"
-            android:text="Autosort Progressive Values"
+            android:text="@string/autosort_label_text"
             android:textSize="20sp"/>
 
         <View
@@ -64,7 +35,7 @@
             android:layout_width="match_parent"
             android:layout_height="60dp"
             android:enabled="true"
-            android:text="Min Value"
+            android:text="@string/minimum_value_label"
             android:textSize="15sp" />
 
         <com.google.android.material.button.MaterialButton
@@ -73,17 +44,8 @@
             android:layout_width="match_parent"
             android:layout_height="60dp"
             android:enabled="true"
-            android:text="Sign Out"
+            android:text="@string/sign_out_text"
             android:textSize="15sp" />
-
-        <!--<android.support.design.button.MaterialButton
-            android:id="@+id/changeEmailButton"
-            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-            android:layout_width="match_parent"
-            android:layout_height="60dp"
-            android:enabled="true"
-            android:text="Change Email"
-            android:textSize="15sp" />-->
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/changePasswordButton"
@@ -91,7 +53,7 @@
             android:layout_width="match_parent"
             android:layout_height="60dp"
             android:enabled="true"
-            android:text="Change Password"
+            android:text="@string/change_password_text"
             android:textSize="15sp" />
 
         <com.google.android.material.button.MaterialButton
@@ -100,7 +62,7 @@
             android:layout_width="match_parent"
             android:layout_height="60dp"
             android:enabled="true"
-            android:text="Delete Account"
+            android:text="@string/delete_account_text"
             android:textSize="15sp" />
 
     </LinearLayout>
