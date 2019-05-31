@@ -29,6 +29,12 @@
             android:layout_marginBottom="1dp"
             android:background="@android:color/black"/>
 
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:text="Recipient Email: \najpowell@email.wm.edu"
+            android:textSize="20sp"/>
+
         <com.google.android.material.button.MaterialButton
             android:id="@+id/chooseMinValue"
             style="@style/Widget.MaterialComponents.Button.OutlinedButton"
