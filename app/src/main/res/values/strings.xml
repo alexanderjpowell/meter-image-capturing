@@ -33,7 +33,7 @@
 
     <string name="autosort_label_text">Autosort Progressive Values</string>
     <string name="minimum_value_label">Min Value</string>
-    <string name="sign_out_text">minimum_value_label</string>
+    <string name="sign_out_text">Sign Out</string>
 
     <string name="change_password_text">Change Password</string>
     <string name="delete_account_text">Delete Account</string>
