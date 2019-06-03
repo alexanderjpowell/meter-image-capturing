@@ -1,38 +1,43 @@
 <?xml version="1.0" encoding="utf-8"?>
-<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:android="http://schemas.android.com/apk/res/android">
+<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <SwitchPreference
+        app:key="notifications"
+        app:title="Autosort progressive values"/>
+
+    <SwitchPreference
+        app:key="reject_duplicates"
+        app:title="Reject Duplicates"
+        app:summary="Don't process multiple scans from the same machine number in a 24 hour period."/>
+
+    <EditTextPreference
+        app:key="email_recipient"
+        app:title="Report Recipient Email"/>
+
+    <EditTextPreference
+        app:key="minimum_value"
+        app:title="Minimum Value"
+        app:summary="Smallest value recognized by the OCR"/>
 
     <PreferenceCategory
         app:key="notifications_category"
-        app:title="Notifications">
-
-        <SwitchPreference
-            app:key="notifications"
-            app:title="Autosort progressive values"
-            app:summary="sample"/>
+        app:title="Account">
 
         <Preference
-            app:key="feedback"
-            app:title="Send feedback"
-            app:summary="Report technical issues or suggest new features"/>
-
-        <EditTextPreference
-            app:key="email_recipient"
-            app:title="Report Recipient Email"/>
-
-        <EditTextPreference
-            app:key="minimum_value"
-            app:title="Minimum Value"
-            app:summary="Smallest value recognized by the OCR"/>
-
-    </PreferenceCategory>
-
-    <PreferenceCategory
-        app:key="notifications_category"
-        app:title="Notifications">
+            app:key="feedback1"
+            app:title="Sign Out"/>
 
         <Preference
-            app:key="feedback"
+            app:key="feedback2"
+            app:title="Change Password"/>
+
+        <Preference
+            app:key="feedback3"
+            app:title="Delete Account"
+            app:summary="Permanently delete your account. This cannot be undone."/>
+
+        <Preference
+            app:key="feedback4"
             app:title="Send feedback"
             app:summary="Report technical issues or suggest new features"/>
 
