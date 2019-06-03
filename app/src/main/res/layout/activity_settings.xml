@@ -35,6 +35,8 @@
             android:text="Recipient Email: \najpowell@email.wm.edu"
             android:textSize="20sp"/>
 
+
+
         <com.google.android.material.button.MaterialButton
             android:id="@+id/chooseMinValue"
             style="@style/Widget.MaterialComponents.Button.OutlinedButton"

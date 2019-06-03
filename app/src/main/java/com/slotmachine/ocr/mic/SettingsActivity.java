@@ -44,6 +44,15 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        getSupportFragmentManager()
+                .beginTransaction()
+                .replace(android.R.id.content, new MySettingsFragment())
+                .commit();
+    }
+
+    /*@Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -114,7 +123,7 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
         //emailTextView.setText("email: " + firebaseAuth.getCurrentUser().getEmail());
 
 
-    }
+    }*/
 
     private void setSortProgressives(boolean isSort) {
         Map<String, Boolean> user = new HashMap<>();
