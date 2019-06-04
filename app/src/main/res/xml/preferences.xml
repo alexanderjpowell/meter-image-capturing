@@ -24,20 +24,20 @@
         app:title="Account">
 
         <Preference
-            app:key="feedback1"
+            app:key="sign_out_button"
             app:title="Sign Out"/>
 
         <Preference
-            app:key="feedback2"
+            app:key="change_password_button"
             app:title="Change Password"/>
 
         <Preference
-            app:key="feedback3"
+            app:key="delete_account_button"
             app:title="Delete Account"
             app:summary="Permanently delete your account. This cannot be undone."/>
 
         <Preference
-            app:key="feedback4"
+            app:key="send_feedback_button"
             app:title="Send feedback"
             app:summary="Report technical issues or suggest new features"/>
 
