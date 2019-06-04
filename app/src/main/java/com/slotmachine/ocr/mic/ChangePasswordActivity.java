@@ -61,6 +61,11 @@ public class ChangePasswordActivity extends AppCompatActivity implements View.On
                 return;
             }
 
+            if (currentPassword.isEmpty() || newPassword1.isEmpty() || newPassword2.isEmpty()) {
+                showToast("All values are required.");
+                return;
+            }
+
             firebaseAuth.signInWithEmailAndPassword(email, currentPassword)
                     .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                         @Override

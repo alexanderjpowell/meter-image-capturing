@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto">
+<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
 
     <SwitchPreference
         app:key="notifications"
@@ -18,6 +19,12 @@
         app:key="minimum_value"
         app:title="Minimum Value"
         app:summary="Smallest value recognized by the OCR"/>
+
+    <SeekBarPreference
+        app:key="minimum_value2"
+        app:title="Minimum Value"
+        app:summary="Smallest value recognized by the OCR"
+        app:max="100"/>
 
     <PreferenceCategory
         app:key="notifications_category"

@@ -1,5 +1,6 @@
 package com.slotmachine.ocr.mic;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.InputType;
@@ -13,6 +14,9 @@ import androidx.preference.Preference;
 import androidx.preference.Preference.SummaryProvider;
 import androidx.preference.PreferenceFragmentCompat;
 
+import com.firebase.ui.auth.AuthUI;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 
@@ -68,7 +72,19 @@ public class MySettingsFragment extends PreferenceFragmentCompat {
                     new Preference.OnPreferenceClickListener() {
                         @Override
                         public boolean onPreferenceClick(Preference preference) {
-                            Toast.makeText(getContext(), "Sign out", Toast.LENGTH_SHORT).show();
+                            AuthUI.getInstance()
+                                    .signOut(getActivity())
+                                    .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                        @Override
+                                        public void onComplete(@NonNull Task<Void> task) {
+                                            if (task.isSuccessful()) {
+                                                getActivity().finish();
+                                                startActivity(new Intent(getActivity(), LoginActivity.class));
+                                            } else {
+                                                Toast.makeText(getContext(), task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                                            }
+                                        }
+                                    });
                             return true;
                         }
                     }
@@ -81,6 +97,7 @@ public class MySettingsFragment extends PreferenceFragmentCompat {
                         @Override
                         public boolean onPreferenceClick(Preference preference) {
                             Toast.makeText(getContext(), "Change password", Toast.LENGTH_SHORT).show();
+                            startActivity(new Intent(getActivity(), ChangePasswordActivity.class));
                             return true;
                         }
                     }

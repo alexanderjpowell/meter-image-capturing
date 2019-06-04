@@ -1,12 +1,16 @@
 package com.slotmachine.ocr.mic;
 
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import androidx.annotation.NonNull;
 import com.google.android.material.button.MaterialButton;
 import androidx.appcompat.app.AppCompatActivity;
+
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.text.InputType;
 import android.view.View;
 import android.view.WindowManager;
@@ -37,7 +41,6 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
     private MaterialButton deleteAccountButton;
     private MaterialButton chooseMinValue;
     private MaterialButton changeEmailButton;
-    //private TextView emailTextView;
 
     private String minimumProgressiveValue;
 
@@ -48,6 +51,18 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
                 .beginTransaction()
                 .replace(android.R.id.content, new MySettingsFragment())
                 .commit();
+
+        firebaseAuth = FirebaseAuth.getInstance();
+        if (firebaseAuth.getCurrentUser() == null) {
+            startActivity(new Intent(SettingsActivity.this, LoginActivity.class));
+            finish();
+            return;
+        }
+        database = FirebaseFirestore.getInstance();
+
+        //SharedPreferences sharedPref = this.getSharedPreferences("notifications", Context.MODE_PRIVATE);
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        boolean bool = sharedPreferences.getBoolean("notifications", true);
     }
 
     /*@Override
