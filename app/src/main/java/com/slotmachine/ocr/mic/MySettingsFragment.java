@@ -41,6 +41,15 @@ public class MySettingsFragment extends PreferenceFragmentCompat {
                     return text;
                 }
             });
+            editTextPreference.setOnPreferenceChangeListener(
+                    new Preference.OnPreferenceChangeListener() {
+                        @Override
+                        public boolean onPreferenceChange(Preference preference, Object newValue) {
+                            Toast.makeText(getContext(), "changed email", Toast.LENGTH_SHORT).show();
+                            return true;
+                        }
+                    }
+            );
         }
 
         if (minimum_value != null) {
