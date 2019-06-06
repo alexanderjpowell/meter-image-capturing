@@ -830,6 +830,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 return;
             }
 
+            // Check if same machine number has been scanned in last 24 hours
+            // maybe compile a collection (set) of all unique machine numbers in the oncreate so this only has to be done once
+            // then run cross check based on that and display a popup if necessary.
+
+            //
+
             Map<String, Object> user = new HashMap<>();
             //user.put("name", displayNameText);
             user.put("email", emailText);

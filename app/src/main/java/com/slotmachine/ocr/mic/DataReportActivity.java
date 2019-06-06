@@ -2,6 +2,7 @@ package com.slotmachine.ocr.mic;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Environment;
 import androidx.annotation.NonNull;
@@ -17,6 +18,7 @@ import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.preference.PreferenceManager;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -74,8 +76,9 @@ public class DataReportActivity extends AppCompatActivity {// implements Adapter
                     public void onRefresh() {
                         // This method performs the actual data-refresh operation.
                         // The method calls setRefreshing(false) when it's finished.
-                        executeQuery("WEEK");
+                        executeQuery("YEAR");
                         //swipeRefreshLayout.setRefreshing(false);
+                        showToast("test");
                     }
                 }
         );
@@ -190,6 +193,9 @@ public class DataReportActivity extends AppCompatActivity {// implements Adapter
             offset = 86400;
         else if (dateRange.equals("WEEK"))
             offset = 604800;
+        else if (dateRange.equals("YEAR"))
+            offset = 24192;
+        //showToast(Long.toString(System.currentTimeMillis()));
         Date time = new Date(System.currentTimeMillis() - offset * 1000);
         CollectionReference collectionReference = database.collection("scans");
         Query query = collectionReference.whereEqualTo("uid", firebaseAuth.getCurrentUser().getUid())
@@ -285,6 +291,10 @@ public class DataReportActivity extends AppCompatActivity {// implements Adapter
     }
 
     public void generateReport(View view) {
+
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        String report_recipient_email = sharedPreferences.getString("email_recipient", "");
+
         if (isExternalStorageWritable()) {
             File csvFile = new File(getFilesDir(), "report.csv");
             String fileContents = createCsvFile();
@@ -295,7 +305,9 @@ public class DataReportActivity extends AppCompatActivity {// implements Adapter
 
                 Uri uri = FileProvider.getUriForFile(this, "com.slotmachine.ocr.mic.fileprovider", csvFile);
                 Intent intent = new Intent(Intent.ACTION_SEND);
-                intent.putExtra(Intent.EXTRA_EMAIL  , new String[]{ "lotrrox@gmail.com" });
+                if (!report_recipient_email.isEmpty()) {
+                    intent.putExtra(Intent.EXTRA_EMAIL, new String[]{ report_recipient_email });
+                }
                 intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
                 intent.putExtra(Intent.EXTRA_STREAM, uri);
                 intent.setType("text/csv");

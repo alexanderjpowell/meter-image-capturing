@@ -61,8 +61,8 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
         database = FirebaseFirestore.getInstance();
 
         //SharedPreferences sharedPref = this.getSharedPreferences("notifications", Context.MODE_PRIVATE);
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        boolean bool = sharedPreferences.getBoolean("notifications", true);
+        //SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        //boolean bool = sharedPreferences.getBoolean("notifications", true);
     }
 
     /*@Override
