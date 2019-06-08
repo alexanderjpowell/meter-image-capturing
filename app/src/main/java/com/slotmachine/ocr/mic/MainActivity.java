@@ -847,46 +847,48 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             // Check if same machine number has been scanned in last 24 hours
             // maybe compile a collection (set) of all unique machine numbers in the oncreate so this only has to be done once
             // then run cross check based on that and display a popup if necessary.
-            if (set.contains(machineIdText)) {
-                //showToast("possible duplicate");
-                AlertDialog alertDialog = new AlertDialog.Builder(MainActivity.this).create();
-                alertDialog.setMessage("This machine has already been scanned in the past 24 hours.");
-                alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, "CANCEL",
-                        new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int i) {
-                                dialog.dismiss();
-                            }
-                        });
-                alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "SUBMIT ANYWAY",
-                        new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int i) {
-                                Map<String, Object> user = new HashMap<>();
-                                //user.put("name", displayNameText);
-                                user.put("email", emailText);
-                                user.put("uid", userId);
-                                user.put("progressive1", progressiveText1);
-                                user.put("progressive2", progressiveText2);
-                                user.put("progressive3", progressiveText3);
-                                user.put("progressive4", progressiveText4);
-                                user.put("progressive5", progressiveText5);
-                                user.put("progressive6", progressiveText6);
-                                user.put("machine_id", machineIdText);
-                                user.put("timestamp", FieldValue.serverTimestamp());
-                                user.put("userName", userName);
-                                user.put("notes", "");
+            SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+            boolean reject_duplicates = sharedPreferences.getBoolean("reject_duplicates", false);
+            if (reject_duplicates) {
+                if (set.contains(machineIdText)) {
+                    AlertDialog alertDialog = new AlertDialog.Builder(MainActivity.this).create();
+                    alertDialog.setMessage("This machine has already been scanned in the past 24 hours.");
+                    alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, "CANCEL",
+                            new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int i) {
+                                    dialog.dismiss();
+                                }
+                            });
+                    alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "SUBMIT ANYWAY",
+                            new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int i) {
+                                    Map<String, Object> user = new HashMap<>();
+                                    user.put("email", emailText);
+                                    user.put("uid", userId);
+                                    user.put("progressive1", progressiveText1);
+                                    user.put("progressive2", progressiveText2);
+                                    user.put("progressive3", progressiveText3);
+                                    user.put("progressive4", progressiveText4);
+                                    user.put("progressive5", progressiveText5);
+                                    user.put("progressive6", progressiveText6);
+                                    user.put("machine_id", machineIdText);
+                                    user.put("timestamp", FieldValue.serverTimestamp());
+                                    user.put("userName", userName);
+                                    user.put("notes", "");
 
-                                database.collection("scans").document().set(user);
-                                set.add(machineIdText);
+                                    database.collection("scans").document().set(user);
+                                    set.add(machineIdText);
 
-                                resetMachineId();
-                                resetProgressives();
-                                showToast("Progressives submitted successfully");
-                                hideKeyboard();
-                                dialog.dismiss();
-                            }
-                        });
-                alertDialog.show();
-                return;
+                                    resetMachineId();
+                                    resetProgressives();
+                                    showToast("Progressives submitted successfully");
+                                    hideKeyboard();
+                                    dialog.dismiss();
+                                }
+                            });
+                    alertDialog.show();
+                    return;
+                }
             }
             //
 

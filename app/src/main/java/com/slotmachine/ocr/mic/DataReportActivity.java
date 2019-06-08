@@ -6,8 +6,6 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Environment;
 import androidx.annotation.NonNull;
-import androidx.core.app.NotificationCompat;
-import androidx.core.app.NotificationManagerCompat;
 import androidx.core.content.FileProvider;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import androidx.appcompat.app.AlertDialog;
@@ -40,11 +38,10 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
-import static androidx.core.content.FileProvider.getUriForFile;
-
 public class DataReportActivity extends AppCompatActivity {// implements AdapterView.OnItemSelectedListener {
 
     private List<RowData> rowDataList;
+    private List<RowData> rowDataListReport;
     private RecyclerView recyclerView;
     private ReportDataAdapter mAdapter;
 
@@ -87,6 +84,7 @@ public class DataReportActivity extends AppCompatActivity {// implements Adapter
         dateRange = DateRange.DAY; // Default to last 24 hours
 
         rowDataList = new ArrayList<>();
+        rowDataListReport = new ArrayList<>();
         recyclerView = findViewById(R.id.recycler_view);
         mAdapter = new ReportDataAdapter(DataReportActivity.this, rowDataList);
 
@@ -173,7 +171,6 @@ public class DataReportActivity extends AppCompatActivity {// implements Adapter
                 }
                 count++;
             }
-            //showToast(data);
         } else if (id == R.id.action_past_hour) {
             dateRange = DateRange.HOUR;
             executeQuery(DateRange.HOUR);
@@ -199,7 +196,6 @@ public class DataReportActivity extends AppCompatActivity {// implements Adapter
             offset = 86400;
         else if (dateRange == DateRange.WEEK)
             offset = 604800;
-        //showToast(Long.toString(System.currentTimeMillis()));
         Date time = new Date(System.currentTimeMillis() - offset * 1000);
         CollectionReference collectionReference = database.collection("scans");
         Query query = collectionReference.whereEqualTo("uid", firebaseAuth.getCurrentUser().getUid())
@@ -224,6 +220,9 @@ public class DataReportActivity extends AppCompatActivity {// implements Adapter
         String machine_id, timestamp, user, progressive1, progressive2, progressive3, progressive4, progressive5, progressive6, notes;
         RowData rowData;
         rowDataList.clear(); // reset the current data list
+        rowDataListReport.clear();
+        int maxDisplayedValues = 100;
+        int count = 0;
 
         for (QueryDocumentSnapshot document : snapshot) {
 
@@ -250,7 +249,12 @@ public class DataReportActivity extends AppCompatActivity {// implements Adapter
                     progressive6,
                     notes,
                     false);
-            rowDataList.add(rowData);
+
+            if (count < maxDisplayedValues) {
+                rowDataList.add(rowData);
+            }
+            rowDataListReport.add(rowData);
+            count++;
         }
 
         mAdapter.notifyDataSetChanged();
@@ -277,9 +281,10 @@ public class DataReportActivity extends AppCompatActivity {// implements Adapter
     }
 
     private String createCsvFile() {
+
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("\"Machine\",\"Progressive1\",\"Progressive2\",\"Progressive3\",\"Progressive4\",\"Progressive5\",\"Progressive6\", \"Notes\",\"Date\",\"User\"\n");
-        for (RowData rowData : rowDataList) {
+        for (RowData rowData : rowDataListReport) {
             stringBuilder.append("\"" + getMachineIdFromString(rowData.getMachineId()) + "\",");
             stringBuilder.append("\"" + rowData.getProgressive1() + "\",");
             stringBuilder.append("\"" + rowData.getProgressive2() + "\",");
@@ -317,8 +322,6 @@ public class DataReportActivity extends AppCompatActivity {// implements Adapter
                 intent.setType("text/csv");
 
                 startActivity(Intent.createChooser(intent, "Share to"));
-
-                //showToast("File created");
             } catch (Exception ex) {
                 showToast(ex.getMessage());
             }

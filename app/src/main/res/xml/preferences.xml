@@ -51,10 +51,10 @@
             app:summary="1.4"
             app:selectable="false"/>
 
-        <Preference
+        <!--<Preference
             app:key="send_feedback_button"
             app:title="Send feedback"
-            app:summary="Report technical issues or suggest new features"/>
+            app:summary="Report technical issues or suggest new features"/>-->
 
     </PreferenceCategory>
 
