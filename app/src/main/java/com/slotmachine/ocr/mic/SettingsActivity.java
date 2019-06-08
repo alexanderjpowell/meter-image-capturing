@@ -153,7 +153,7 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
 
         if (view == signOutButton) {
 
-            AuthUI.getInstance()
+            /*AuthUI.getInstance()
                     .signOut(this)
                     .addOnCompleteListener(new OnCompleteListener<Void>() {
                         @Override
@@ -165,11 +165,11 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
                                 showToast(task.getException().getMessage());
                             }
                         }
-                    });
+                    });*/
 
         } else if (view == deleteAccountButton) {
 
-            new AlertDialog.Builder(this)
+            /*new AlertDialog.Builder(this)
                     .setTitle("Delete Account")
                     .setMessage("Are you sure you want to delete your account? This operation cannot be undone.")
                     .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
@@ -190,12 +190,12 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
                         }
                     })
                     .setNegativeButton("No", null)
-                    .show();
+                    .show();*/
 
         } else if (view == changePasswordButton) {
-            startActivity(new Intent(SettingsActivity.this, ChangePasswordActivity.class));
+            /*startActivity(new Intent(SettingsActivity.this, ChangePasswordActivity.class));*/
         } else if (view == chooseMinValue) {
-            final EditText input = new EditText(SettingsActivity.this);
+            /*final EditText input = new EditText(SettingsActivity.this);
             input.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
             input.requestFocus();
             input.setHint("Enter a value");
@@ -222,11 +222,11 @@ public class SettingsActivity extends AppCompatActivity implements View.OnClickL
                             dialog.dismiss();
                         }
                     });
-            alertDialog.show();
+            alertDialog.show();*/
         } else if (view == changeEmailButton) {
             //showToast("clicked");
 
-            FirebaseUser user = firebaseAuth.getCurrentUser();
+            //FirebaseUser user = firebaseAuth.getCurrentUser();
             //user.updateEmail("<email>")
         }
     }

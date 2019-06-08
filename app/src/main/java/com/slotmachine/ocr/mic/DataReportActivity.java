@@ -53,6 +53,9 @@ public class DataReportActivity extends AppCompatActivity {// implements Adapter
 
     private SwipeRefreshLayout swipeRefreshLayout;
 
+    private enum DateRange {HOUR, DAY, WEEK}
+    private DateRange dateRange;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -76,12 +79,12 @@ public class DataReportActivity extends AppCompatActivity {// implements Adapter
                     public void onRefresh() {
                         // This method performs the actual data-refresh operation.
                         // The method calls setRefreshing(false) when it's finished.
-                        executeQuery("YEAR");
-                        //swipeRefreshLayout.setRefreshing(false);
-                        showToast("test");
+                        executeQuery(dateRange);
                     }
                 }
         );
+
+        dateRange = DateRange.DAY; // Default to last 24 hours
 
         rowDataList = new ArrayList<>();
         recyclerView = findViewById(R.id.recycler_view);
@@ -142,7 +145,7 @@ public class DataReportActivity extends AppCompatActivity {// implements Adapter
             }
         }));
 
-        executeQuery("WEEK");
+        executeQuery(dateRange);
     }
 
     @Override
@@ -172,11 +175,14 @@ public class DataReportActivity extends AppCompatActivity {// implements Adapter
             }
             //showToast(data);
         } else if (id == R.id.action_past_hour) {
-            executeQuery("HOUR");
+            dateRange = DateRange.HOUR;
+            executeQuery(DateRange.HOUR);
         } else if (id == R.id.action_past_day) {
-            executeQuery("DAY");
+            dateRange = DateRange.DAY;
+            executeQuery(DateRange.DAY);
         } else if (id == R.id.action_past_week) {
-            executeQuery("WEEK");
+            dateRange = DateRange.WEEK;
+            executeQuery(DateRange.WEEK);
         }
         return super.onOptionsItemSelected(item);
     }
@@ -185,23 +191,21 @@ public class DataReportActivity extends AppCompatActivity {// implements Adapter
         database.collection("scans").document(document_id).delete();
     }
 
-    private void executeQuery(String dateRange) {
+    private void executeQuery(DateRange dateRange) {
         int offset = 0;
-        if (dateRange.equals("HOUR"))
+        if (dateRange == DateRange.HOUR)
             offset = 3600;
-        else if (dateRange.equals("DAY"))
+        else if (dateRange == DateRange.DAY)
             offset = 86400;
-        else if (dateRange.equals("WEEK"))
+        else if (dateRange == DateRange.WEEK)
             offset = 604800;
-        else if (dateRange.equals("YEAR"))
-            offset = 24192;
         //showToast(Long.toString(System.currentTimeMillis()));
         Date time = new Date(System.currentTimeMillis() - offset * 1000);
         CollectionReference collectionReference = database.collection("scans");
         Query query = collectionReference.whereEqualTo("uid", firebaseAuth.getCurrentUser().getUid())
                 .whereGreaterThan("timestamp", time)
                 .orderBy("timestamp", Query.Direction.DESCENDING)
-                .limit(100);
+                .limit(5000);
         query.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {

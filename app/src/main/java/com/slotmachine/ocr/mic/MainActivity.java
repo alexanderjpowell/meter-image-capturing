@@ -48,9 +48,11 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.ml.vision.FirebaseVision;
@@ -67,10 +69,13 @@ import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, View.OnTouchListener {
 
@@ -111,6 +116,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     private Double minimumProgressiveValue;
     private Boolean autoSortProgressives = true;
+
+    private Set set;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -184,31 +191,38 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         progressive6.addTextChangedListener(new GenericTextWatcher(progressive6));
         machineId.addTextChangedListener(new GenericTextWatcher(machineId));
 
-        // Get minimum progressive amount
-        database.collection("users")
-                .document(firebaseAuth.getCurrentUser().getUid())
-                .get()
-                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                        if (task.isSuccessful()) {
-                            if (task.getResult().get("minimumProgressiveValue") != null) {
-                                minimumProgressiveValue = Double.parseDouble(task.getResult().get("minimumProgressiveValue").toString());
-                            } else {
-                                minimumProgressiveValue = 0.0;
-                            }
+        // Set minimum progressive value
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        String val = sharedPreferences.getString("minimum_value", "0");
+        try {
+            minimumProgressiveValue = Double.valueOf(val);
+        } catch (Exception ex) {
+            minimumProgressiveValue = 0.0;
+        }
 
-                            if (task.getResult().get("sortProgressives") != null) {
-                                autoSortProgressives = (boolean)task.getResult().get("sortProgressives");
-                            } else {
-                                autoSortProgressives = true;
-                            }
-                        }
+
+        // Get set of machine numbers in past 24 hours
+        set = new HashSet();
+        int offset = 86400;
+        Date time = new Date(System.currentTimeMillis() - offset * 1000);
+        CollectionReference collectionReference = database.collection("scans");
+        Query query = collectionReference.whereEqualTo("uid", firebaseAuth.getCurrentUser().getUid())
+                .whereGreaterThan("timestamp", time)
+                .orderBy("timestamp", Query.Direction.DESCENDING)
+                .limit(1000);
+        query.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                if (task.isSuccessful()) {
+                    for (QueryDocumentSnapshot document : task.getResult()) {
+                        set.add(document.get("machine_id").toString().trim());
                     }
-                });
+                } else {
+                    showToast("Unable to refresh.  Check your connection.");
+                }
+            }
+        });
     }
-
-
 
     @Override
     public boolean onTouch(View v, MotionEvent event) {
@@ -626,7 +640,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                     for (FirebaseVisionDocumentText.Paragraph paragraph : paragraphs) {
                                         List<FirebaseVisionDocumentText.Word> words = paragraph.getWords();
                                         Log.d("PARAGRAPH", paragraph.getText());
-                                        if (getNumberOfOccurences(paragraph.getText()) == 2) {
+                                        if (getNumberOfOccurrences(paragraph.getText()) == 2) {
                                             int firstIndex = paragraph.getText().indexOf('#');
                                             int secondIndex = paragraph.getText().indexOf('#', firstIndex + 1);
                                             machineCode = paragraph.getText().substring(firstIndex+1, secondIndex).trim();
@@ -760,7 +774,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG).show();
     }
 
-    private int getNumberOfOccurences(String input) {
+    private int getNumberOfOccurrences(String input) {
         int ret = 0;
         for (int i = 0; i < input.length(); i++) {
             if (input.charAt(i) == '#') {
@@ -793,16 +807,16 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             sortProgressives();
 
             // Get data points
-            String machineIdText = machineId.getText().toString().trim();
-            String progressiveText1 = progressive1.getText().toString().trim();
-            String progressiveText2 = progressive2.getText().toString().trim();
-            String progressiveText3 = progressive3.getText().toString().trim();
-            String progressiveText4 = progressive4.getText().toString().trim();
-            String progressiveText5 = progressive5.getText().toString().trim();
-            String progressiveText6 = progressive6.getText().toString().trim();
-            String emailText = firebaseAuth.getCurrentUser().getEmail().trim();
-            String userId = firebaseAuth.getCurrentUser().getUid().trim();
-            String userName = (spinner.getSelectedItem() == null) ? "No user selected" : spinner.getSelectedItem().toString();
+            final String machineIdText = machineId.getText().toString().trim();
+            final String progressiveText1 = progressive1.getText().toString().trim();
+            final String progressiveText2 = progressive2.getText().toString().trim();
+            final String progressiveText3 = progressive3.getText().toString().trim();
+            final String progressiveText4 = progressive4.getText().toString().trim();
+            final String progressiveText5 = progressive5.getText().toString().trim();
+            final String progressiveText6 = progressive6.getText().toString().trim();
+            final String emailText = firebaseAuth.getCurrentUser().getEmail().trim();
+            final String userId = firebaseAuth.getCurrentUser().getUid().trim();
+            final String userName = (spinner.getSelectedItem() == null) ? "No user selected" : spinner.getSelectedItem().toString();
 
             // First, make sure machine id isn't blank
             if (machineIdText.isEmpty()) {
@@ -833,7 +847,47 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             // Check if same machine number has been scanned in last 24 hours
             // maybe compile a collection (set) of all unique machine numbers in the oncreate so this only has to be done once
             // then run cross check based on that and display a popup if necessary.
+            if (set.contains(machineIdText)) {
+                //showToast("possible duplicate");
+                AlertDialog alertDialog = new AlertDialog.Builder(MainActivity.this).create();
+                alertDialog.setMessage("This machine has already been scanned in the past 24 hours.");
+                alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, "CANCEL",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int i) {
+                                dialog.dismiss();
+                            }
+                        });
+                alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "SUBMIT ANYWAY",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int i) {
+                                Map<String, Object> user = new HashMap<>();
+                                //user.put("name", displayNameText);
+                                user.put("email", emailText);
+                                user.put("uid", userId);
+                                user.put("progressive1", progressiveText1);
+                                user.put("progressive2", progressiveText2);
+                                user.put("progressive3", progressiveText3);
+                                user.put("progressive4", progressiveText4);
+                                user.put("progressive5", progressiveText5);
+                                user.put("progressive6", progressiveText6);
+                                user.put("machine_id", machineIdText);
+                                user.put("timestamp", FieldValue.serverTimestamp());
+                                user.put("userName", userName);
+                                user.put("notes", "");
 
+                                database.collection("scans").document().set(user);
+                                set.add(machineIdText);
+
+                                resetMachineId();
+                                resetProgressives();
+                                showToast("Progressives submitted successfully");
+                                hideKeyboard();
+                                dialog.dismiss();
+                            }
+                        });
+                alertDialog.show();
+                return;
+            }
             //
 
             Map<String, Object> user = new HashMap<>();
@@ -852,6 +906,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             user.put("notes", "");
 
             database.collection("scans").document().set(user);
+            set.add(machineIdText);
 
             resetMachineId();
             resetProgressives();
@@ -886,13 +941,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     private String formatVoiceToSpeech(String text, boolean isProgressive) {
-        //showToast(text);
         text = text.toLowerCase();
         String original = text;
         StringBuilder newText = new StringBuilder();
         String[] words = text.split("\\s");
         for (int i = 0; i < words.length; i++) {
-            //words[i] = convertString(words[i]);
             newText.append(convertString(words[i]));
         }
         text = newText.toString();
@@ -982,7 +1035,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             values.add(Double.parseDouble(progressive6.getText().toString()));
         }
 
-        if (autoSortProgressives) {
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        boolean sort = sharedPreferences.getBoolean("autosort_progressives_preference", true);
+
+        if (sort) {
             Collections.sort(values);
             Collections.reverse(values);
         }
@@ -1005,24 +1061,5 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 progressive6.setText(df.format(values.get(i)));
             }
         }
-
-        /*database.collection("users")
-                .document(firebaseAuth.getCurrentUser().getUid())
-                .get()
-                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                        if (task.isSuccessful()) {
-                            if (task.getResult().get("sortProgressives") != null) {
-                                boolean sort = (boolean)task.getResult().get("sortProgressives");
-                                if (sort) {
-                                }
-                            } else {
-                            }
-                        } else {
-                            showToast("No connection");
-                        }
-                    }
-                });*/
     }
 }
