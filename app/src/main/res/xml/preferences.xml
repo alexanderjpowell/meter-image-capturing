@@ -48,7 +48,7 @@
         <Preference
             app:key="version_number_preference"
             app:title="Version Number"
-            app:summary="1.4"
+            app:summary="1.5"
             app:selectable="false"/>
 
         <!--<Preference
