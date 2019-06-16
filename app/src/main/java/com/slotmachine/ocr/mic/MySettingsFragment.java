@@ -39,6 +39,7 @@ public class MySettingsFragment extends PreferenceFragmentCompat {
         Preference sign_out_preference = findPreference("sign_out_button");
         Preference change_password_button = findPreference("change_password_button");
         Preference delete_account_button = findPreference("delete_account_button");
+        Preference terms_and_conditions_button = findPreference("legal_disclaimer");
 
         if (editTextPreference != null) {
             editTextPreference.setSummaryProvider(new SummaryProvider<EditTextPreference>() {
@@ -55,7 +56,7 @@ public class MySettingsFragment extends PreferenceFragmentCompat {
                     new Preference.OnPreferenceChangeListener() {
                         @Override
                         public boolean onPreferenceChange(Preference preference, Object newValue) {
-                            Toast.makeText(getContext(), "changed email", Toast.LENGTH_SHORT).show();
+                            //Toast.makeText(getContext(), "changed email", Toast.LENGTH_SHORT).show();
                             return true;
                         }
                     }
@@ -102,7 +103,6 @@ public class MySettingsFragment extends PreferenceFragmentCompat {
                     new Preference.OnPreferenceClickListener() {
                         @Override
                         public boolean onPreferenceClick(Preference preference) {
-                            Toast.makeText(getContext(), "Change password", Toast.LENGTH_SHORT).show();
                             startActivity(new Intent(getActivity(), ChangePasswordActivity.class));
                             return true;
                         }
@@ -137,6 +137,18 @@ public class MySettingsFragment extends PreferenceFragmentCompat {
                                     })
                                     .setNegativeButton("No", null)
                                     .show();
+                            return true;
+                        }
+                    }
+            );
+        }
+
+        if (terms_and_conditions_button != null) {
+            terms_and_conditions_button.setOnPreferenceClickListener(
+                    new Preference.OnPreferenceClickListener() {
+                        @Override
+                        public boolean onPreferenceClick(Preference preference) {
+                            startActivity(new Intent(getActivity(), DisclaimerActivity.class));
                             return true;
                         }
                     }
