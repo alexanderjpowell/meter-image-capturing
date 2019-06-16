@@ -5,10 +5,17 @@ import android.content.Intent;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.SpannableString;
+import android.text.Spanned;
+import android.text.TextPaint;
 import android.text.TextUtils;
+import android.text.method.LinkMovementMethod;
+import android.text.style.ClickableSpan;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -23,7 +30,8 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     private EditText emailEditText;
     private EditText passwordEditText;
     private Button loginButton;
-    //private TextView signinActivityTextView;
+    private CheckBox checkBox;
+    private TextView textView;
 
     private ProgressDialog progressDialog;
 
@@ -42,12 +50,20 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         emailEditText = (EditText)findViewById(R.id.emailEditText);
         passwordEditText = (EditText)findViewById(R.id.passwordEditText);
         loginButton = (Button)findViewById(R.id.loginButton);
-        //signinActivityTextView = (TextView)findViewById(R.id.signinActivityTextView);
+        checkBox = (CheckBox)findViewById(R.id.checkBox);
+        textView = (TextView)findViewById(R.id.textView);
+
+        String message = "I have read and agree to the terms and conditions";
+        SpannableString ss = new SpannableString(message);
+        ss.setSpan(new MyClickableSpan(), message.length() - "terms and conditions".length(), message.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        textView.setText(ss);
 
         progressDialog = new ProgressDialog(this);
 
         loginButton.setOnClickListener(this);
-        //signinActivityTextView.setOnClickListener(this);
+        textView.setMovementMethod(LinkMovementMethod.getInstance());
+
+        loginButton.setEnabled(false);
     }
 
     private void userLogin() {
@@ -90,10 +106,12 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     public void onClick(View view) {
         if (view == loginButton) {
             userLogin();
-        } //else if (view == signinActivityTextView) {
-            //finish();
-            //startActivity(new Intent(LoginActivity.this, SignUpActivity.class));
-        //}
+        }
+    }
+
+    public void onCheckboxClicked(View view) {
+        boolean checked = ((CheckBox)view).isChecked();
+        loginButton.setEnabled(checked);
     }
 
     // Prevent back press from logging user back in
@@ -107,5 +125,18 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
     private void showToast(String message) {
         Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG).show();
+    }
+
+    class MyClickableSpan extends ClickableSpan {
+
+        public void onClick(View textView) {
+            Intent intent = new Intent(LoginActivity.this, DisclaimerActivity.class);
+            startActivity(intent);
+        }
+
+        @Override
+        public void updateDrawState(TextPaint ds) {
+            ds.setUnderlineText(true);
+        }
     }
 }

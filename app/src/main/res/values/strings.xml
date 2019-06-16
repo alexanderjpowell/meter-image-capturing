@@ -51,4 +51,9 @@
     <string name="one_day_text">1 Day</string>
     <string name="one_week_text">1 Week</string>
 
+    <string name="disclaimer_header">Disclaimer</string>
+    <string name="terms_and_conditions1">The information contained within the MIC application is for general informational purposes, and acts as a data gathering tool.  MIC or it’s distributors assume no responsibility for errors or omissions in the collected data.</string>
+    <string name="terms_and_conditions2">In no way shall MIC or it’s distributors be liable for any special, direct, indirect, consequential, or incidental damages or any damages whatsoever, arising out of, or in connection with the use of the application.  MIC reserves the right to make additions, deletions, or modifications to application at any time without prior notice.</string>
+    <string name="terms_and_conditions3">By using the MIC application, the user assumes all responsibility to ensure the data is accurate and consistent with whatever Minimum Internal Control standards, or other regulatory conditions user may or may not be subject to.</string>
+
 </resources>
