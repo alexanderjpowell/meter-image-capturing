@@ -47,7 +47,8 @@ public class MySettingsFragment extends PreferenceFragmentCompat {
                 public CharSequence provideSummary(EditTextPreference preference) {
                     String text = preference.getText();
                     if (TextUtils.isEmpty(text)) {
-                        return "Not set";
+                        //return "Not set";
+                        return "Separate with commas to include multiple recipients";
                     }
                     return text;
                 }

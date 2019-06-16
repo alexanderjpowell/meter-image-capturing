@@ -55,11 +55,6 @@
             app:key="legal_disclaimer"
             app:title="Terms and Conditions"/>
 
-        <!--<Preference
-            app:key="send_feedback_button"
-            app:title="Send feedback"
-            app:summary="Report technical issues or suggest new features"/>-->
-
     </PreferenceCategory>
 
 </PreferenceScreen>
