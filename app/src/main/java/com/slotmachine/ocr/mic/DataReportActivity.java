@@ -316,7 +316,6 @@ public class DataReportActivity extends AppCompatActivity {// implements Adapter
                 Uri uri = FileProvider.getUriForFile(this, "com.slotmachine.ocr.mic.fileprovider", csvFile);
                 Intent intent = new Intent(Intent.ACTION_SEND);
                 if (!report_recipient_email.isEmpty()) {
-                    //intent.putExtra(Intent.EXTRA_EMAIL, new String[]{ report_recipient_email });
                     intent.putExtra(Intent.EXTRA_EMAIL, emails);
                 }
                 intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
