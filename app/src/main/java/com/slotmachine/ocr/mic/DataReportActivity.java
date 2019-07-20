@@ -143,6 +143,17 @@ public class DataReportActivity extends AppCompatActivity {// implements Adapter
             }
         }));
 
+        //
+        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                if (dy > 0) {
+                    //showToast("scrolling down");
+                }
+            }
+        });
+        //
+
         executeQuery(dateRange);
     }
 

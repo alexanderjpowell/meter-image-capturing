@@ -12,6 +12,7 @@
     <color name="primary">#202020</color>
     <color name="primary_dark">#282828</color>
     <color name="primary_darker">#303030</color>
+    <color name="primary_lighter">#414141</color>
 
     <!--<color name="primary">#03A9F4</color>
     <color name="primary_dark">#2196F3</color>
