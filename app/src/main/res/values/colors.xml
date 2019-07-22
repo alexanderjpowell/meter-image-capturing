@@ -8,7 +8,6 @@
 
     <color name="green">#DC028A02</color>
 
-
     <color name="primary">#202020</color>
     <color name="primary_dark">#282828</color>
     <color name="primary_darker">#303030</color>
@@ -23,6 +22,8 @@
     <color name="base">#AAAAAA</color>
     <color name="iron">#CCCCCC</color>
     <color name="white">#FFFFFF</color>
+
+    <color name="status_bar_login">#999999</color>
 
     <color name="submit_button_color">#CCFFFFFF</color>
 
