@@ -41,17 +41,24 @@ import java.util.List;
 public class DataReportActivity extends AppCompatActivity {// implements AdapterView.OnItemSelectedListener {
 
     private List<RowData> rowDataList;
-    private List<RowData> rowDataListReport;
+    //private List<RowData> rowDataListReport;
     private RecyclerView recyclerView;
     private ReportDataAdapter mAdapter;
 
     private FirebaseAuth firebaseAuth;
     private FirebaseFirestore database;
+    private QueryDocumentSnapshot lastDocumentSnapshot;
 
     private SwipeRefreshLayout swipeRefreshLayout;
 
     private enum DateRange {HOUR, DAY, WEEK}
     private DateRange dateRange;
+
+    int pastVisibleItems, visibleItemCount, totalItemCount;
+    private boolean LOADING = true;
+
+    int offset = 0;
+    private int QUERY_LIMIT_SIZE = 25;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,6 +75,8 @@ public class DataReportActivity extends AppCompatActivity {// implements Adapter
             return;
         }
 
+        dateRange = DateRange.DAY; // Default to last 24 hours
+
         database = FirebaseFirestore.getInstance();
         swipeRefreshLayout = findViewById(R.id.swipeRefresh);
         swipeRefreshLayout.setOnRefreshListener(
@@ -81,14 +90,13 @@ public class DataReportActivity extends AppCompatActivity {// implements Adapter
                 }
         );
 
-        dateRange = DateRange.DAY; // Default to last 24 hours
-
         rowDataList = new ArrayList<>();
-        rowDataListReport = new ArrayList<>();
+        //rowDataListReport = new ArrayList<>();
         recyclerView = findViewById(R.id.recycler_view);
         mAdapter = new ReportDataAdapter(DataReportActivity.this, rowDataList);
 
-        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
+        //final RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
+        final LinearLayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
         recyclerView.setLayoutManager(mLayoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.addItemDecoration(new DividerItemDecoration(this, LinearLayoutManager.VERTICAL));
@@ -143,12 +151,36 @@ public class DataReportActivity extends AppCompatActivity {// implements Adapter
             }
         }));
 
-        //
+        // Load more results when bottom of page is reached
         recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
-            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
                 if (dy > 0) {
-                    //showToast("scrolling down");
+
+                    visibleItemCount = mLayoutManager.getChildCount();
+                    totalItemCount = mLayoutManager.getItemCount();
+                    pastVisibleItems = mLayoutManager.findFirstVisibleItemPosition();
+
+                    if (LOADING) {
+                        if ((visibleItemCount + pastVisibleItems) >= totalItemCount) {
+                            LOADING = false;
+                            //showToast("Last Item Wow!");
+                            // do pagination
+                            /*RowData r1 = new RowData("x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", false);
+                            RowData r2 = new RowData("x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", false);
+                            RowData r3 = new RowData("x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", false);
+                            rowDataList.add(r1);
+                            rowDataList.add(r2);
+                            rowDataList.add(r3);
+                            rowDataListReport.add(r1);
+                            rowDataListReport.add(r2);
+                            rowDataListReport.add(r3);
+                            mAdapter.notifyDataSetChanged();*/
+                            loadMoreRecords();
+                            //
+                            //LOADING = true;
+                        }
+                    }
                 }
             }
         });
@@ -184,15 +216,50 @@ public class DataReportActivity extends AppCompatActivity {// implements Adapter
             }
         } else if (id == R.id.action_past_hour) {
             dateRange = DateRange.HOUR;
-            executeQuery(DateRange.HOUR);
+            offset = 3600;
+            executeQuery(dateRange);
         } else if (id == R.id.action_past_day) {
             dateRange = DateRange.DAY;
-            executeQuery(DateRange.DAY);
+            offset = 86400;
+            executeQuery(dateRange);
         } else if (id == R.id.action_past_week) {
             dateRange = DateRange.WEEK;
-            executeQuery(DateRange.WEEK);
+            offset = 604800;
+            executeQuery(dateRange);
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private int getOffsetFromDateRange(DateRange dateRange) {
+        int ret = 86400;
+        if (dateRange.equals(DateRange.HOUR))
+            ret = 3600;
+        else if (dateRange.equals(DateRange.DAY))
+            ret = 86400;
+        else if (dateRange.equals(DateRange.WEEK))
+            ret = offset = 604800;
+        return ret;
+    }
+
+    private void loadMoreRecords() {
+        Date time = new Date(System.currentTimeMillis() - offset * 1000);
+        CollectionReference collectionReference = database.collection("scans");
+        Query query = collectionReference.whereEqualTo("uid", firebaseAuth.getCurrentUser().getUid())
+                .whereGreaterThan("timestamp", time)
+                .orderBy("timestamp", Query.Direction.DESCENDING)
+                .startAfter(lastDocumentSnapshot)
+                .limit(QUERY_LIMIT_SIZE);//5
+        query.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                if (task.isSuccessful()) {
+                    updateData(task.getResult());
+                } else {
+                    showToast("Unable to refresh.  Check your connection.");
+                }
+                LOADING = true;
+            }
+        });
     }
 
     private void deleteScanFromDatabase(String document_id) {
@@ -200,19 +267,12 @@ public class DataReportActivity extends AppCompatActivity {// implements Adapter
     }
 
     private void executeQuery(DateRange dateRange) {
-        int offset = 0;
-        if (dateRange == DateRange.HOUR)
-            offset = 3600;
-        else if (dateRange == DateRange.DAY)
-            offset = 86400;
-        else if (dateRange == DateRange.WEEK)
-            offset = 604800;
         Date time = new Date(System.currentTimeMillis() - offset * 1000);
         CollectionReference collectionReference = database.collection("scans");
         Query query = collectionReference.whereEqualTo("uid", firebaseAuth.getCurrentUser().getUid())
                 .whereGreaterThan("timestamp", time)
                 .orderBy("timestamp", Query.Direction.DESCENDING)
-                .limit(5000);
+                .limit(QUERY_LIMIT_SIZE);//5000
         query.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
@@ -231,11 +291,11 @@ public class DataReportActivity extends AppCompatActivity {// implements Adapter
         String machine_id, timestamp, user, progressive1, progressive2, progressive3, progressive4, progressive5, progressive6, notes;
         RowData rowData;
         rowDataList.clear(); // reset the current data list
-        rowDataListReport.clear();
-        int maxDisplayedValues = 100;
-        int count = 0;
+        //rowDataListReport.clear();
 
         for (QueryDocumentSnapshot document : snapshot) {
+
+            lastDocumentSnapshot = document;
 
             machine_id = document.get("machine_id").toString();
             timestamp = document.getTimestamp("timestamp").toDate().toString();
@@ -261,11 +321,48 @@ public class DataReportActivity extends AppCompatActivity {// implements Adapter
                     notes,
                     false);
 
-            if (count < maxDisplayedValues) {
-                rowDataList.add(rowData);
-            }
-            rowDataListReport.add(rowData);
-            count++;
+            rowDataList.add(rowData);
+            //rowDataListReport.add(rowData);
+        }
+
+        mAdapter.notifyDataSetChanged();
+    }
+
+    private void updateData(QuerySnapshot snapshot) {
+
+        String machine_id, timestamp, user, progressive1, progressive2, progressive3, progressive4, progressive5, progressive6, notes;
+        RowData rowData;
+
+        for (QueryDocumentSnapshot document : snapshot) {
+
+            lastDocumentSnapshot = document;
+
+            machine_id = document.get("machine_id").toString();
+            timestamp = document.getTimestamp("timestamp").toDate().toString();
+            user = (document.get("userName") == null) ? "User not specified" : document.get("userName").toString();
+            progressive1 = document.get("progressive1").toString().trim().isEmpty() ? "" : "$" + document.get("progressive1").toString().trim();
+            progressive2 = document.get("progressive2").toString().trim().isEmpty() ? "" : "$" + document.get("progressive2").toString().trim();
+            progressive3 = document.get("progressive3").toString().trim().isEmpty() ? "" : "$" + document.get("progressive3").toString().trim();
+            progressive4 = document.get("progressive4").toString().trim().isEmpty() ? "" : "$" + document.get("progressive4").toString().trim();
+            progressive5 = document.get("progressive5").toString().trim().isEmpty() ? "" : "$" + document.get("progressive5").toString().trim();
+            progressive6 = document.get("progressive6").toString().trim().isEmpty() ? "" : "$" + document.get("progressive6").toString().trim();
+            notes = (document.get("notes") == null) ? "" : document.get("notes").toString().trim();
+
+            rowData = new RowData(document.getId(),
+                    "Machine ID: " + machine_id,
+                    timestamp,
+                    user,
+                    progressive1,
+                    progressive2,
+                    progressive3,
+                    progressive4,
+                    progressive5,
+                    progressive6,
+                    notes,
+                    false);
+
+            rowDataList.add(rowData);
+            //rowDataListReport.add(rowData);
         }
 
         mAdapter.notifyDataSetChanged();
@@ -295,7 +392,7 @@ public class DataReportActivity extends AppCompatActivity {// implements Adapter
 
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("\"Machine\",\"Progressive1\",\"Progressive2\",\"Progressive3\",\"Progressive4\",\"Progressive5\",\"Progressive6\", \"Notes\",\"Date\",\"User\"\n");
-        for (RowData rowData : rowDataListReport) {
+        /*for (RowData rowData : rowDataListReport) {
             stringBuilder.append("\"" + getMachineIdFromString(rowData.getMachineId()) + "\",");
             stringBuilder.append("\"" + rowData.getProgressive1() + "\",");
             stringBuilder.append("\"" + rowData.getProgressive2() + "\",");
@@ -306,7 +403,7 @@ public class DataReportActivity extends AppCompatActivity {// implements Adapter
             stringBuilder.append("\"" + rowData.getNotes() + "\",");
             stringBuilder.append("\"" + rowData.getDate() + "\",");
             stringBuilder.append("\"" + rowData.getUser() + "\"\n");
-        }
+        }*/
         return stringBuilder.toString();
     }
 
@@ -318,7 +415,9 @@ public class DataReportActivity extends AppCompatActivity {// implements Adapter
 
         if (isExternalStorageWritable()) {
             File csvFile = new File(getFilesDir(), "report.csv");
+
             String fileContents = createCsvFile();
+
             try {
                 FileOutputStream fos = new FileOutputStream(csvFile);
                 fos.write(fileContents.getBytes());
