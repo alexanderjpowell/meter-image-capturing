@@ -76,6 +76,7 @@ public class DataReportActivity extends AppCompatActivity {// implements Adapter
         }
 
         dateRange = DateRange.DAY; // Default to last 24 hours
+        offset = 86400; // ...
 
         database = FirebaseFirestore.getInstance();
         swipeRefreshLayout = findViewById(R.id.swipeRefresh);
@@ -373,11 +374,11 @@ public class DataReportActivity extends AppCompatActivity {// implements Adapter
         return text;
     }
 
-    private String createCsvFile() {
+    /*private String createCsvFile() {
 
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("\"Machine\",\"Progressive1\",\"Progressive2\",\"Progressive3\",\"Progressive4\",\"Progressive5\",\"Progressive6\", \"Notes\",\"Date\",\"User\"\n");
-        /*for (RowData rowData : rowDataListReport) {
+        for (RowData rowData : rowDataListReport) {
             stringBuilder.append("\"" + getMachineIdFromString(rowData.getMachineId()) + "\",");
             stringBuilder.append("\"" + rowData.getProgressive1() + "\",");
             stringBuilder.append("\"" + rowData.getProgressive2() + "\",");
@@ -388,39 +389,82 @@ public class DataReportActivity extends AppCompatActivity {// implements Adapter
             stringBuilder.append("\"" + rowData.getNotes() + "\",");
             stringBuilder.append("\"" + rowData.getDate() + "\",");
             stringBuilder.append("\"" + rowData.getUser() + "\"\n");
-        }*/
+        }
+
+        return stringBuilder.toString();
+    }*/
+
+    private String createCsvFile2(QuerySnapshot snapshot) {
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("\"Machine\",\"Progressive1\",\"Progressive2\",\"Progressive3\",\"Progressive4\",\"Progressive5\",\"Progressive6\", \"Notes\",\"Date\",\"User\"\n");
+        for (QueryDocumentSnapshot document : snapshot) {
+            String machine_id = document.get("machine_id").toString();
+            String timestamp = document.getTimestamp("timestamp").toDate().toString();
+            String user = (document.get("userName") == null) ? "User not specified" : document.get("userName").toString();
+            String progressive1 = document.get("progressive1").toString().trim().isEmpty() ? "" : "$" + document.get("progressive1").toString().trim();
+            String progressive2 = document.get("progressive2").toString().trim().isEmpty() ? "" : "$" + document.get("progressive2").toString().trim();
+            String progressive3 = document.get("progressive3").toString().trim().isEmpty() ? "" : "$" + document.get("progressive3").toString().trim();
+            String progressive4 = document.get("progressive4").toString().trim().isEmpty() ? "" : "$" + document.get("progressive4").toString().trim();
+            String progressive5 = document.get("progressive5").toString().trim().isEmpty() ? "" : "$" + document.get("progressive5").toString().trim();
+            String progressive6 = document.get("progressive6").toString().trim().isEmpty() ? "" : "$" + document.get("progressive6").toString().trim();
+            String notes = (document.get("notes") == null) ? "" : document.get("notes").toString().trim();
+
+            stringBuilder.append("\"" + machine_id + "\",");
+            stringBuilder.append("\"" + progressive1 + "\",");
+            stringBuilder.append("\"" + progressive2 + "\",");
+            stringBuilder.append("\"" + progressive3 + "\",");
+            stringBuilder.append("\"" + progressive4 + "\",");
+            stringBuilder.append("\"" + progressive5 + "\",");
+            stringBuilder.append("\"" + progressive6 + "\",");
+            stringBuilder.append("\"" + notes + "\",");
+            stringBuilder.append("\"" + timestamp + "\",");
+            stringBuilder.append("\"" + user + "\"\n");
+        }
         return stringBuilder.toString();
     }
 
     public void generateReport(View view) {
 
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        String report_recipient_email = sharedPreferences.getString("email_recipient", "");
-        String[] emails = report_recipient_email.split(",");
+        final String report_recipient_email = sharedPreferences.getString("email_recipient", "");
+        final String[] emails = report_recipient_email.split(",");
+        final File csvFile = new File(getFilesDir(), "report.csv");
 
         if (isExternalStorageWritable()) {
-            File csvFile = new File(getFilesDir(), "report.csv");
+            Date time = new Date(System.currentTimeMillis() - offset * 1000);
+            CollectionReference collectionReference = database.collection("scans");
+            Query query = collectionReference.whereEqualTo("uid", firebaseAuth.getCurrentUser().getUid())
+                    .whereGreaterThan("timestamp", time)
+                    .orderBy("timestamp", Query.Direction.DESCENDING)
+                    .limit(5000);
+            query.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                @Override
+                public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                    if (task.isSuccessful()) {
+                        String report_contents = createCsvFile2(task.getResult());
+                        try {
+                            FileOutputStream fos = new FileOutputStream(csvFile);
+                            fos.write(report_contents.getBytes());
+                            fos.close();
 
-            String fileContents = createCsvFile();
+                            Uri uri = FileProvider.getUriForFile(DataReportActivity.this, "com.slotmachine.ocr.mic.fileprovider", csvFile);
+                            Intent intent = new Intent(Intent.ACTION_SEND);
+                            if (!report_recipient_email.isEmpty()) {
+                                intent.putExtra(Intent.EXTRA_EMAIL, emails);
+                            }
+                            intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                            intent.putExtra(Intent.EXTRA_STREAM, uri);
+                            intent.setType("text/csv");
 
-            try {
-                FileOutputStream fos = new FileOutputStream(csvFile);
-                fos.write(fileContents.getBytes());
-                fos.close();
-
-                Uri uri = FileProvider.getUriForFile(this, "com.slotmachine.ocr.mic.fileprovider", csvFile);
-                Intent intent = new Intent(Intent.ACTION_SEND);
-                if (!report_recipient_email.isEmpty()) {
-                    intent.putExtra(Intent.EXTRA_EMAIL, emails);
+                            startActivity(Intent.createChooser(intent, "Share to"));
+                        } catch (Exception ex) {
+                            showToast(ex.getMessage());
+                        }
+                    } else {
+                        showToast("Unable to generate report.  Check your connection.");
+                    }
                 }
-                intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                intent.putExtra(Intent.EXTRA_STREAM, uri);
-                intent.setType("text/csv");
-
-                startActivity(Intent.createChooser(intent, "Share to"));
-            } catch (Exception ex) {
-                showToast(ex.getMessage());
-            }
+            });
         } else {
             showToast("Cannot write to external storage");
         }
