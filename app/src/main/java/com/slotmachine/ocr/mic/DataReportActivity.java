@@ -58,7 +58,7 @@ public class DataReportActivity extends AppCompatActivity {// implements Adapter
     private boolean LOADING = true;
 
     int offset = 0;
-    private int QUERY_LIMIT_SIZE = 25;
+    private int QUERY_LIMIT_SIZE = 10;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -164,21 +164,7 @@ public class DataReportActivity extends AppCompatActivity {// implements Adapter
                     if (LOADING) {
                         if ((visibleItemCount + pastVisibleItems) >= totalItemCount) {
                             LOADING = false;
-                            //showToast("Last Item Wow!");
-                            // do pagination
-                            /*RowData r1 = new RowData("x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", false);
-                            RowData r2 = new RowData("x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", false);
-                            RowData r3 = new RowData("x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", false);
-                            rowDataList.add(r1);
-                            rowDataList.add(r2);
-                            rowDataList.add(r3);
-                            rowDataListReport.add(r1);
-                            rowDataListReport.add(r2);
-                            rowDataListReport.add(r3);
-                            mAdapter.notifyDataSetChanged();*/
                             loadMoreRecords();
-                            //
-                            //LOADING = true;
                         }
                     }
                 }
@@ -198,11 +184,9 @@ public class DataReportActivity extends AppCompatActivity {// implements Adapter
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-        if (id == R.id.action_delete) {
-
+        /*if (id == R.id.action_delete) {
             String data = "";
             List<RowData> listRowData = mAdapter.getRowDataList();
-
             Iterator<RowData> listRowDataIterator = listRowData.iterator();
             int count = 0;
             while (listRowDataIterator.hasNext()) {
@@ -214,7 +198,8 @@ public class DataReportActivity extends AppCompatActivity {// implements Adapter
                 }
                 count++;
             }
-        } else if (id == R.id.action_past_hour) {
+        }*/
+        if (id == R.id.action_past_hour) {
             dateRange = DateRange.HOUR;
             offset = 3600;
             executeQuery(dateRange);
