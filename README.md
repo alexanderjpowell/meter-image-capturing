@@ -39,11 +39,15 @@ The following security rules are in place to ensure data stored in our database 
 
 ```
 service cloud.firestore {
-    match /databases/{database}/documents {
-        match /{document=**} {
-            allow read, write: if request.auth.uid != null;
-        }
-    }
+	match /databases/{database}/documents {    
+		match /scans/{documentId} {
+			allow read, update, delete: if request.auth.uid == resource.data.uid;
+			allow create: if request.auth.uid != null;
+		}
+		match /users/{document=**} {
+			allow read, write: if request.auth.uid != null;
+		}
+	}
 }
 ```
 
