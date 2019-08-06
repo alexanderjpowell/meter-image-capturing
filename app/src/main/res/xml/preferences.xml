@@ -33,6 +33,14 @@
         app:title="Account">
 
         <Preference
+            app:key="account_email_button"
+            app:title="Account Email"/>
+
+        <Preference
+            app:key="display_name_button"
+            app:title="Name"/>
+
+        <Preference
             app:key="sign_out_button"
             app:title="Sign Out"/>
 

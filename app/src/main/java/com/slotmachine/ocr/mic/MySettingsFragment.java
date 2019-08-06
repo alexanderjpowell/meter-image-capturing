@@ -33,27 +33,40 @@ public class MySettingsFragment extends PreferenceFragmentCompat {
         setPreferencesFromResource(R.xml.preferences, rootKey);
 
         firebaseAuth = FirebaseAuth.getInstance();
+        if (firebaseAuth.getCurrentUser() == null) {
+            startActivity(new Intent(getContext(), LoginActivity.class));
+            return;
+        }
 
-        EditTextPreference editTextPreference = findPreference("email_recipient");
+        Preference account_email_preference = findPreference("account_email_button");
+        Preference display_name_preference = findPreference("display_name_button");
+        EditTextPreference email_recipient_preference = findPreference("email_recipient");
         EditTextPreference minimum_value = findPreference("minimum_value");
         Preference sign_out_preference = findPreference("sign_out_button");
         Preference change_password_button = findPreference("change_password_button");
         Preference delete_account_button = findPreference("delete_account_button");
         Preference terms_and_conditions_button = findPreference("legal_disclaimer");
 
-        if (editTextPreference != null) {
-            editTextPreference.setSummaryProvider(new SummaryProvider<EditTextPreference>() {
+        if (account_email_preference != null) {
+            account_email_preference.setSummary(firebaseAuth.getCurrentUser().getEmail());
+        }
+
+        if (display_name_preference != null) {
+            display_name_preference.setSummary(firebaseAuth.getCurrentUser().getDisplayName());
+        }
+
+        if (email_recipient_preference != null) {
+            email_recipient_preference.setSummaryProvider(new SummaryProvider<EditTextPreference>() {
                 @Override
                 public CharSequence provideSummary(EditTextPreference preference) {
                     String text = preference.getText();
                     if (TextUtils.isEmpty(text)) {
-                        //return "Not set";
                         return "Separate with commas to include multiple recipients";
                     }
                     return text;
                 }
             });
-            editTextPreference.setOnPreferenceChangeListener(
+            email_recipient_preference.setOnPreferenceChangeListener(
                     new Preference.OnPreferenceChangeListener() {
                         @Override
                         public boolean onPreferenceChange(Preference preference, Object newValue) {

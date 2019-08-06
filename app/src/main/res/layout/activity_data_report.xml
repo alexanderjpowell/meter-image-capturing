@@ -7,10 +7,6 @@
     android:layout_height="match_parent"
     tools:context=".DataReportActivity">
 
-    <!--androidx.coordinatorlayout.widget.CoordinatorLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">-->
-
         <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
             android:id="@+id/swipeRefresh"
             android:layout_width="match_parent"
@@ -48,7 +44,5 @@
             android:layout_margin="@dimen/fab_margin"
             app:srcCompat="@drawable/baseline_share_white_18"
             android:onClick="generateReport"/>
-
-    <!--</androidx.coordinatorlayout.widget.CoordinatorLayout>-->
 
 </FrameLayout>
