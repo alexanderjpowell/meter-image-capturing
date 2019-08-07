@@ -2,10 +2,8 @@ package com.slotmachine.ocr.mic;
 
 import android.content.Intent;
 import androidx.appcompat.app.AppCompatActivity;
-
 import android.os.Bundle;
 import android.view.View;
-
 import com.google.firebase.auth.FirebaseAuth;
 
 public class SettingsActivity extends AppCompatActivity implements View.OnClickListener{

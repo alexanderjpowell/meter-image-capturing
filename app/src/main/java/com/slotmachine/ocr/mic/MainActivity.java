@@ -1038,7 +1038,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
 
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        boolean sort = sharedPreferences.getBoolean("autosort_progressives_preference", true);
+        boolean sort = sharedPreferences.getBoolean("auto_sort_progressives_preference", true);
 
         if (sort) {
             Collections.sort(values);
