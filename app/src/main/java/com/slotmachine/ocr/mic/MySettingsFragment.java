@@ -3,7 +3,6 @@ package com.slotmachine.ocr.mic;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.InputType;
 import android.text.TextUtils;
@@ -21,25 +20,26 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.auth.UserProfileChangeRequest;
 
 public class MySettingsFragment extends PreferenceFragmentCompat {
 
     private FirebaseAuth firebaseAuth;
-    private FirebaseFirestore database;
+    private FirebaseUser firebaseUser;
 
     @Override
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
         setPreferencesFromResource(R.xml.preferences, rootKey);
 
         firebaseAuth = FirebaseAuth.getInstance();
-        if (firebaseAuth.getCurrentUser() == null) {
+        firebaseUser = firebaseAuth.getCurrentUser();
+        if (firebaseUser == null) {
             startActivity(new Intent(getContext(), LoginActivity.class));
             return;
         }
 
         Preference account_email_preference = findPreference("account_email_button");
-        Preference display_name_preference = findPreference("display_name_button");
+        EditTextPreference display_name_preference = findPreference("display_name_button");
         EditTextPreference email_recipient_preference = findPreference("email_recipient");
         EditTextPreference minimum_value = findPreference("minimum_value");
         Preference sign_out_preference = findPreference("sign_out_button");
@@ -52,7 +52,28 @@ public class MySettingsFragment extends PreferenceFragmentCompat {
         }
 
         if (display_name_preference != null) {
-            display_name_preference.setSummary(firebaseAuth.getCurrentUser().getDisplayName());
+            display_name_preference.setSummaryProvider(new SummaryProvider<EditTextPreference>() {
+                @Override
+                public CharSequence provideSummary(EditTextPreference preference) {
+                    String text = preference.getText();
+                    if (TextUtils.isEmpty(text)) {
+                        return "Not set";
+                    }
+                    return text;
+                }
+            });
+            display_name_preference.setOnPreferenceChangeListener(
+                    new Preference.OnPreferenceChangeListener() {
+                        @Override
+                        public boolean onPreferenceChange(Preference preference, Object newValue) {
+                            UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
+                                    .setDisplayName(newValue.toString())
+                                    .build();
+                            firebaseUser.updateProfile(profileUpdates);
+                            return true;
+                        }
+                    }
+            );
         }
 
         if (email_recipient_preference != null) {
@@ -70,7 +91,6 @@ public class MySettingsFragment extends PreferenceFragmentCompat {
                     new Preference.OnPreferenceChangeListener() {
                         @Override
                         public boolean onPreferenceChange(Preference preference, Object newValue) {
-                            //Toast.makeText(getContext(), "changed email", Toast.LENGTH_SHORT).show();
                             return true;
                         }
                     }
@@ -94,15 +114,16 @@ public class MySettingsFragment extends PreferenceFragmentCompat {
                         @Override
                         public boolean onPreferenceClick(Preference preference) {
                             AuthUI.getInstance()
-                                    .signOut(getActivity())
+                                    .signOut(requireActivity())
                                     .addOnCompleteListener(new OnCompleteListener<Void>() {
                                         @Override
                                         public void onComplete(@NonNull Task<Void> task) {
                                             if (task.isSuccessful()) {
-                                                getActivity().finish();
-                                                startActivity(new Intent(getActivity(), LoginActivity.class));
+                                                requireActivity().finish();
+                                                startActivity(new Intent(requireActivity(), LoginActivity.class));
                                             } else {
-                                                Toast.makeText(getContext(), task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                                                if (task.getException() != null)
+                                                    Toast.makeText(getContext(), task.getException().getMessage(), Toast.LENGTH_SHORT).show();
                                             }
                                         }
                                     });
@@ -117,7 +138,7 @@ public class MySettingsFragment extends PreferenceFragmentCompat {
                     new Preference.OnPreferenceClickListener() {
                         @Override
                         public boolean onPreferenceClick(Preference preference) {
-                            startActivity(new Intent(getActivity(), ChangePasswordActivity.class));
+                            startActivity(new Intent(requireActivity(), ChangePasswordActivity.class));
                             return true;
                         }
                     }
@@ -129,7 +150,7 @@ public class MySettingsFragment extends PreferenceFragmentCompat {
                     new Preference.OnPreferenceClickListener() {
                         @Override
                         public boolean onPreferenceClick(Preference preference) {
-                            new AlertDialog.Builder(getActivity())
+                            new AlertDialog.Builder(requireActivity())
                                     .setTitle("Delete Account")
                                     .setMessage("Are you sure you want to delete your account? This operation cannot be undone.")
                                     .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
@@ -140,10 +161,11 @@ public class MySettingsFragment extends PreferenceFragmentCompat {
                                                 @Override
                                                 public void onComplete(@NonNull Task<Void> task) {
                                                     if (task.isSuccessful()) {
-                                                        getActivity().finish();
-                                                        startActivity(new Intent(getActivity(), LoginActivity.class));
+                                                        requireActivity().finish();
+                                                        startActivity(new Intent(requireActivity(), LoginActivity.class));
                                                     } else {
-                                                        Toast.makeText(getContext(), task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                                                        if (task.getException() != null)
+                                                            Toast.makeText(getContext(), task.getException().getMessage(), Toast.LENGTH_SHORT).show();
                                                     }
                                                 }
                                             });
@@ -169,7 +191,6 @@ public class MySettingsFragment extends PreferenceFragmentCompat {
             );
         }
     }
-
 }
 
 

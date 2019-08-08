@@ -117,7 +117,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private Double minimumProgressiveValue;
     private Boolean autoSortProgressives = true;
 
-    private Set<String> set;
+    private Set<String> set = new HashSet<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -203,7 +203,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     // Get set of machine numbers in past 24 hours
     private void populateDuplicatesSet() {
-        set = new HashSet<>();
+        set.clear();
         int offset = 86400;
         Date time = new Date(System.currentTimeMillis() - offset * 1000);
         CollectionReference collectionReference = database.collection("scans");
