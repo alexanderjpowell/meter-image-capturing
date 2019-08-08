@@ -158,11 +158,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         NavigationView navigationView = (NavigationView)findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
         View headerView = navigationView.getHeaderView(0);
-        //navDrawerText1 = headerView.findViewById(R.id.navDrawerText1);
-        //navDrawerText2 = headerView.findViewById(R.id.navDrawerText2);
-        //String userName = firebaseAuth.getCurrentUser().getDisplayName();
-        //navDrawerText1.setText("Meter Image Capturing");
-        //navDrawerText2.setText("Welcome " + userName + "!");
 
         progressive1 = (TextInputEditText)findViewById(R.id.progressive1);
         progressive2 = (TextInputEditText)findViewById(R.id.progressive2);
@@ -200,9 +195,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             minimumProgressiveValue = 0.0;
         }
 
+        boolean reject_duplicates = sharedPreferences.getBoolean("reject_duplicates", false);
+        if (reject_duplicates) {
+            populateDuplicatesSet();
+        }
+    }
 
-        // Get set of machine numbers in past 24 hours
-        set = new HashSet<String>();
+    // Get set of machine numbers in past 24 hours
+    private void populateDuplicatesSet() {
+        set = new HashSet<>();
         int offset = 86400;
         Date time = new Date(System.currentTimeMillis() - offset * 1000);
         CollectionReference collectionReference = database.collection("scans");
@@ -441,13 +442,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        //showToast("testing");
-
-        //if (id == R.id.action_settings) {
-            //showToast(spinner.getSelectedItem().toString());
-            //return true;
         if (id == R.id.action_bar_spinner) {
-            //showToast("spinner");
             showToast(spinner.getSelectedItem().toString());
             return true;
         }
@@ -484,32 +479,24 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
         super.onActivityResult(requestCode, resultCode, intent);
-        //showToast("onActivityResult");
         try {
             switch (requestCode) {
                 case REQUEST_TAKE_PHOTO_PROGRESSIVES: {
-
                     resetProgressives();
                     if (resultCode == RESULT_OK) {
                         File file = new File(mCurrentPhotoPath);
                         Bitmap bitmap = MediaStore.Images.Media.getBitmap(getApplicationContext().getContentResolver(), Uri.fromFile(file));
-
                         if (bitmap != null) {
-
                             ExifInterface exif = new ExifInterface(mCurrentPhotoPath);
                             int rotation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL);
                             int rotationInDegrees = exifToDegrees(rotation);
                             Matrix matrix = new Matrix();
                             if (rotation != 0) { matrix.preRotate(rotationInDegrees); }
-                            //setPic(matrix); // Used if need to display image to user
                             Bitmap newBitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
                             processProgressivesOCR(newBitmap);
-
                             if (file.exists()) {
                                 boolean deleted = file.delete();
                             }
-
-
                         } else {
                             showToast("Bitmap is null");
                         }
@@ -538,7 +525,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     break;
                 }
                 case REQUEST_SETTINGS_ACTIVITY: {
-                    //showToast("coming from settings activity");
                     break;
                 }
             }
@@ -598,9 +584,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                         }
                                     }
                                 }
-                                //showToast(sb.toString());
-                                //machineId.setText(resultText);
-                                //showToast(resultText);
                             }
                         })
                         .addOnFailureListener(
@@ -849,6 +832,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             // then run cross check based on that and display a popup if necessary.
             SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
             boolean reject_duplicates = sharedPreferences.getBoolean("reject_duplicates", false);
+            if (reject_duplicates && set.size() == 0) {
+                populateDuplicatesSet();
+            }
             if (reject_duplicates) {
                 if (set.contains(machineIdText)) {
                     AlertDialog alertDialog = new AlertDialog.Builder(MainActivity.this).create();
@@ -947,8 +933,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         String original = text;
         StringBuilder newText = new StringBuilder();
         String[] words = text.split("\\s");
-        for (int i = 0; i < words.length; i++) {
-            newText.append(convertString(words[i]));
+        for (String word : words) {
+            newText.append(convertString(word));
         }
         text = newText.toString();
 
