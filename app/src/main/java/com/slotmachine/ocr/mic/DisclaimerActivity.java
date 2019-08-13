@@ -1,7 +1,6 @@
 package com.slotmachine.ocr.mic;
 
 import androidx.appcompat.app.AppCompatActivity;
-
 import android.os.Bundle;
 
 public class DisclaimerActivity extends AppCompatActivity {

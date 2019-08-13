@@ -61,14 +61,14 @@ public class EditScanActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         database = FirebaseFirestore.getInstance();
 
-        machineId = (TextInputEditText)findViewById(R.id.machineId);
-        progressive1 = (TextInputEditText)findViewById(R.id.progressive1);
-        progressive2 = (TextInputEditText)findViewById(R.id.progressive2);
-        progressive3 = (TextInputEditText)findViewById(R.id.progressive3);
-        progressive4 = (TextInputEditText)findViewById(R.id.progressive4);
-        progressive5 = (TextInputEditText)findViewById(R.id.progressive5);
-        progressive6 = (TextInputEditText)findViewById(R.id.progressive6);
-        notes = (TextInputEditText)findViewById(R.id.notes);
+        machineId = findViewById(R.id.machineId);
+        progressive1 = findViewById(R.id.progressive1);
+        progressive2 = findViewById(R.id.progressive2);
+        progressive3 = findViewById(R.id.progressive3);
+        progressive4 = findViewById(R.id.progressive4);
+        progressive5 = findViewById(R.id.progressive5);
+        progressive6 = findViewById(R.id.progressive6);
+        notes = findViewById(R.id.notes);
 
         Intent intent = getIntent();
         machine_id = intent.getStringExtra("MACHINE_ID");
@@ -118,7 +118,6 @@ public class EditScanActivity extends AppCompatActivity {
 
     private void saveToDatabase() {
 
-
         Map<String, Object> map = new HashMap<>();
         map.put("progressive1", progressive1.getText().toString());
         map.put("progressive2", progressive2.getText().toString());
@@ -134,17 +133,16 @@ public class EditScanActivity extends AppCompatActivity {
                 .document(document_id)
                 .update(map)
                 .addOnCompleteListener(new OnCompleteListener<Void>() {
-                                           @Override
-                                           public void onComplete(@NonNull Task<Void> task) {
-                                               if (task.isSuccessful()) {
-                                                   startActivity(new Intent(EditScanActivity.this, DataReportActivity.class));
-                                                   finish();
-                                               } else {
-                                                   showToast("No connection");
-                                               }
-                                           }
-                                       }
-                );
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if (task.isSuccessful()) {
+                            startActivity(new Intent(EditScanActivity.this, DataReportActivity.class));
+                            finish();
+                        } else {
+                            showToast("No connection");
+                        }
+                    }
+                });
     }
 
     private void showToast(String message) {

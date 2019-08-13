@@ -463,6 +463,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         if (id == R.id.nav_gallery) {
             intent = new Intent(MainActivity.this, DataReportActivity.class);
             startActivity(intent);
+        } else if (id == R.id.to_do_list) {
+            intent = new Intent(MainActivity.this, TodoListActivity.class);
+            startActivity(intent);
         } else if (id == R.id.nav_slideshow) {
             intent = new Intent(MainActivity.this, ManageUsersActivity.class);
             startActivity(intent);
@@ -471,7 +474,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             startActivity(intent);
         }
 
-        DrawerLayout drawer = (DrawerLayout)findViewById(R.id.drawer_layout);
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }

@@ -59,4 +59,8 @@
     <string name="terms_and_conditions2">In no way shall MIC or it’s distributors be liable for any special, direct, indirect, consequential, or incidental damages or any damages whatsoever, arising out of, or in connection with the use of the application.  MIC reserves the right to make additions, deletions, or modifications to application at any time without prior notice.</string>
     <string name="terms_and_conditions3">By using the MIC application, the user assumes all responsibility to ensure the data is accurate and consistent with whatever Minimum Internal Control standards, or other regulatory conditions user may or may not be subject to.</string>
 
+    <string name="completed_scans_nav_bar">Completed Scans</string>
+    <string name="manage_users_nav_bar">Manage Users</string>
+    <string name="settings_nav_bar">Settings</string>
+    <string name="title_activity_todo_list">TodoListActivity</string>
 </resources>

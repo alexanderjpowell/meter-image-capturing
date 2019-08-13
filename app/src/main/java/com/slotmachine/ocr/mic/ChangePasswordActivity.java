@@ -23,7 +23,6 @@ public class ChangePasswordActivity extends AppCompatActivity implements View.On
     private EditText newPassword2EditText;
     private Button submitPasswordChangeButton;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -38,10 +37,10 @@ public class ChangePasswordActivity extends AppCompatActivity implements View.On
             return;
         }
 
-        currentPasswordEditText = (EditText)findViewById(R.id.currentPasswordEditText);
-        newPassword1EditText = (EditText)findViewById(R.id.newPassword1EditText);
-        newPassword2EditText = (EditText)findViewById(R.id.newPassword2EditText);
-        submitPasswordChangeButton = (Button)findViewById(R.id.submitPasswordChangeButton);
+        currentPasswordEditText = findViewById(R.id.currentPasswordEditText);
+        newPassword1EditText = findViewById(R.id.newPassword1EditText);
+        newPassword2EditText = findViewById(R.id.newPassword2EditText);
+        submitPasswordChangeButton = findViewById(R.id.submitPasswordChangeButton);
 
         submitPasswordChangeButton.setOnClickListener(this);
     }
@@ -61,7 +60,7 @@ public class ChangePasswordActivity extends AppCompatActivity implements View.On
                 return;
             }
 
-            if (currentPassword.isEmpty() || newPassword1.isEmpty() || newPassword2.isEmpty()) {
+            if (currentPassword.isEmpty() || newPassword1.isEmpty()) {
                 showToast("All values are required.");
                 return;
             }
@@ -71,7 +70,6 @@ public class ChangePasswordActivity extends AppCompatActivity implements View.On
                         @Override
                         public void onComplete(@NonNull Task<AuthResult> task) {
                             if (task.isSuccessful()) {
-                                // Continue with password change
                                 firebaseAuth.getCurrentUser().updatePassword(newPassword1)
                                         .addOnCompleteListener(new OnCompleteListener<Void>() {
                                             @Override

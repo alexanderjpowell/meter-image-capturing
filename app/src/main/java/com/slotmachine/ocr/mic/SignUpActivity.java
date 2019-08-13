@@ -88,7 +88,6 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
         progressDialog.setMessage("Registering.  Please Wait...");
         progressDialog.show();
 
-        //creating a new user
         firebaseAuth.createUserWithEmailAndPassword(email, password)
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                     @Override
@@ -127,7 +126,7 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
     }
 
     private boolean validate() {
-        boolean valid = true;
+        boolean isValid = true;
 
         String email = emailEditText.getText().toString().trim();
         String password = passwordEditText.getText().toString().trim();
@@ -135,19 +134,19 @@ public class SignUpActivity extends AppCompatActivity implements View.OnClickLis
 
         if (email.isEmpty() || !android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
             emailEditText.setError("Enter a valid email address");
-            valid = false;
+            isValid = false;
         }
 
         if (password.isEmpty() || password.length() < 4) {
             passwordEditText.setError("Password must be at least 4 characters");
-            valid = false;
+            isValid = false;
         }
 
         if (!password.equals(reenterPassword)) {
             passwordEditText.setError("Passwords don't match");
-            valid = false;
+            isValid = false;
         }
 
-        return valid;
+        return isValid;
     }
 }

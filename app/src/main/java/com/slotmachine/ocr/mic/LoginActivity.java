@@ -31,7 +31,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     private EditText passwordEditText;
     private Button loginButton;
     private CheckBox checkBox;
-    private TextView textView;
 
     private ProgressDialog progressDialog;
 
@@ -47,11 +46,11 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             startActivity(new Intent(LoginActivity.this, MainActivity.class));
         }
 
-        emailEditText = (EditText)findViewById(R.id.emailEditText);
-        passwordEditText = (EditText)findViewById(R.id.passwordEditText);
-        loginButton = (Button)findViewById(R.id.loginButton);
-        checkBox = (CheckBox)findViewById(R.id.checkBox);
-        textView = (TextView)findViewById(R.id.textView);
+        emailEditText = findViewById(R.id.emailEditText);
+        passwordEditText = findViewById(R.id.passwordEditText);
+        loginButton = findViewById(R.id.loginButton);
+        checkBox = findViewById(R.id.checkBox);
+        TextView textView = findViewById(R.id.textView);
 
         String message = "I have read and agree to the terms and conditions";
         SpannableString ss = new SpannableString(message);
@@ -89,14 +88,11 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         progressDialog.dismiss();
-                        //if the task is successfully
                         if (task.isSuccessful()) {
-                            //start the profile activity
                             finish();
                             startActivity(new Intent(LoginActivity.this, MainActivity.class));
                         } else {
                             showToast("Incorrect username or password.  Try again.");
-                            //showToast("Unable to complete signin");
                         }
                     }
                 });
@@ -110,8 +106,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     }
 
     public void onCheckboxClicked(View view) {
-        boolean checked = ((CheckBox)view).isChecked();
-        loginButton.setEnabled(checked);
+        loginButton.setEnabled(checkBox.isChecked());
     }
 
     // Prevent back press from logging user back in
@@ -129,13 +124,13 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
     class MyClickableSpan extends ClickableSpan {
 
-        public void onClick(View textView) {
+        public void onClick(@NonNull View textView) {
             Intent intent = new Intent(LoginActivity.this, DisclaimerActivity.class);
             startActivity(intent);
         }
 
         @Override
-        public void updateDrawState(TextPaint ds) {
+        public void updateDrawState(@NonNull TextPaint ds) {
             ds.setUnderlineText(true);
         }
     }

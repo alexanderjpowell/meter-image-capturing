@@ -9,27 +9,25 @@ import java.util.List;
 
 public class TextParser {
 
-    private String text;
+    //private String text;
 
     public TextParser() { }
 
     public static void main(String[] args) {
 
-        StringBuilder sb = new StringBuilder("5:$44");
-        System.out.println(sb.toString().contains("$"));
     }
 
-    private static boolean charIsIn(char c, String string) {
+    /*private static boolean charIsIn(char c, String string) {
         for (int i = 0; i < string.length(); i++) {
             if (c == string.charAt(i))
                 return true;
         }
         return false;
-    }
+    }*/
 
-    public String getText() {
+    /*public String getText() {
         return this.text;
-    }
+    }*/
 
     // need to start at $
     // Basic algorithm to determine if text is relevant to current progressive value
@@ -69,6 +67,7 @@ public class TextParser {
                 }
             }
         }
+
         // add the last remaining tmp
         if (!tmp.toString().equals("")) {
             ret.add(tmp.toString());
@@ -82,7 +81,7 @@ public class TextParser {
         return ret;
     }
 
-    public static String formatProgressives(String progressive) {
+    private static String formatProgressives(String progressive) {
         StringBuilder formattedProgressive = new StringBuilder();
         for (int i = 0; i < progressive.length(); i++) {
             if ("0123456789".indexOf(progressive.charAt(i)) >= 0) {

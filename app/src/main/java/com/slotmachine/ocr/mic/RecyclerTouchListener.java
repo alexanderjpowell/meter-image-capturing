@@ -1,6 +1,8 @@
 package com.slotmachine.ocr.mic;
 
 import android.content.Context;
+
+import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
@@ -23,24 +25,26 @@ public class RecyclerTouchListener implements RecyclerView.OnItemTouchListener {
             public void onLongPress(MotionEvent e) {
                 View child = recyclerView.findChildViewUnder(e.getX(), e.getY());
                 if (child != null && clickListener != null) {
-                    clickListener.onLongClick(child, recyclerView.getChildPosition(child));
+                    //clickListener.onLongClick(child, recyclerView.getChildPosition(child));
+                    clickListener.onLongClick(child, recyclerView.getChildAdapterPosition(child));
                 }
             }
         });
     }
 
     @Override
-    public boolean onInterceptTouchEvent(RecyclerView rv, MotionEvent e) {
+    public boolean onInterceptTouchEvent(@NonNull RecyclerView rv, @NonNull MotionEvent e) {
 
         View child = rv.findChildViewUnder(e.getX(), e.getY());
         if (child != null && clickListener != null && gestureDetector.onTouchEvent(e)) {
-            clickListener.onClick(child, rv.getChildPosition(child));
+            //clickListener.onClick(child, rv.getChildPosition(child));
+            clickListener.onClick(child, rv.getChildAdapterPosition(child));
         }
         return false;
     }
 
     @Override
-    public void onTouchEvent(RecyclerView rv, MotionEvent e) {
+    public void onTouchEvent(@NonNull RecyclerView rv, @NonNull MotionEvent e) {
     }
 
     @Override

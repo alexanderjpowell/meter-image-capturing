@@ -41,7 +41,6 @@ import java.util.List;
 public class DataReportActivity extends AppCompatActivity {// implements AdapterView.OnItemSelectedListener {
 
     private List<RowData> rowDataList;
-    //private List<RowData> rowDataListReport;
     private RecyclerView recyclerView;
     private ReportDataAdapter mAdapter;
 
@@ -92,11 +91,9 @@ public class DataReportActivity extends AppCompatActivity {// implements Adapter
         );
 
         rowDataList = new ArrayList<>();
-        //rowDataListReport = new ArrayList<>();
         recyclerView = findViewById(R.id.recycler_view);
         mAdapter = new ReportDataAdapter(DataReportActivity.this, rowDataList);
 
-        //final RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
         final LinearLayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
         recyclerView.setLayoutManager(mLayoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
@@ -107,8 +104,6 @@ public class DataReportActivity extends AppCompatActivity {// implements Adapter
             @Override
             public void onClick(View view, int position) {
                 RowData rowData = rowDataList.get(position);
-                //showToast(rowData.getDocumentId());
-
                 Intent intent = new Intent(DataReportActivity.this, EditScanActivity.class);
                 intent.putExtra("MACHINE_ID", getMachineIdFromString(rowData.getMachineId()));
                 intent.putExtra("PROGRESSIVE_1", removeDollarSignFromString(rowData.getProgressive1()));
@@ -119,7 +114,6 @@ public class DataReportActivity extends AppCompatActivity {// implements Adapter
                 intent.putExtra("PROGRESSIVE_6", removeDollarSignFromString(rowData.getProgressive6()));
                 intent.putExtra("NOTES", rowData.getNotes());
                 intent.putExtra("DOCUMENT_ID", rowData.getDocumentId());
-
                 startActivity(intent);
             }
 

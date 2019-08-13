@@ -14,8 +14,8 @@ import java.util.List;
 
 public class ReportDataAdapter extends RecyclerView.Adapter<ReportDataAdapter.ReportDataHolder> {
 
-    Context context;
-    List<RowData> rowDataList = new ArrayList<>();
+    private Context context;
+    private List<RowData> rowDataList = new ArrayList<>();
 
     public ReportDataAdapter(Context context, List<RowData> rowDataList) {
         this.context = context;
