@@ -50,7 +50,7 @@ public class DataReportActivity extends AppCompatActivity {// implements Adapter
 
     private SwipeRefreshLayout swipeRefreshLayout;
 
-    private enum DateRange {HOUR, DAY, WEEK}
+    private enum DateRange { HOUR, DAY, WEEK }
     private DateRange dateRange;
 
     int pastVisibleItems, visibleItemCount, totalItemCount;
@@ -120,12 +120,8 @@ public class DataReportActivity extends AppCompatActivity {// implements Adapter
             @Override
             public void onLongClick(View view, final int position) {
                 final RowData rowData = rowDataList.get(position);
-                //showToast(rowData.getDocumentId());
-
-                //final EditText input = new EditText(DataReportActivity.this);
                 AlertDialog alertDialog = new AlertDialog.Builder(DataReportActivity.this).create();
                 alertDialog.setMessage("Are you sure you want to delete this scan?");
-                //alertDialog.setView(input, 100, 0, 100, 0);
                 alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "Yes",
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int i) {
