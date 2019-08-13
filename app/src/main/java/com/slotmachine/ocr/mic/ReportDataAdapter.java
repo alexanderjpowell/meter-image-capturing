@@ -1,6 +1,8 @@
 package com.slotmachine.ocr.mic;
 
 import android.content.Context;
+
+import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.view.LayoutInflater;
@@ -8,14 +10,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.TextView;
-
-import java.util.ArrayList;
 import java.util.List;
 
 public class ReportDataAdapter extends RecyclerView.Adapter<ReportDataAdapter.ReportDataHolder> {
 
     private Context context;
-    private List<RowData> rowDataList = new ArrayList<>();
+    private List<RowData> rowDataList;
 
     public ReportDataAdapter(Context context, List<RowData> rowDataList) {
         this.context = context;
@@ -23,13 +23,14 @@ public class ReportDataAdapter extends RecyclerView.Adapter<ReportDataAdapter.Re
     }
 
     @Override
-    public ReportDataHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    @NonNull
+    public ReportDataHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view  = LayoutInflater.from(context).inflate(R.layout.report_list_row, parent,false);
         return new ReportDataHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(final ReportDataHolder holder, final int position) {
+    public void onBindViewHolder(@NonNull final ReportDataHolder holder, final int position) {
 
         RowData rowData = rowDataList.get(position);
 
@@ -64,10 +65,10 @@ public class ReportDataAdapter extends RecyclerView.Adapter<ReportDataAdapter.Re
         return rowDataList.size();
     }
 
-    public void removeItem(int position) {
+    /*public void removeItem(int position) {
         rowDataList.remove(position);
         notifyItemRemoved(position);
-    }
+    }*/
 
     public static class ReportDataHolder extends RecyclerView.ViewHolder{
 
@@ -94,7 +95,7 @@ public class ReportDataAdapter extends RecyclerView.Adapter<ReportDataAdapter.Re
         }
     }
 
-    public List<RowData> getRowDataList(){
+    /*public List<RowData> getRowDataList(){
         return rowDataList;
-    }
+    }*/
 }

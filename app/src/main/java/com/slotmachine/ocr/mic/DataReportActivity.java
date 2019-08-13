@@ -147,7 +147,6 @@ public class DataReportActivity extends AppCompatActivity {// implements Adapter
             @Override
             public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
                 if (dy > 0) {
-
                     visibleItemCount = mLayoutManager.getChildCount();
                     totalItemCount = mLayoutManager.getItemCount();
                     pastVisibleItems = mLayoutManager.findFirstVisibleItemPosition();
