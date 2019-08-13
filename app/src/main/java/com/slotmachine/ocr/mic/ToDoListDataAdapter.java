@@ -1,43 +1,41 @@
 package com.slotmachine.ocr.mic;
 
 import android.content.Context;
-
-import androidx.annotation.NonNull;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.TextView;
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
 import java.util.List;
 
-public class ReportDataAdapter extends RecyclerView.Adapter<ReportDataAdapter.ReportDataHolder> {
+public class ToDoListDataAdapter extends RecyclerView.Adapter<ToDoListDataAdapter.ToDoListDataHolder> {
 
     private Context context;
-    private List<RowData> rowDataList;
+    private List<ToDoListData> rowDataList;
 
-    public ReportDataAdapter(Context context, List<RowData> rowDataList) {
+    public ToDoListDataAdapter(Context context, List<ToDoListData> rowDataList) {
         this.context = context;
         this.rowDataList = rowDataList;
     }
 
     @Override
     @NonNull
-    public ReportDataHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public ToDoListDataAdapter.ToDoListDataHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view  = LayoutInflater.from(context).inflate(R.layout.report_list_row, parent,false);
-        return new ReportDataHolder(view);
+        return new ToDoListDataAdapter.ToDoListDataHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull final ReportDataHolder holder, final int position) {
+    public void onBindViewHolder(@NonNull final ToDoListDataAdapter.ToDoListDataHolder holder, final int position) {
 
-        RowData rowData = rowDataList.get(position);
+        ToDoListData rowData = rowDataList.get(position);
 
         holder.machineIdTextView.setText(rowData.getMachineId());
         holder.dateTextView.setText(rowData.getDate());
         holder.userNameTextView.setText(rowData.getUser());
-        holder.progressiveTextView1.setText(rowData.getProgressive1());
+        /*holder.progressiveTextView1.setText(rowData.getProgressive1());
         holder.progressiveTextView2.setText(rowData.getProgressive2());
         holder.progressiveTextView3.setText(rowData.getProgressive3());
         holder.progressiveTextView4.setText(rowData.getProgressive4());
@@ -45,7 +43,7 @@ public class ReportDataAdapter extends RecyclerView.Adapter<ReportDataAdapter.Re
         holder.progressiveTextView6.setText(rowData.getProgressive6());
         holder.notesTextView.setText(rowData.getNotes());
 
-        holder.checkBox.setChecked(rowData.isSelected());
+        holder.checkBox.setChecked(rowData.isSelected());*/
         holder.checkBox.setTag(rowDataList.get(position));
 
         holder.checkBox.setOnClickListener(new View.OnClickListener() {
@@ -68,7 +66,7 @@ public class ReportDataAdapter extends RecyclerView.Adapter<ReportDataAdapter.Re
         notifyItemRemoved(position);
     }*/
 
-    public static class ReportDataHolder extends RecyclerView.ViewHolder{
+    public static class ToDoListDataHolder extends RecyclerView.ViewHolder{
 
         TextView machineIdTextView, dateTextView, userNameTextView;
         TextView progressiveTextView1, progressiveTextView2, progressiveTextView3;
@@ -76,7 +74,7 @@ public class ReportDataAdapter extends RecyclerView.Adapter<ReportDataAdapter.Re
         TextView notesTextView;
         CheckBox checkBox;
 
-        public ReportDataHolder(View itemView) {
+        public ToDoListDataHolder(View itemView) {
             super(itemView);
 
             machineIdTextView = itemView.findViewById(R.id.machineIdTextView);
