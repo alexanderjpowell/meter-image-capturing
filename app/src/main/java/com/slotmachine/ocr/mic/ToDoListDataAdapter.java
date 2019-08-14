@@ -1,6 +1,7 @@
 package com.slotmachine.ocr.mic;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,18 +24,27 @@ public class ToDoListDataAdapter extends RecyclerView.Adapter<ToDoListDataAdapte
     @Override
     @NonNull
     public ToDoListDataAdapter.ToDoListDataHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view  = LayoutInflater.from(context).inflate(R.layout.report_list_row, parent,false);
+        View view  = LayoutInflater.from(context).inflate(R.layout.to_do_list_item_row, parent,false);
         return new ToDoListDataAdapter.ToDoListDataHolder(view);
     }
 
     @Override
     public void onBindViewHolder(@NonNull final ToDoListDataAdapter.ToDoListDataHolder holder, final int position) {
 
-        ToDoListData rowData = rowDataList.get(position);
+        ToDoListData toDoListData = rowDataList.get(position);
 
-        holder.machineIdTextView.setText(rowData.getMachineId());
-        holder.dateTextView.setText(rowData.getDate());
-        holder.userNameTextView.setText(rowData.getUser());
+        holder.machineIdTextView.setText(toDoListData.getMachineId());
+        holder.userNameTextView.setText(toDoListData.getUser());
+        holder.descriptionTextView.setText(toDoListData.getDescription());
+        holder.locationTextView.setText(toDoListData.getLocation());
+
+        if (toDoListData.isCompleted()) {
+            holder.locationTextView.setTextColor(Color.GREEN);
+            holder.lastScannedTextView.setText(toDoListData.getDate());
+        } else {
+            holder.lastScannedTextView.setVisibility(View.INVISIBLE);
+        }
+
         /*holder.progressiveTextView1.setText(rowData.getProgressive1());
         holder.progressiveTextView2.setText(rowData.getProgressive2());
         holder.progressiveTextView3.setText(rowData.getProgressive3());
@@ -44,7 +54,7 @@ public class ToDoListDataAdapter extends RecyclerView.Adapter<ToDoListDataAdapte
         holder.notesTextView.setText(rowData.getNotes());
 
         holder.checkBox.setChecked(rowData.isSelected());*/
-        holder.checkBox.setTag(rowDataList.get(position));
+        /*holder.checkBox.setTag(rowDataList.get(position));
 
         holder.checkBox.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -53,7 +63,7 @@ public class ToDoListDataAdapter extends RecyclerView.Adapter<ToDoListDataAdapte
                 rowData1.setSelected(holder.checkBox.isChecked());
                 rowDataList.get(position).setSelected(holder.checkBox.isChecked());
             }
-        });
+        });*/
     }
 
     @Override
@@ -68,26 +78,18 @@ public class ToDoListDataAdapter extends RecyclerView.Adapter<ToDoListDataAdapte
 
     public static class ToDoListDataHolder extends RecyclerView.ViewHolder{
 
-        TextView machineIdTextView, dateTextView, userNameTextView;
-        TextView progressiveTextView1, progressiveTextView2, progressiveTextView3;
-        TextView progressiveTextView4, progressiveTextView5, progressiveTextView6;
-        TextView notesTextView;
-        CheckBox checkBox;
+        TextView machineIdTextView, lastScannedTextView, userNameTextView;
+        TextView descriptionTextView, locationTextView;
+        //CheckBox checkBox;
 
         public ToDoListDataHolder(View itemView) {
             super(itemView);
 
             machineIdTextView = itemView.findViewById(R.id.machineIdTextView);
-            dateTextView = itemView.findViewById(R.id.dateTextView);
+            lastScannedTextView = itemView.findViewById(R.id.lastScannedTextView);
             userNameTextView = itemView.findViewById(R.id.userNameTextView);
-            progressiveTextView1 = itemView.findViewById(R.id.progressiveTextView1);
-            progressiveTextView2 = itemView.findViewById(R.id.progressiveTextView2);
-            progressiveTextView3 = itemView.findViewById(R.id.progressiveTextView3);
-            progressiveTextView4 = itemView.findViewById(R.id.progressiveTextView4);
-            progressiveTextView5 = itemView.findViewById(R.id.progressiveTextView5);
-            progressiveTextView6 = itemView.findViewById(R.id.progressiveTextView6);
-            notesTextView = itemView.findViewById(R.id.notesTextView);
-            checkBox = itemView.findViewById(R.id.checkBox);
+            descriptionTextView = itemView.findViewById(R.id.descriptionTextView);
+            locationTextView = itemView.findViewById(R.id.locationTextView);
         }
     }
 
