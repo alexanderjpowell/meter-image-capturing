@@ -48,12 +48,11 @@ public class TodoListActivity extends AppCompatActivity {
         }));
 
         //String date = "Tue Aug 13 15:45:43 EDT 2019";
-        String date = "Last scanned 43 minutes ago";
+        String date = "Last scanned 43 minutes ago by Alex";
 
         ToDoListData row1 = new ToDoListData("AB2301-03",
                 "12345",
-                "Triple Jackpot Gems - CLII",
-                "Alex",
+                "TRIPLE JACKPOT GEMS - CLII",
                 date,
                 false,
                 false);
@@ -61,7 +60,6 @@ public class TodoListActivity extends AppCompatActivity {
         ToDoListData row2 = new ToDoListData("AB2304-6",
                 "45789",
                 "BLACK DIAMOND PLATINUM",
-                "Alex",
                 date,
                 false,
                 false);
@@ -69,7 +67,6 @@ public class TodoListActivity extends AppCompatActivity {
         ToDoListData row3 = new ToDoListData("AB2307-09",
                 "33451",
                 "DBL JACKPOT GEMS/DBL JACKPOT LIONS SHARE",
-                "Alex",
                 date,
                 true,
                 false);
@@ -77,7 +74,6 @@ public class TodoListActivity extends AppCompatActivity {
         ToDoListData row4 = new ToDoListData("AB3300",
                 "56091",
                 "SUPER JACKPOT - CLII",
-                "Alex",
                 date,
                 false,
                 false);

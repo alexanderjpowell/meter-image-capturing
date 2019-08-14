@@ -30,13 +30,13 @@
         android:textSize="18sp"
         android:paddingEnd="20dp"/>
 
-    <TextView
+    <!--<TextView
         android:id="@+id/userNameTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_toRightOf="@id/machineIdTextView"
         android:textStyle="bold"
-        android:textSize="18sp"/>
+        android:textSize="18sp"/>-->
 
     <TextView
         android:id="@+id/descriptionTextView"

@@ -34,7 +34,6 @@ public class ToDoListDataAdapter extends RecyclerView.Adapter<ToDoListDataAdapte
         ToDoListData toDoListData = rowDataList.get(position);
 
         holder.machineIdTextView.setText(toDoListData.getMachineId());
-        holder.userNameTextView.setText(toDoListData.getUser());
         holder.descriptionTextView.setText(toDoListData.getDescription());
         holder.locationTextView.setText(toDoListData.getLocation());
 
@@ -78,7 +77,7 @@ public class ToDoListDataAdapter extends RecyclerView.Adapter<ToDoListDataAdapte
 
     public static class ToDoListDataHolder extends RecyclerView.ViewHolder{
 
-        TextView machineIdTextView, lastScannedTextView, userNameTextView;
+        TextView machineIdTextView, lastScannedTextView;//, userNameTextView;
         TextView descriptionTextView, locationTextView;
         //CheckBox checkBox;
 
@@ -87,7 +86,7 @@ public class ToDoListDataAdapter extends RecyclerView.Adapter<ToDoListDataAdapte
 
             machineIdTextView = itemView.findViewById(R.id.machineIdTextView);
             lastScannedTextView = itemView.findViewById(R.id.lastScannedTextView);
-            userNameTextView = itemView.findViewById(R.id.userNameTextView);
+            //userNameTextView = itemView.findViewById(R.id.userNameTextView);
             descriptionTextView = itemView.findViewById(R.id.descriptionTextView);
             locationTextView = itemView.findViewById(R.id.locationTextView);
         }

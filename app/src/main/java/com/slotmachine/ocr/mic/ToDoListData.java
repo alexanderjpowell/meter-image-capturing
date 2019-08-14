@@ -3,20 +3,18 @@ package com.slotmachine.ocr.mic;
 // POJO for to-do list data displayed to the user
 public class ToDoListData {
 
-    private String location, machineId, description, user, date;
+    private String location, machineId, description, date;
     private boolean isCompleted, isSelected;
 
     public ToDoListData(String location,
                         String machineId,
                         String description,
-                        String user,
                         String date,
                         boolean isCompleted,
                         boolean isSelected) {
         this.location = location;
         this.machineId = machineId;
         this.description = description;
-        this.user = user;
         this.date = date;
         this.isCompleted = isCompleted;
         this.isSelected = isSelected;
@@ -30,9 +28,6 @@ public class ToDoListData {
 
     public String getDescription() { return this.description; }
     public void setDescription(String description) { this.description = description; }
-
-    public String getUser() { return this.user; }
-    public void setUser(String user) { this.user = user; }
 
     public String getDate() { return this.date; }
     public void setDate(String date) { this.date = date; }
