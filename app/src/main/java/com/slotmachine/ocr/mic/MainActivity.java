@@ -186,6 +186,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         progressive6.addTextChangedListener(new GenericTextWatcher(progressive6));
         machineId.addTextChangedListener(new GenericTextWatcher(machineId));
 
+        // Populate machine id if coming from to do list activity
+        Intent intent = getIntent();
+        String value = intent.getStringExtra("machine_id");
+        machineId.setText(value);
+        //
+
         // Set minimum progressive value
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         String val = sharedPreferences.getString("minimum_value", "0");

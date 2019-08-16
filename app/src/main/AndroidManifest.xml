@@ -81,7 +81,7 @@
             android:label="@string/title_activity_todo_list"
             android:parentActivityName=".MainActivity"
             android:screenOrientation="portrait"
-            android:theme="@style/SettingsTheme">
+            android:theme="@style/ToDoListTheme">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".MainActivity" />

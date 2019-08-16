@@ -37,12 +37,12 @@ public class ToDoListDataAdapter extends RecyclerView.Adapter<ToDoListDataAdapte
         holder.descriptionTextView.setText(toDoListData.getDescription());
         holder.locationTextView.setText(toDoListData.getLocation());
 
-        if (toDoListData.isCompleted()) {
+        /*if (toDoListData.isCompleted()) {
             holder.locationTextView.setTextColor(Color.GREEN);
             holder.lastScannedTextView.setText(toDoListData.getDate());
         } else {
             holder.lastScannedTextView.setVisibility(View.INVISIBLE);
-        }
+        }*/
 
         /*holder.progressiveTextView1.setText(rowData.getProgressive1());
         holder.progressiveTextView2.setText(rowData.getProgressive2());
