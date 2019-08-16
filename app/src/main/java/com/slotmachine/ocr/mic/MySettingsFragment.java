@@ -52,6 +52,7 @@ public class MySettingsFragment extends PreferenceFragmentCompat {
         }
 
         if (display_name_preference != null) {
+            display_name_preference.setSummary(firebaseUser.getDisplayName());
             display_name_preference.setSummaryProvider(new SummaryProvider<EditTextPreference>() {
                 @Override
                 public CharSequence provideSummary(EditTextPreference preference) {
@@ -190,6 +191,10 @@ public class MySettingsFragment extends PreferenceFragmentCompat {
                     }
             );
         }
+    }
+
+    private void showToast(String message) {
+        Toast.makeText(getContext(), message, Toast.LENGTH_LONG).show();
     }
 }
 
