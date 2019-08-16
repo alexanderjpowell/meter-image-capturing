@@ -17,7 +17,7 @@
         android:name=".MyApplication"
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
-        android:label="@string/app_name"
+        android:label="@string/app_name_condensed"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
 
@@ -37,7 +37,7 @@
             android:theme="@style/LoginTheme"></activity>
         <activity
             android:name=".MainActivity"
-            android:label="@string/app_name"
+            android:label="@string/app_name_condensed"
             android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
