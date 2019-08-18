@@ -37,6 +37,8 @@ public class TodoListActivity extends AppCompatActivity {
     private FirebaseAuth firebaseAuth;
     private FirebaseFirestore database;
 
+    private CollectionReference uploadFormDataCollectionReference;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -54,6 +56,9 @@ public class TodoListActivity extends AppCompatActivity {
         //
 
         database = FirebaseFirestore.getInstance();
+        uploadFormDataCollectionReference = database.collection("formUploads")
+                .document(firebaseAuth.getCurrentUser().getUid())
+                .collection("uploadFormData");
 
         recyclerView = findViewById(R.id.recycler_view_to_do_list);
         toDoDataList = new ArrayList<>();
@@ -68,7 +73,6 @@ public class TodoListActivity extends AppCompatActivity {
         recyclerView.addOnItemTouchListener(new RecyclerTouchListener(getApplicationContext(), recyclerView, new RecyclerTouchListener.ClickListener() {
             @Override
             public void onClick(View view, int position) {
-                showToast("Click position: " + position);
                 Intent intent = new Intent(TodoListActivity.this, MainActivity.class);
                 intent.putExtra("machine_id", toDoDataList.get(position).getMachineId());
                 startActivity(intent);
@@ -76,57 +80,20 @@ public class TodoListActivity extends AppCompatActivity {
 
             @Override
             public void onLongClick(View view, final int position) {
-                showToast("Long click on position: " + position);
             }
         }));
 
         currentStatus = Status.INCOMPLETE;
-
-        //
         populateRecyclerView();
         //
+    }
 
-        //String date = "Tue Aug 13 15:45:43 EDT 2019";
-        /*String date = "Last scanned 43 minutes ago by Alex";
-
-        ToDoListData row1 = new ToDoListData("AB2301-03",
-                "12345",
-                "TRIPLE JACKPOT GEMS - CLII",
-                date,
-                false,
-                false);
-
-        ToDoListData row2 = new ToDoListData("AB2304-6",
-                "45789",
-                "BLACK DIAMOND PLATINUM",
-                date,
-                false,
-                false);
-
-        ToDoListData row3 = new ToDoListData("AB2307-09",
-                "33451",
-                "DBL JACKPOT GEMS/DBL JACKPOT LIONS SHARE",
-                date,
-                true,
-                false);
-
-        ToDoListData row4 = new ToDoListData("AB3300",
-                "56091",
-                "SUPER JACKPOT - CLII",
-                date,
-                false,
-                false);
-
-        toDoDataList.add(row1);
-        toDoDataList.add(row2);
-        toDoDataList.add(row3);
-        toDoDataList.add(row4);*/
-
-        CollectionReference collectionReference = database.collection("formUploads")
-                .document(firebaseAuth.getCurrentUser().getUid())
-                .collection("uploadFormData");
-
-        collectionReference.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+    private void populateRecyclerView() {
+        toDoDataList.clear();
+        boolean isComplete = currentStatus.equals(Status.COMPLETE);
+        uploadFormDataCollectionReference
+                .whereEqualTo("isCompleted", isComplete)
+                .get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
                 if (task.isSuccessful()) {
@@ -137,28 +104,15 @@ public class TodoListActivity extends AppCompatActivity {
                                 false,
                                 false);
                         toDoDataList.add(row);
-                        mAdapter.notifyDataSetChanged();
+
                     }
+                    mAdapter.notifyDataSetChanged();
                 } else {
                     showToast("Unable to refresh.  Check your connection.");
                 }
             }
         });
-
-        //mAdapter.notifyDataSetChanged();
     }
-
-    //
-    private void populateRecyclerView() {
-    	if (currentStatus.equals(Status.INCOMPLETE)) {
-    		// Get all records from below path where !isComplete
-    		// path - formUploads/<UID>/uploadFormData/<documentId>
-
-    	} else { // currentStatus == Status.COMPLETE
-
-    	}
-    }
-    //
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -172,11 +126,11 @@ public class TodoListActivity extends AppCompatActivity {
 
         if ((id == R.id.incompleteScans) && (!currentStatus.equals(Status.INCOMPLETE))) {
             currentStatus = Status.INCOMPLETE;
-            showToast("incomplete scans");
+            populateRecyclerView();
             return true;
         } else if ((id == R.id.completedScans) && (!currentStatus.equals(Status.COMPLETE))) {
             currentStatus = Status.COMPLETE;
-            showToast("completed scans");
+            populateRecyclerView();
             return true;
         }
 

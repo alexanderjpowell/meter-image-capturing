@@ -49,6 +49,7 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -904,6 +905,30 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
             database.collection("scans").document().set(user);
             set.add(machineIdText);
+
+            // Also mark docs in uploadFormData if machine id matches
+            Query query = database.collection("formUploads")
+                    .document(userId)
+                    .collection("uploadFormData")
+                    .whereEqualTo("machine_id", machineIdText);
+            query.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                @Override
+                public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                    if (task.isSuccessful()) {
+                        for (QueryDocumentSnapshot document : task.getResult()) {
+                            DocumentReference documentReference = database.collection("formUploads")
+                                    .document(userId)
+                                    .collection("uploadFormData")
+                                    .document(document.getId());
+                            documentReference.update("isCompleted", true);
+                            set.add(document.get("machine_id").toString().trim());
+                        }
+                    } else {
+                        showToast("Unable to refresh.  Check your connection.");
+                    }
+                }
+            });
+            //
 
             resetMachineId();
             resetProgressives();
