@@ -1,12 +1,6 @@
 # Meter Image Capturing
 [![version](https://img.shields.io/badge/version-1.9.1-success.svg)](https://semver.org)
 
-<img src="https://raw.githubusercontent.com/alexanderjpowell/meter-image-capturing/master/docs/main_activity.png" width="250">
-
-<img src="https://raw.githubusercontent.com/alexanderjpowell/meter-image-capturing/master/docs/report_data_activity.png" width="250">
-
-<img src="https://raw.githubusercontent.com/alexanderjpowell/meter-image-capturing/master/docs/nav_bar.png" width="250">
-
 MiC is a mobile application designed for the Android operating system written in the Java programming language.  An iOS version does not exist at this time.  The main use case for the app is to use OCR (optical character recognition) to extract the progressive dollar values from images of slot machines.  The objective here is to save the casino employees time so they don't have to manually log all progressive values for each slot machine they monitor.  
 
 ## OCR ##
@@ -68,7 +62,11 @@ service cloud.firestore {
 
 MiC uses the Firebase authentication SDK to handle user registration and sign in.  Passwords are encrypted and completely handled by Google's API.  The developers of MiC have no access to a user's password, only the email they are using as a username.  Note that this information is not stored in the Cloud Firestore discussed above.  Completely separate processes are used for authentication and database management.  
 
+## Screenshots ##
 
+<img src="https://raw.githubusercontent.com/alexanderjpowell/meter-image-capturing/master/docs/main_activity.png" width="250">
 
+<img src="https://raw.githubusercontent.com/alexanderjpowell/meter-image-capturing/master/docs/report_data_activity.png" width="250">
 
+<img src="https://raw.githubusercontent.com/alexanderjpowell/meter-image-capturing/master/docs/nav_bar.png" width="250">
 
