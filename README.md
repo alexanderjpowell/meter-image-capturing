@@ -28,10 +28,10 @@ scans
  * userName
 
 users
-	* displayNames
+ * displayNames
 
 formUploads
-	* uploadFormData
+ * uploadFormData
 
 Note the current version of cloud firestore used by the application is 19.0.2.  
 
