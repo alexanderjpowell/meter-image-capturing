@@ -1,7 +1,7 @@
 # Meter Image Capturing
 [![version](https://img.shields.io/badge/version-1.9.1-success.svg)](https://semver.org)
 
-<img src="https://raw.githubusercontent.com/alexanderjpowell/meter-image-capturing/master/docs/main_activity.png" width="150">
+<img src="https://raw.githubusercontent.com/alexanderjpowell/meter-image-capturing/master/docs/main_activity.png" width="250">
 
 ![Queried state](https://raw.githubusercontent.com/alexanderjpowell/meter-image-capturing/master/docs/report_data_activity.png)
 
