@@ -64,4 +64,6 @@
     <string name="manage_users_nav_bar">Manage Users</string>
     <string name="settings_nav_bar">Settings</string>
     <string name="title_activity_todo_list">TodoListActivity</string>
+
+    <string name="upload_file_empty_state_message">Upload a CSV file via\n      the web portal</string>
 </resources>

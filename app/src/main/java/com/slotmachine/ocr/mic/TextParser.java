@@ -13,9 +13,9 @@ public class TextParser {
 
     public TextParser() { }
 
-    public static void main(String[] args) {
+    /*public static void main(String[] args) {
 
-    }
+    }*/
 
     /*private static boolean charIsIn(char c, String string) {
         for (int i = 0; i < string.length(); i++) {

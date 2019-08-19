@@ -18,8 +18,46 @@
             android:background="?android:selectableItemBackground"
             android:clickable="true"
             android:focusable="true"
-            android:scrollbars="vertical"/>
+            android:scrollbars="vertical"
+            android:visibility="gone"/>
 
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+
+    <TextView
+        android:id="@+id/empty_state_no_file_text_view"
+        android:drawableTop="@drawable/round_cloud_upload_black_48"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Upload a CSV file via\n      the web portal"
+        android:textSize="28sp"
+        android:layout_gravity="center"
+        android:visibility="gone"/>
+
+    <TextView
+        android:id="@+id/empty_state_completed_text_view"
+        android:drawableTop="@drawable/round_done_black_48"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Congratulations! All assigned scans have been completed."
+        android:textSize="28sp"
+        android:layout_gravity="center"
+        android:visibility="gone"/>
+
+    <TextView
+        android:id="@+id/empty_state_uncompleted_text_view"
+        android:drawableTop="@drawable/round_clear_black_48"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="No assigned scans have been completed. Get started now"
+        android:textSize="28sp"
+        android:layout_gravity="center"
+        android:visibility="gone"/>
+
+    <ProgressBar
+        android:id="@+id/progress_bar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:visibility="visible"/>
 
 </FrameLayout>

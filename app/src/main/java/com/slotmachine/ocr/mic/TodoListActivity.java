@@ -5,6 +5,8 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -20,7 +22,6 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
@@ -33,6 +34,7 @@ public class TodoListActivity extends AppCompatActivity {
     private RecyclerView recyclerView;
     private ToDoListDataAdapter mAdapter;
     private enum Status { INCOMPLETE, COMPLETE }
+    private enum EmptyState { NO_FILE_UPLOAD, ALL_COMPLETED, NONE_COMPLETED, NORMAL }
     private Status currentStatus;
 
     private FirebaseAuth firebaseAuth;
@@ -41,6 +43,11 @@ public class TodoListActivity extends AppCompatActivity {
     private SwipeRefreshLayout swipeRefreshLayout;
 
     private CollectionReference uploadFormDataCollectionReference;
+
+    private TextView empty_state_text_view;
+    private TextView empty_state_completed_text_view;
+    private TextView empty_state_uncompleted_text_view;
+    private ProgressBar progressBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,6 +64,11 @@ public class TodoListActivity extends AppCompatActivity {
             return;
         }
         //
+
+        empty_state_text_view = findViewById(R.id.empty_state_no_file_text_view);
+        empty_state_completed_text_view = findViewById(R.id.empty_state_completed_text_view);
+        empty_state_uncompleted_text_view = findViewById(R.id.empty_state_uncompleted_text_view);
+        progressBar = findViewById(R.id.progress_bar);
 
         database = FirebaseFirestore.getInstance();
         uploadFormDataCollectionReference = database.collection("formUploads")
@@ -104,30 +116,88 @@ public class TodoListActivity extends AppCompatActivity {
     }
 
     private void populateRecyclerView() {
+        recyclerView.setVisibility(View.GONE);
+        empty_state_text_view.setVisibility(View.GONE);
+        progressBar.setVisibility(View.VISIBLE);
         toDoDataList.clear();
-        boolean isComplete = currentStatus.equals(Status.COMPLETE);
         uploadFormDataCollectionReference
-                .whereEqualTo("isCompleted", isComplete)
+                //.whereEqualTo("isCompleted", isComplete)
                 //.orderBy("timestamp", Query.Direction.DESCENDING) // Need to add index
                 .get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
                 if (task.isSuccessful()) {
+                    if (task.getResult().size() == 0) {
+                        //recyclerView.setVisibility(View.VISIBLE);
+                        //empty_state_text_view.setVisibility(View.GONE);
+                        toggleEmptyStateDisplays(EmptyState.NO_FILE_UPLOAD);
+                    } /*else {
+                        recyclerView.setVisibility(View.GONE);
+                        empty_state_text_view.setVisibility(View.VISIBLE);
+                    }*/
                     for (QueryDocumentSnapshot document : task.getResult()) {
-                        ToDoListData row = new ToDoListData(document.get("location").toString().trim(),
-                                document.get("machine_id").toString().trim(),
-                                document.get("description").toString().trim(),
-                                false,
-                                false);
-                        toDoDataList.add(row);
+                        boolean a = (boolean)document.get("isCompleted");
+                        if (currentStatus.equals(Status.COMPLETE) && a) {
+                            ToDoListData row = new ToDoListData(document.get("location").toString().trim(),
+                                    document.get("machine_id").toString().trim(),
+                                    document.get("description").toString().trim(),
+                                    true,
+                                    false);
+                            toDoDataList.add(row);
+                        } else if (!currentStatus.equals(Status.COMPLETE) && !a) {
+                            ToDoListData row = new ToDoListData(document.get("location").toString().trim(),
+                                    document.get("machine_id").toString().trim(),
+                                    document.get("description").toString().trim(),
+                                    false,
+                                    false);
+                            toDoDataList.add(row);
+                        }
+                        //
+                        if (currentStatus.equals(Status.COMPLETE) && (toDoDataList.size() == 0)) {
+                            // Show empty state message that no scans have been performed
+                            //showToast("start performing scans");
+                            toggleEmptyStateDisplays(EmptyState.NONE_COMPLETED);
+                        } else if (!currentStatus.equals(Status.COMPLETE) && (toDoDataList.size() == 0)) {
+                            // Show empty state message congratulating user for finishing to do list
+                            //showToast("congrats! you've finished all your scans!");
+                            toggleEmptyStateDisplays(EmptyState.ALL_COMPLETED);
+                        } else {
+                            toggleEmptyStateDisplays(EmptyState.NORMAL);
+                        }
+                        //
                     }
                     mAdapter.notifyDataSetChanged();
                 } else {
                     showToast("Unable to refresh.  Check your connection.");
                 }
+                progressBar.setVisibility(View.GONE);
                 swipeRefreshLayout.setRefreshing(false);
             }
         });
+    }
+
+    private void toggleEmptyStateDisplays(EmptyState state) {
+        if (state.equals(EmptyState.NO_FILE_UPLOAD)) {
+            recyclerView.setVisibility(View.GONE);
+            empty_state_text_view.setVisibility(View.VISIBLE);
+            empty_state_completed_text_view.setVisibility(View.GONE);
+            empty_state_uncompleted_text_view.setVisibility(View.GONE);
+        } else if (state.equals(EmptyState.ALL_COMPLETED)) {
+            recyclerView.setVisibility(View.GONE);
+            empty_state_text_view.setVisibility(View.GONE);
+            empty_state_completed_text_view.setVisibility(View.VISIBLE);
+            empty_state_uncompleted_text_view.setVisibility(View.GONE);
+        } else if (state.equals(EmptyState.NONE_COMPLETED)) {
+            recyclerView.setVisibility(View.GONE);
+            empty_state_text_view.setVisibility(View.GONE);
+            empty_state_completed_text_view.setVisibility(View.GONE);
+            empty_state_uncompleted_text_view.setVisibility(View.VISIBLE);
+        } else if (state.equals(EmptyState.NORMAL)) {
+            recyclerView.setVisibility(View.VISIBLE);
+            empty_state_text_view.setVisibility(View.GONE);
+            empty_state_completed_text_view.setVisibility(View.GONE);
+            empty_state_uncompleted_text_view.setVisibility(View.GONE);
+        }
     }
 
     @Override
