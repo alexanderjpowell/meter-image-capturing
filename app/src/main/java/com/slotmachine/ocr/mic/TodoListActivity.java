@@ -13,12 +13,14 @@ import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
@@ -36,17 +38,16 @@ public class TodoListActivity extends AppCompatActivity {
     private FirebaseAuth firebaseAuth;
     private FirebaseFirestore database;
 
+    private SwipeRefreshLayout swipeRefreshLayout;
+
     private CollectionReference uploadFormDataCollectionReference;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_todo_list);
-        if (getSupportActionBar() != null) {
+        if (getSupportActionBar() != null)
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-            //getSupportActionBar().setTitle("Incomplete Scans");
-        }
-
 
         // Ensure user is signed in
         firebaseAuth = FirebaseAuth.getInstance();
@@ -61,6 +62,19 @@ public class TodoListActivity extends AppCompatActivity {
         uploadFormDataCollectionReference = database.collection("formUploads")
                 .document(firebaseAuth.getCurrentUser().getUid())
                 .collection("uploadFormData");
+
+        currentStatus = Status.INCOMPLETE;
+        swipeRefreshLayout = findViewById(R.id.swipeRefresh);
+        swipeRefreshLayout.setOnRefreshListener(
+                new SwipeRefreshLayout.OnRefreshListener() {
+                    @Override
+                    public void onRefresh() {
+                        // This method performs the actual data-refresh operation.
+                        // The method calls setRefreshing(false) when it's finished.
+                        populateRecyclerView();
+                    }
+                }
+        );
 
         recyclerView = findViewById(R.id.recycler_view_to_do_list);
         toDoDataList = new ArrayList<>();
@@ -82,12 +96,11 @@ public class TodoListActivity extends AppCompatActivity {
 
             @Override
             public void onLongClick(View view, final int position) {
+                // TODO
             }
         }));
 
-        currentStatus = Status.INCOMPLETE;
         populateRecyclerView();
-        //
     }
 
     private void populateRecyclerView() {
@@ -95,6 +108,7 @@ public class TodoListActivity extends AppCompatActivity {
         boolean isComplete = currentStatus.equals(Status.COMPLETE);
         uploadFormDataCollectionReference
                 .whereEqualTo("isCompleted", isComplete)
+                //.orderBy("timestamp", Query.Direction.DESCENDING) // Need to add index
                 .get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
@@ -106,12 +120,12 @@ public class TodoListActivity extends AppCompatActivity {
                                 false,
                                 false);
                         toDoDataList.add(row);
-
                     }
                     mAdapter.notifyDataSetChanged();
                 } else {
                     showToast("Unable to refresh.  Check your connection.");
                 }
+                swipeRefreshLayout.setRefreshing(false);
             }
         });
     }
