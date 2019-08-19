@@ -14,18 +14,18 @@ Note the current version of ML Kit used by the application is 22.0.0.  Also, MiC
 The backend database is powered by Cloud Firestore which is a NoSQL cloud database provided by Google Firebase.  It is document based and designed to be fast and scalable.  In the Firestore model, documents are stored in collections and can contain fields as well as other collections.  The current schema contains two collections: scans and users.  The scans collection contains documents with details about each image capture, and the users collection stores data specific to each user account.  
 
 scans
-	* email
-	* machine_id
-	* notes
-	* progressive1
-	* progressive2
-	* progressive3
-	* progressive4
-	* progressive5
-	* progressive6
-	* timestamp
-	* uid
-	* userName
+ * email
+ * machine_id
+ * notes
+ * progressive1
+ * progressive2
+ * progressive3
+ * progressive4
+ * progressive5
+ * progressive6
+ * timestamp
+ * uid
+ * userName
 
 users
 	* displayNames
