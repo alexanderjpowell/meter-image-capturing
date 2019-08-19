@@ -1,4 +1,11 @@
 # Meter Image Capturing
+[![version](https://img.shields.io/badge/version-1.9.1-success.svg)](https://semver.org)
+
+![Queried state](https://raw.githubusercontent.com/alexanderjpowell/mic-flask-app/master/docs/main_activity.png)
+
+![Queried state](https://raw.githubusercontent.com/alexanderjpowell/mic-flask-app/master/docs/report_data_activity.png)
+
+![Empty state](https://raw.githubusercontent.com/alexanderjpowell/mic-flask-app/master/docs/nav_bar.png)
 
 MiC is a mobile application designed for the Android operating system written in the Java programming language.  An iOS version does not exist at this time.  The main use case for the app is to use OCR (optical character recognition) to extract the progressive dollar values from images of slot machines.  The objective here is to save the casino employees time so they don't have to manually log all progressive values for each slot machine they monitor.  
 
@@ -6,28 +13,31 @@ MiC is a mobile application designed for the Android operating system written in
 
 The main backend logic behind the OCR comes from Google's ML Kit SDK.  The SDK provides a number of machine learning APIs; MiC uses the text recognition API originally optimized for recognizing text in documents.  While the SDK provides support for text recogntion both on-device and by making a call to the cloud, the cloud model is the one used in the application.  This means that some sort of network connection (Wifi or Data) is required to make a successfull call.  Note: progressive values can still be inputted manually through the keyboard and submitted to the database without a network connection.  In this case the values will be stored in a queue until the next time the device connects to the internet, at which point they'll be pushed to the database.  The quality of the image the user captures correlates to the accuracy of the progressive text detected.  For best results ensure that the camera is properly focused and is not blurry.  
 
-Note the current version of ML Kit used by the application is 20.0.0.  Also, MiC requires at least Android API level 23, or version 6.0 (Marshmallow).  
+Note the current version of ML Kit used by the application is 22.0.0.  Also, MiC requires at least Android API level 23, or version 6.0 (Marshmallow).  
 
 ## Database ##
 
 The backend database is powered by Cloud Firestore which is a NoSQL cloud database provided by Google Firebase.  It is document based and designed to be fast and scalable.  In the Firestore model, documents are stored in collections and can contain fields as well as other collections.  The current schema contains two collections: scans and users.  The scans collection contains documents with details about each image capture, and the users collection stores data specific to each user account.  
 
 scans
- * email
- * machine_id
- * notes
- * progressive1
- * progressive2
- * progressive3
- * progressive4
- * progressive5
- * progressive6
- * timestamp
- * uid
- * userName
+	* email
+	* machine_id
+	* notes
+	* progressive1
+	* progressive2
+	* progressive3
+	* progressive4
+	* progressive5
+	* progressive6
+	* timestamp
+	* uid
+	* userName
 
 users
- * displayNames
+	* displayNames
+
+formUploads
+	* uploadFormData
 
 Note the current version of cloud firestore used by the application is 19.0.2.  
 
@@ -45,6 +55,9 @@ service cloud.firestore {
 			allow create: if request.auth.uid != null;
 		}
 		match /users/{document=**} {
+			allow read, write: if request.auth.uid != null;
+		}
+		match /formUploads/{document=**} {
 			allow read, write: if request.auth.uid != null;
 		}
 	}
