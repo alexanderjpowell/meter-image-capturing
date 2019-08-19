@@ -152,19 +152,14 @@ public class TodoListActivity extends AppCompatActivity {
                                     false);
                             toDoDataList.add(row);
                         }
-                        //
+
                         if (currentStatus.equals(Status.COMPLETE) && (toDoDataList.size() == 0)) {
-                            // Show empty state message that no scans have been performed
-                            //showToast("start performing scans");
                             toggleEmptyStateDisplays(EmptyState.NONE_COMPLETED);
                         } else if (!currentStatus.equals(Status.COMPLETE) && (toDoDataList.size() == 0)) {
-                            // Show empty state message congratulating user for finishing to do list
-                            //showToast("congrats! you've finished all your scans!");
                             toggleEmptyStateDisplays(EmptyState.ALL_COMPLETED);
                         } else {
                             toggleEmptyStateDisplays(EmptyState.NORMAL);
                         }
-                        //
                     }
                     mAdapter.notifyDataSetChanged();
                 } else {

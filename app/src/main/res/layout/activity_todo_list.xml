@@ -28,8 +28,9 @@
         android:drawableTop="@drawable/round_cloud_upload_black_48"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Upload a CSV file via\n      the web portal"
+        android:text="@string/upload_file_empty_state_no_file_message"
         android:textSize="28sp"
+        android:textAlignment="center"
         android:layout_gravity="center"
         android:visibility="gone"/>
 
@@ -38,8 +39,9 @@
         android:drawableTop="@drawable/round_done_black_48"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Congratulations! All assigned scans have been completed."
+        android:text="@string/upload_file_empty_state_completed_message"
         android:textSize="28sp"
+        android:textAlignment="center"
         android:layout_gravity="center"
         android:visibility="gone"/>
 
@@ -48,8 +50,9 @@
         android:drawableTop="@drawable/round_clear_black_48"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="No assigned scans have been completed. Get started now"
+        android:text="@string/upload_file_empty_state_incomplete_message"
         android:textSize="28sp"
+        android:textAlignment="center"
         android:layout_gravity="center"
         android:visibility="gone"/>
 
