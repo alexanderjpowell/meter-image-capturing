@@ -33,7 +33,7 @@ users
 formUploads
  * uploadFormData
 
-Note the current version of cloud firestore used by the application is 19.0.2.  
+Note the current version of cloud firestore used by the application is 20.2.0.  
 
 ### Indexes ###
 There is a composite index on the scans collection with uid ascending and timestamp descending.  
