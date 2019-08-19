@@ -10,6 +10,7 @@
             android:title="@string/completed_scans_nav_bar" />
         <item
             android:id="@+id/to_do_list"
+            android:icon="@drawable/sharp_announcement_black_48"
             android:title="To Do List"/>
         <item
             android:id="@+id/nav_slideshow"

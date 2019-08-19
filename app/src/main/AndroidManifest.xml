@@ -78,7 +78,7 @@
         </activity>
         <activity
             android:name=".TodoListActivity"
-            android:label="@string/title_activity_todo_list"
+            android:label="Incomplete Scans"
             android:parentActivityName=".MainActivity"
             android:screenOrientation="portrait"
             android:theme="@style/ToDoListTheme">

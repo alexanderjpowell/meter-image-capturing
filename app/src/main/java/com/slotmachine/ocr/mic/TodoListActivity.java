@@ -19,7 +19,6 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
@@ -31,7 +30,7 @@ public class TodoListActivity extends AppCompatActivity {
     private List<ToDoListData> toDoDataList;
     private RecyclerView recyclerView;
     private ToDoListDataAdapter mAdapter;
-    private enum Status {INCOMPLETE, COMPLETE};
+    private enum Status { INCOMPLETE, COMPLETE }
     private Status currentStatus;
 
     private FirebaseAuth firebaseAuth;
@@ -43,8 +42,11 @@ public class TodoListActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_todo_list);
-        if (getSupportActionBar() != null)
+        if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            //getSupportActionBar().setTitle("Incomplete Scans");
+        }
+
 
         // Ensure user is signed in
         firebaseAuth = FirebaseAuth.getInstance();
@@ -127,10 +129,12 @@ public class TodoListActivity extends AppCompatActivity {
         if ((id == R.id.incompleteScans) && (!currentStatus.equals(Status.INCOMPLETE))) {
             currentStatus = Status.INCOMPLETE;
             populateRecyclerView();
+            getSupportActionBar().setTitle("Incomplete Scans");
             return true;
         } else if ((id == R.id.completedScans) && (!currentStatus.equals(Status.COMPLETE))) {
             currentStatus = Status.COMPLETE;
             populateRecyclerView();
+            getSupportActionBar().setTitle("Completed Scans");
             return true;
         }
 
