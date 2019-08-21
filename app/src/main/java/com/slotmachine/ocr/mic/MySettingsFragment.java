@@ -193,9 +193,9 @@ public class MySettingsFragment extends PreferenceFragmentCompat {
         }
     }
 
-    private void showToast(String message) {
+    /*private void showToast(String message) {
         Toast.makeText(getContext(), message, Toast.LENGTH_LONG).show();
-    }
+    }*/
 }
 
 

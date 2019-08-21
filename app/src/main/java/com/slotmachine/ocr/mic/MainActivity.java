@@ -19,7 +19,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Matrix;
 import android.graphics.Rect;
-import android.media.ExifInterface;
+import androidx.exifinterface.media.ExifInterface;
 import android.net.Uri;
 import android.provider.MediaStore;
 import androidx.annotation.NonNull;
@@ -50,7 +50,6 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
@@ -101,22 +100,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public TextInputEditText progressive6;
     public TextInputEditText machineId;
 
-    public TextView navDrawerText1;
-    public TextView navDrawerText2;
     public Spinner spinner;
 
-    public Bitmap mBitmap;
     private DrawerLayout mDrawerLayout;
 
     private FirebaseAuth firebaseAuth;
     private FirebaseFirestore database;
 
-    //private ProgressDialog progressDialog;
-
-    private String ACTIVITY_LABEL = "User:";
-
     private Double minimumProgressiveValue;
-    private Boolean autoSortProgressives = true;
 
     private Set<String> set = new HashSet<>();
 
@@ -125,7 +116,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        setTitle(ACTIVITY_LABEL);
+        setTitle("User:");
 
         // Ensure user is signed in
         firebaseAuth = FirebaseAuth.getInstance();
@@ -136,7 +127,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
         //
 
-        Toolbar toolbar = (Toolbar)findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         // Set nav header color
@@ -150,24 +141,24 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         //
         checkPermissions();
 
-        DrawerLayout drawer = (DrawerLayout)findViewById(R.id.drawer_layout);
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
         toggle.syncState();
 
-        NavigationView navigationView = (NavigationView)findViewById(R.id.nav_view);
+        NavigationView navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
         View headerView = navigationView.getHeaderView(0);
 
-        progressive1 = (TextInputEditText)findViewById(R.id.progressive1);
-        progressive2 = (TextInputEditText)findViewById(R.id.progressive2);
-        progressive3 = (TextInputEditText)findViewById(R.id.progressive3);
-        progressive4 = (TextInputEditText)findViewById(R.id.progressive4);
-        progressive5 = (TextInputEditText)findViewById(R.id.progressive5);
-        progressive6 = (TextInputEditText)findViewById(R.id.progressive6);
-        machineId = (TextInputEditText)findViewById(R.id.machineId);
-        submitButton = (Button)findViewById(R.id.submit_button);
+        progressive1 = findViewById(R.id.progressive1);
+        progressive2 = findViewById(R.id.progressive2);
+        progressive3 = findViewById(R.id.progressive3);
+        progressive4 = findViewById(R.id.progressive4);
+        progressive5 = findViewById(R.id.progressive5);
+        progressive6 = findViewById(R.id.progressive6);
+        machineId = findViewById(R.id.machineId);
+        submitButton = findViewById(R.id.submit_button);
 
         resetProgressives();
 
@@ -457,7 +448,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         return super.onOptionsItemSelected(item);
     }
 
-    @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
@@ -565,7 +555,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         progressive6.clearFocus();
     }
 
-    private void processMachineOCR(Bitmap bitmap) {
+    /*private void processMachineOCR(Bitmap bitmap) {
         FirebaseVisionImage image = FirebaseVisionImage.fromBitmap(bitmap);
         FirebaseVisionTextRecognizer detector = FirebaseVision.getInstance().getOnDeviceTextRecognizer();
         Task<FirebaseVisionText> result =
@@ -603,7 +593,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                         showToast("Error with OCR");
                                     }
                                 });
-    }
+    }*/
 
     private void processProgressivesOCR(Bitmap bitmap) {
 
@@ -736,8 +726,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     private File createImageFile() throws IOException {
         // Create an image file name
-        //String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-        //String imageFileName = "JPEG_" + timeStamp + "_";
         String imageFileName = "tempMICImage";
         File storageDir = getFilesDir();
         //File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);

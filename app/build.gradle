@@ -50,6 +50,7 @@ dependencies {
 
     implementation 'androidx.core:core:1.0.2'
     implementation 'androidx.preference:preference:1.1.0-rc01'
+    implementation 'androidx.exifinterface:exifinterface:1.0.0'
 }
 
 apply plugin: 'com.google.gms.google-services'

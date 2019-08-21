@@ -247,7 +247,7 @@ public class DataReportActivity extends AppCompatActivity {// implements Adapter
         Query query = collectionReference.whereEqualTo("uid", firebaseAuth.getCurrentUser().getUid())
                 .whereGreaterThan("timestamp", time)
                 .orderBy("timestamp", Query.Direction.DESCENDING)
-                .limit(QUERY_LIMIT_SIZE);//5000
+                .limit(QUERY_LIMIT_SIZE);
         query.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
