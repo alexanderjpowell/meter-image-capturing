@@ -62,6 +62,8 @@ service cloud.firestore {
 
 MiC uses the Firebase authentication SDK to handle user registration and sign in.  Passwords are encrypted and completely handled by Google's API.  The developers of MiC have no access to a user's password, only the email they are using as a username.  Note that this information is not stored in the Cloud Firestore discussed above.  Completely separate processes are used for authentication and database management.  
 
+Note the current version of Firebase auth used by the application is 4.3.0.
+
 ## Dependencies ##
 
 The following dependencies are necessary in the app level gradle file
