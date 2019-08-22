@@ -68,4 +68,7 @@
     <string name="upload_file_empty_state_no_file_message">Upload a CSV file via\nthe web portal</string>
     <string name="upload_file_empty_state_completed_message">Congratulations! All assigned scans have been completed</string>
     <string name="upload_file_empty_state_incomplete_message">No assigned scans have been completed</string>
+
+    <string name="progressive_values_row_label">progressive values</string>
+    <string name="location_text">Location</string>
 </resources>

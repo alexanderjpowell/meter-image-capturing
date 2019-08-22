@@ -50,10 +50,22 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />-->
 
-    <TextView
+    <!--<TextView
         android:id="@+id/lastScannedTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_below="@id/descriptionTextView"/>-->
+
+    <TextView
+        android:id="@+id/numberOfProgressivesTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_below="@id/descriptionTextView"/>
+
+    <TextView
+        android:id="@+id/userTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/numberOfProgressivesTextView"/>
 
 </RelativeLayout>

@@ -4,6 +4,7 @@ import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
+import android.content.res.ColorStateList;
 import android.graphics.Color;
 
 import androidx.core.view.MenuItemCompat;
@@ -40,13 +41,13 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
@@ -59,8 +60,6 @@ import com.google.firebase.ml.vision.FirebaseVision;
 import com.google.firebase.ml.vision.common.FirebaseVisionImage;
 import com.google.firebase.ml.vision.document.FirebaseVisionDocumentText;
 import com.google.firebase.ml.vision.document.FirebaseVisionDocumentTextRecognizer;
-import com.google.firebase.ml.vision.text.FirebaseVisionText;
-import com.google.firebase.ml.vision.text.FirebaseVisionTextRecognizer;
 
 import android.speech.RecognizerIntent;
 
@@ -99,6 +98,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public TextInputEditText progressive5;
     public TextInputEditText progressive6;
     public TextInputEditText machineId;
+
+    public TextInputLayout inputLayout0;
+    public TextInputLayout inputLayout1;
+    public TextInputLayout inputLayout2;
+    public TextInputLayout inputLayout3;
+    public TextInputLayout inputLayout4;
+    public TextInputLayout inputLayout5;
+    public TextInputLayout inputLayout6;
 
     public Spinner spinner;
 
@@ -160,6 +167,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         machineId = findViewById(R.id.machineId);
         submitButton = findViewById(R.id.submit_button);
 
+        inputLayout0 = findViewById(R.id.inputLayout0);
+        inputLayout1 = findViewById(R.id.inputLayout1);
+        inputLayout2 = findViewById(R.id.inputLayout2);
+        inputLayout3 = findViewById(R.id.inputLayout3);
+        inputLayout4 = findViewById(R.id.inputLayout4);
+        inputLayout5 = findViewById(R.id.inputLayout5);
+        inputLayout6 = findViewById(R.id.inputLayout6);
+
         resetProgressives();
 
         progressive1.setOnTouchListener(this);
@@ -181,7 +196,16 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         // Populate machine id if coming from to do list activity
         Intent intent = getIntent();
         String value = intent.getStringExtra("machine_id");
-        machineId.setText(value);
+        int numberOfProgressives = intent.getIntExtra("numberOfProgressives",0);
+        labelEditTextsFromToDo(value, numberOfProgressives);
+        //machineId.setText(value);
+        //progressive1.setEnabled(false);
+        //progressive1.setHintTextColor(Color.GREEN);
+        //progressive1.setVisibility(View.INVISIBLE);
+        //TextInputLayout inputLayout1 = findViewById(R.id.inputLayout1);
+        //inputLayout1.setEnabled(false);
+        //inputLayout1.setDefaultHintTextColor(myList);
+        //progressive1.setText("test");
         //
 
         // Set minimum progressive value
@@ -196,6 +220,28 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         boolean reject_duplicates = sharedPreferences.getBoolean("reject_duplicates", false);
         if (reject_duplicates) {
             populateDuplicatesSet();
+        }
+    }
+
+    private void labelEditTextsFromToDo(String machine_id, int numberOfProgressives) {
+        numberOfProgressives = (numberOfProgressives > 6) ? 6 : numberOfProgressives;
+        int[][] states = new int[][] {
+                new int[] { android.R.attr.state_enabled }, // enabled
+                new int[] { -android.R.attr.state_enabled }, // disabled
+                new int[] { -android.R.attr.state_checked }, // unchecked
+                new int[] { android.R.attr.state_pressed }  // pressed
+        };
+        int[] colors = new int[] {
+                Color.GREEN,
+                Color.GREEN,
+                Color.GREEN,
+                Color.GREEN
+        };
+        ColorStateList colorStateList = new ColorStateList(states, colors);
+        machineId.setText(machine_id);
+        TextInputLayout[] array = { inputLayout1, inputLayout2, inputLayout3, inputLayout4, inputLayout5, inputLayout6 };
+        for (int i = 0; i < numberOfProgressives; i++) {
+            array[i].setDefaultHintTextColor(colorStateList);
         }
     }
 

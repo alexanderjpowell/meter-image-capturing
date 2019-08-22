@@ -2,6 +2,7 @@ package com.slotmachine.ocr.mic;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -56,6 +57,8 @@ public class TodoListActivity extends AppCompatActivity {
         if (getSupportActionBar() != null)
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
+        //setTitle("Incomplete Scans");
+
         // Ensure user is signed in
         firebaseAuth = FirebaseAuth.getInstance();
         if (firebaseAuth.getCurrentUser() == null) {
@@ -103,6 +106,7 @@ public class TodoListActivity extends AppCompatActivity {
             public void onClick(View view, int position) {
                 Intent intent = new Intent(TodoListActivity.this, MainActivity.class);
                 intent.putExtra("machine_id", toDoDataList.get(position).getMachineId());
+                intent.putExtra("numberOfProgressives", toDoDataList.get(position).getNumberOfProgressives());
                 startActivity(intent);
             }
 
@@ -127,20 +131,16 @@ public class TodoListActivity extends AppCompatActivity {
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
                 if (task.isSuccessful()) {
-                    if (task.getResult().size() == 0) {
-                        //recyclerView.setVisibility(View.VISIBLE);
-                        //empty_state_text_view.setVisibility(View.GONE);
+                    if (task.getResult().size() == 0)
                         toggleEmptyStateDisplays(EmptyState.NO_FILE_UPLOAD);
-                    } /*else {
-                        recyclerView.setVisibility(View.GONE);
-                        empty_state_text_view.setVisibility(View.VISIBLE);
-                    }*/
                     for (QueryDocumentSnapshot document : task.getResult()) {
                         boolean a = (boolean)document.get("isCompleted");
                         if (currentStatus.equals(Status.COMPLETE) && a) {
                             ToDoListData row = new ToDoListData(document.get("location").toString().trim(),
                                     document.get("machine_id").toString().trim(),
                                     document.get("description").toString().trim(),
+                                    "",
+                                    1,
                                     true,
                                     false);
                             toDoDataList.add(row);
@@ -148,6 +148,8 @@ public class TodoListActivity extends AppCompatActivity {
                             ToDoListData row = new ToDoListData(document.get("location").toString().trim(),
                                     document.get("machine_id").toString().trim(),
                                     document.get("description").toString().trim(),
+                                    (document.get("user") == null) ? null : document.get("user").toString(),
+                                    (document.get("number") == null) ? null : Integer.valueOf((String)document.get("number")),
                                     false,
                                     false);
                             toDoDataList.add(row);

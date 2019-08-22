@@ -76,6 +76,17 @@ implementation 'com.google.firebase:firebase-firestore:21.0.0'
 implementation 'com.firebaseui:firebase-ui-auth:4.3.0'
 ```
 
+The current gradle and google-services repositories are:
+
+```
+dependencies {
+	classpath 'com.android.tools.build:gradle:3.5.0'
+	classpath 'com.google.gms:google-services:4.3.0'
+}
+```
+
+The google-services.json file should be placed in the app level directory of the project.
+
 ## Screenshots ##
 
 <img src="https://raw.githubusercontent.com/alexanderjpowell/meter-image-capturing/master/docs/main_activity.png" width="250">
