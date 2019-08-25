@@ -118,6 +118,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     private Set<String> set = new HashSet<>();
 
+    private Intent intent;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -128,10 +130,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         // Ensure user is signed in
         firebaseAuth = FirebaseAuth.getInstance();
         if (firebaseAuth.getCurrentUser() == null) {
+            //showToast("sign out user");
             startActivity(new Intent(MainActivity.this, LoginActivity.class));
             finish();
             return;
+        } else {
+            //showToast(firebaseAuth.getCurrentUser().getEmail());
         }
+        //
+        //setContentView(R.layout.activity_main);
         //
 
         Toolbar toolbar = findViewById(R.id.toolbar);
@@ -194,19 +201,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         machineId.addTextChangedListener(new GenericTextWatcher(machineId));
 
         // Populate machine id if coming from to do list activity
-        Intent intent = getIntent();
+        intent = getIntent();
         String value = intent.getStringExtra("machine_id");
         int numberOfProgressives = intent.getIntExtra("numberOfProgressives",0);
         labelEditTextsFromToDo(value, numberOfProgressives);
-        //machineId.setText(value);
-        //progressive1.setEnabled(false);
-        //progressive1.setHintTextColor(Color.GREEN);
-        //progressive1.setVisibility(View.INVISIBLE);
-        //TextInputLayout inputLayout1 = findViewById(R.id.inputLayout1);
-        //inputLayout1.setEnabled(false);
-        //inputLayout1.setDefaultHintTextColor(myList);
-        //progressive1.setText("test");
-        //
 
         // Set minimum progressive value
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
@@ -911,7 +909,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
                                     resetMachineId();
                                     resetProgressives();
-                                    showToast("Progressives submitted successfully");
+                                    showToast("Progressive(s) submitted successfully");
                                     hideKeyboard();
                                     dialog.dismiss();
                                 }
@@ -963,10 +961,18 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 }
             });
             //
+            // if coming from to do activity - go back and
+            if (intent.hasExtra("machine_id")) {
+                //super.onBackPressed();
+                setResult(RESULT_OK, getIntent());
+                this.onBackPressed();
+                finish();
+            }
+            //
 
             resetMachineId();
             resetProgressives();
-            showToast("Progressives submitted successfully");
+            showToast("Progressive(s) submitted successfully");
             hideKeyboard();
         } catch (Exception ex) {
             showToast("No connection");

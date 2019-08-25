@@ -2,12 +2,12 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <item android:id="@+id/incompleteScans"
+    <!--<item android:id="@+id/incompleteScans"
         android:title="Incomplete"
         app:showAsAction="never"/>
 
     <item android:id="@+id/completedScans"
         android:title="Complete"
-        app:showAsAction="never"/>
+        app:showAsAction="never"/>-->
 
 </menu>

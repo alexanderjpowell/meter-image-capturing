@@ -8,13 +8,11 @@ import android.text.InputType;
 import android.text.TextUtils;
 import android.widget.EditText;
 import android.widget.Toast;
-
 import androidx.annotation.NonNull;
 import androidx.preference.EditTextPreference;
 import androidx.preference.Preference;
 import androidx.preference.Preference.SummaryProvider;
 import androidx.preference.PreferenceFragmentCompat;
-
 import com.firebase.ui.auth.AuthUI;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -38,29 +36,52 @@ public class MySettingsFragment extends PreferenceFragmentCompat {
             return;
         }
 
+        //
+        // DONT STORE DISPLAY NAME IN PREFERENCES - FETCH FROM FIREBASE AUTH EACH TIME
+        //
+
+        //showToast("Name: " + firebaseUser.getDisplayName());
+
         Preference account_email_preference = findPreference("account_email_button");
         EditTextPreference display_name_preference = findPreference("display_name_button");
         EditTextPreference email_recipient_preference = findPreference("email_recipient");
         EditTextPreference minimum_value = findPreference("minimum_value");
-        Preference sign_out_preference = findPreference("sign_out_button");
+        Preference sign_out_preference_button = findPreference("sign_out_button");
         Preference change_password_button = findPreference("change_password_button");
         Preference delete_account_button = findPreference("delete_account_button");
         Preference terms_and_conditions_button = findPreference("legal_disclaimer");
+        //Preference verify_email_preference_button = findPreference("verify_email_button");
+
+        //EditTextPreference testPref = findPreference("test_pref");
+        /*if (display_name_preference != null)
+            showToast("not null");
+        else
+            showToast("null");*/
+
+        //showToast(display_name_preference.getText());
+
+        //showToast("Name: " + display_name_preference.getText());
 
         if (account_email_preference != null) {
             account_email_preference.setSummary(firebaseAuth.getCurrentUser().getEmail());
         }
 
         if (display_name_preference != null) {
-            display_name_preference.setSummary(firebaseUser.getDisplayName());
+            //display_name_preference.setSummary(firebaseUser.getDisplayName());
             display_name_preference.setSummaryProvider(new SummaryProvider<EditTextPreference>() {
                 @Override
                 public CharSequence provideSummary(EditTextPreference preference) {
-                    String text = preference.getText();
-                    if (TextUtils.isEmpty(text)) {
+                    //showToast("provideSummary");
+                    //String text = preference.getText();
+
+                    if (firebaseUser.getDisplayName() == null)
                         return "Not set";
-                    }
-                    return text;
+                    else
+                        return firebaseUser.getDisplayName();
+                    //else if (TextUtils.isEmpty(text)) {
+                    //    return "Not set";
+                    //}
+                    //return text;
                 }
             });
             display_name_preference.setOnPreferenceChangeListener(
@@ -68,13 +89,15 @@ public class MySettingsFragment extends PreferenceFragmentCompat {
                         @Override
                         public boolean onPreferenceChange(Preference preference, Object newValue) {
                             UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
-                                    .setDisplayName(newValue.toString())
+                                    .setDisplayName(newValue.toString().trim())
                                     .build();
                             firebaseUser.updateProfile(profileUpdates);
+                            //display_name_preference.setText(newValue.toString().trim());
                             return true;
                         }
                     }
             );
+
         }
 
         if (email_recipient_preference != null) {
@@ -99,6 +122,24 @@ public class MySettingsFragment extends PreferenceFragmentCompat {
         }
 
         if (minimum_value != null) {
+            if (minimum_value.getText() == null || minimum_value.getText().trim().isEmpty())
+                minimum_value.setSummary(getString(R.string.minimum_value_summary));
+            else
+                minimum_value.setSummary("$" + minimum_value.getText().trim());
+
+            minimum_value.setOnPreferenceChangeListener(
+                    new Preference.OnPreferenceChangeListener() {
+                        @Override
+                        public boolean onPreferenceChange(Preference preference, Object newValue) {
+                            if (newValue.toString().trim().isEmpty())
+                                preference.setSummary(getString(R.string.minimum_value_summary));
+                            else
+                                preference.setSummary("$" + newValue.toString().trim());
+                            return true;
+                        }
+                    }
+            );
+
             minimum_value.setOnBindEditTextListener(
                     new EditTextPreference.OnBindEditTextListener() {
                         @Override
@@ -109,8 +150,8 @@ public class MySettingsFragment extends PreferenceFragmentCompat {
             );
         }
 
-        if (sign_out_preference != null) {
-            sign_out_preference.setOnPreferenceClickListener(
+        if (sign_out_preference_button != null) {
+            sign_out_preference_button.setOnPreferenceClickListener(
                     new Preference.OnPreferenceClickListener() {
                         @Override
                         public boolean onPreferenceClick(Preference preference) {
@@ -191,6 +232,19 @@ public class MySettingsFragment extends PreferenceFragmentCompat {
                     }
             );
         }
+
+        /*if (verify_email_preference_button != null) {
+
+            verify_email_preference_button.setOnPreferenceClickListener(
+                    new Preference.OnPreferenceClickListener() {
+                        @Override
+                        public boolean onPreferenceClick(Preference preference) {
+                            firebaseUser.sendEmailVerification();
+                            return true;
+                        }
+                    }
+            );
+        }*/
     }
 
     /*private void showToast(String message) {

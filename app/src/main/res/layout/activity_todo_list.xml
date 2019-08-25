@@ -19,7 +19,7 @@
             android:clickable="true"
             android:focusable="true"
             android:scrollbars="vertical"
-            android:visibility="gone"/>
+            android:visibility="visible"/>
 
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 

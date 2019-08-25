@@ -37,14 +37,18 @@ public class ToDoListDataAdapter extends RecyclerView.Adapter<ToDoListDataAdapte
         holder.locationTextView.setText(String.format(Locale.US, "%s: %s", context.getString(R.string.location_text), toDoListData.getLocation()));
 
         if (toDoListData.getNumberOfProgressives() != null) {
-            holder.numberOfProgressivesTextView.setText(String.format(Locale.US,"%d %s", toDoListData.getNumberOfProgressives(), context.getString(R.string.progressive_values_row_label)));
+            if (toDoListData.getNumberOfProgressives() == 1) {
+                holder.numberOfProgressivesTextView.setText(String.format(Locale.US,"%d %s", toDoListData.getNumberOfProgressives(), context.getString(R.string.progressive_values_row_label_singular)));
+            } else {
+                holder.numberOfProgressivesTextView.setText(String.format(Locale.US,"%d %s", toDoListData.getNumberOfProgressives(), context.getString(R.string.progressive_values_row_label)));
+            }
             holder.numberOfProgressivesTextView.setVisibility(View.VISIBLE);
         } else {
             holder.numberOfProgressivesTextView.setVisibility(View.GONE);
         }
 
         if (toDoListData.getUser() != null) {
-            holder.userTextView.setText(toDoListData.getUser());
+            holder.userTextView.setText(String.format(Locale.US, "%s %s", context.getString(R.string.assigned_to_text), toDoListData.getUser()));
             holder.userTextView.setVisibility(View.VISIBLE);
         } else {
             holder.userTextView.setVisibility(View.GONE);
@@ -63,18 +67,15 @@ public class ToDoListDataAdapter extends RecyclerView.Adapter<ToDoListDataAdapte
 
     public static class ToDoListDataHolder extends RecyclerView.ViewHolder{
 
-        TextView machineIdTextView;//, lastScannedTextView;//, userNameTextView;
+        TextView machineIdTextView;
         TextView descriptionTextView, locationTextView;
         TextView numberOfProgressivesTextView;
         TextView userTextView;
-        //CheckBox checkBox;
 
         public ToDoListDataHolder(View itemView) {
             super(itemView);
 
             machineIdTextView = itemView.findViewById(R.id.machineIdTextView);
-            //lastScannedTextView = itemView.findViewById(R.id.lastScannedTextView);
-            //userNameTextView = itemView.findViewById(R.id.userNameTextView);
             descriptionTextView = itemView.findViewById(R.id.descriptionTextView);
             locationTextView = itemView.findViewById(R.id.locationTextView);
             numberOfProgressivesTextView = itemView.findViewById(R.id.numberOfProgressivesTextView);

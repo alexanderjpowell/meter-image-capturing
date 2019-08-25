@@ -65,10 +65,15 @@
     <string name="settings_nav_bar">Settings</string>
     <string name="title_activity_todo_list">TodoListActivity</string>
 
-    <string name="upload_file_empty_state_no_file_message">Upload a CSV file via\nthe web portal</string>
+    <!--<string name="upload_file_empty_state_no_file_message">Upload a CSV file via\nthe web portal</string>-->
+    <string name="upload_file_empty_state_no_file_message">No assigned scans. Get started by uploading a CSV file via the web portal</string>
     <string name="upload_file_empty_state_completed_message">Congratulations! All assigned scans have been completed</string>
     <string name="upload_file_empty_state_incomplete_message">No assigned scans have been completed</string>
 
     <string name="progressive_values_row_label">progressive values</string>
+    <string name="progressive_values_row_label_singular">progressive value</string>
     <string name="location_text">Location</string>
+    <string name="assigned_to_text">Assigned to</string>
+
+    <string name="minimum_value_summary">Smallest value recognized by the OCR</string>
 </resources>
