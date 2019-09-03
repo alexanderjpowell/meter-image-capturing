@@ -109,6 +109,8 @@ public class TodoListActivity extends AppCompatActivity {
                 intent.putExtra("machine_id", toDoDataList.get(position).getMachineId());
                 intent.putExtra("numberOfProgressives", toDoDataList.get(position).getNumberOfProgressives());
                 intent.putExtra("position", position);
+                String[] progressiveDescriptionTitles = toDoDataList.get(position).getProgressiveDescriptions();
+                intent.putExtra("progressiveDescriptionTitles", progressiveDescriptionTitles);
                 startActivityForResult(intent, SUBMIT_PROGRESSIVE_RECORD);
             }
 
@@ -149,11 +151,17 @@ public class TodoListActivity extends AppCompatActivity {
                             toDoDataList.add(row);
                         } else if (!currentStatus.equals(Status.COMPLETE) && !a) {*/
                         if (true) {
+                            String[] progressiveDescriptions = new String[4];
+                            progressiveDescriptions[0] = (document.get("p_1") == null) ? null : document.get("p_1").toString();
+                            progressiveDescriptions[1] = (document.get("p_2") == null) ? null : document.get("p_2").toString();
+                            progressiveDescriptions[2] = (document.get("p_3") == null) ? null : document.get("p_3").toString();
+                            progressiveDescriptions[3] = (document.get("p_4") == null) ? null : document.get("p_4").toString();
                             ToDoListData row = new ToDoListData(document.get("location").toString().trim(),
                                     document.get("machine_id").toString().trim(),
                                     document.get("description").toString().trim(),
                                     (document.get("user") == null) ? null : document.get("user").toString(),
                                     (document.get("progressive_count") == null) ? null : Integer.valueOf((String)document.get("progressive_count")),
+                                    progressiveDescriptions,
                                     false,
                                     false);
                             toDoDataList.add(row);

@@ -134,9 +134,17 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             startActivity(new Intent(MainActivity.this, LoginActivity.class));
             finish();
             return;
-        } else {
-            //showToast(firebaseAuth.getCurrentUser().getEmail());
         }
+        //else {
+            //showToast(firebaseAuth.getCurrentUser().getEmail());
+        //}
+        //
+        /*if (!firebaseAuth.getCurrentUser().isEmailVerified()) {
+            // Start new activity to verify email
+            showToast("Email not verified");
+        } else {
+            showToast("Email verified");
+        }*/
         //
         //setContentView(R.layout.activity_main);
         //
@@ -145,10 +153,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         setSupportActionBar(toolbar);
 
         // Set nav header color
-        int color = Color.parseColor("#2196F3");
-        NavigationView navView = findViewById(R.id.nav_view);
-        View header = navView.getHeaderView(0);
-        header.setBackgroundColor(color);
+        //int color = Color.parseColor("#2196F3");
+        //NavigationView navView = findViewById(R.id.nav_view);
+        //View header = navView.getHeaderView(0);
+        //header.setBackgroundColor(color);
 
         //
         database = FirebaseFirestore.getInstance();
@@ -164,6 +172,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         NavigationView navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
         View headerView = navigationView.getHeaderView(0);
+        headerView.setBackgroundColor(Color.parseColor("#2196F3"));
 
         progressive1 = findViewById(R.id.progressive1);
         progressive2 = findViewById(R.id.progressive2);
@@ -202,9 +211,16 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         // Populate machine id if coming from to do list activity
         intent = getIntent();
-        String value = intent.getStringExtra("machine_id");
+        String machine_id = intent.getStringExtra("machine_id");
         int numberOfProgressives = intent.getIntExtra("numberOfProgressives",0);
-        labelEditTextsFromToDo(value, numberOfProgressives);
+        labelEditTextsFromToDo(machine_id, numberOfProgressives);
+
+        String[] progressiveDescriptionTitles = intent.getStringArrayExtra("progressiveDescriptionTitles");
+        if (progressiveDescriptionTitles != null) {
+            labelEditTextsFromToDo2(progressiveDescriptionTitles);
+        }
+        //
+
 
         // Set minimum progressive value
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
@@ -218,6 +234,29 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         boolean reject_duplicates = sharedPreferences.getBoolean("reject_duplicates", false);
         if (reject_duplicates) {
             populateDuplicatesSet();
+        }
+    }
+
+    private void labelEditTextsFromToDo2(String[] progressiveDescriptionTitles) {
+        int[][] states = new int[][] {
+                new int[] { android.R.attr.state_enabled }, // enabled
+                new int[] { -android.R.attr.state_enabled }, // disabled
+                new int[] { -android.R.attr.state_checked }, // unchecked
+                new int[] { android.R.attr.state_pressed }  // pressed
+        };
+        int[] colors = new int[] {
+                Color.GREEN,
+                Color.GREEN,
+                Color.GREEN,
+                Color.GREEN
+        };
+        ColorStateList colorStateList = new ColorStateList(states, colors);
+        TextInputLayout[] array = { inputLayout1, inputLayout2, inputLayout3, inputLayout4, inputLayout5, inputLayout6 };
+        for (int i = 0; i < progressiveDescriptionTitles.length; i++) {
+            if (progressiveDescriptionTitles[i] != null) {
+                array[i].setHint(progressiveDescriptionTitles[i]);
+                array[i].setDefaultHintTextColor(colorStateList);
+            }
         }
     }
 

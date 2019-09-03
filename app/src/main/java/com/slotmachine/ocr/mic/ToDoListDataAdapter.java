@@ -53,6 +53,14 @@ public class ToDoListDataAdapter extends RecyclerView.Adapter<ToDoListDataAdapte
         } else {
             holder.userTextView.setVisibility(View.GONE);
         }
+
+        String progressiveDescriptions = "";
+        for (int i = 0; i < 4; i++) {
+            if ((toDoListData.getProgressiveDescriptions()[i] != null) && !toDoListData.getProgressiveDescriptions()[i].isEmpty()) {
+                progressiveDescriptions += toDoListData.getProgressiveDescriptions()[i] + " ";
+            }
+        }
+        holder.progressiveDescriptionTitles.setText(progressiveDescriptions.trim());
     }
 
     @Override
@@ -71,6 +79,7 @@ public class ToDoListDataAdapter extends RecyclerView.Adapter<ToDoListDataAdapte
         TextView descriptionTextView, locationTextView;
         TextView numberOfProgressivesTextView;
         TextView userTextView;
+        TextView progressiveDescriptionTitles;
 
         public ToDoListDataHolder(View itemView) {
             super(itemView);
@@ -80,6 +89,7 @@ public class ToDoListDataAdapter extends RecyclerView.Adapter<ToDoListDataAdapte
             locationTextView = itemView.findViewById(R.id.locationTextView);
             numberOfProgressivesTextView = itemView.findViewById(R.id.numberOfProgressivesTextView);
             userTextView = itemView.findViewById(R.id.userTextView);
+            progressiveDescriptionTitles = itemView.findViewById(R.id.progressiveDescriptionTitles);
         }
     }
 

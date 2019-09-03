@@ -7,6 +7,7 @@ public class ToDoListData {
 
     private String location, machineId, description, user;
     @Nullable private Integer numberOfProgressives;
+    private String[] progressiveDescriptions;
     private boolean isCompleted, isSelected;
 
     public ToDoListData(String location,
@@ -14,6 +15,7 @@ public class ToDoListData {
                         String description,
                         @Nullable String user,
                         @Nullable Integer numberOfProgressives,
+                        String[] progressiveDescriptions,
                         boolean isCompleted,
                         boolean isSelected) {
         this.location = location;
@@ -21,6 +23,7 @@ public class ToDoListData {
         this.description = description;
         this.user = user;
         this.numberOfProgressives = numberOfProgressives;
+        this.progressiveDescriptions = progressiveDescriptions;
         this.isCompleted = isCompleted;
         this.isSelected = isSelected;
     }
@@ -39,6 +42,9 @@ public class ToDoListData {
 
     @Nullable public Integer getNumberOfProgressives() { return this.numberOfProgressives; }
     public void setNumberOfProgressives(int numberOfProgressives) { this.numberOfProgressives = numberOfProgressives; }
+
+    public String[] getProgressiveDescriptions() { return this.progressiveDescriptions; }
+    public void setProgressiveDescriptions(String[] progressiveDescriptions) { this.progressiveDescriptions = progressiveDescriptions; }
 
     public boolean isCompleted() { return this.isCompleted; }
     public void setCompleted(boolean isCompleted) { this.isCompleted = isCompleted; }
