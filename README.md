@@ -1,5 +1,5 @@
 # Meter Image Capturing
-[![version](https://img.shields.io/badge/version-1.9.1-success.svg)](https://semver.org)
+[![version](https://img.shields.io/badge/version-1.9.4-success.svg)](https://semver.org)
 
 MiC is a mobile application designed for the Android operating system written in the Java programming language.  An iOS version does not exist at this time.  The main use case for the app is to use OCR (optical character recognition) to extract the progressive dollar values from images of slot machines.  The objective here is to save the casino employees time so they don't have to manually log all progressive values for each slot machine they monitor.  
 

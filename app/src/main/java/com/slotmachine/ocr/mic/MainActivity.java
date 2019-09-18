@@ -135,28 +135,46 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             finish();
             return;
         }
-        //else {
-            //showToast(firebaseAuth.getCurrentUser().getEmail());
-        //}
+
+
         //
+
+        if (!firebaseAuth.getCurrentUser().isEmailVerified()) {
+            firebaseAuth.getCurrentUser().reload().addOnCompleteListener(new OnCompleteListener<Void>() {
+                @Override
+                public void onComplete(@NonNull Task<Void> task) {
+                    if (task.isSuccessful()) {
+                        if (!firebaseAuth.getCurrentUser().isEmailVerified()) {
+                            //showToast("Verified: " + Boolean.toString(firebaseAuth.getCurrentUser().isEmailVerified()));
+                            firebaseAuth.getCurrentUser().sendEmailVerification();
+                        }
+                    } else {
+                        showToast("Unable to reload user");
+                    }
+                }
+            });
+        }
+
         /*if (!firebaseAuth.getCurrentUser().isEmailVerified()) {
-            // Start new activity to verify email
-            showToast("Email not verified");
-        } else {
-            showToast("Email verified");
+            String message = "Please click the link sent to \n" + firebaseAuth.getCurrentUser().getEmail() + " to verify your identity.";
+            new AlertDialog.Builder(this)
+                    .setTitle("Verify Email")
+                    .setMessage(message)
+                    .setPositiveButton("Send", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            firebaseAuth.getCurrentUser().sendEmailVerification();
+                        }
+                    })
+                    .setNegativeButton("Later", null)
+                    .show();
         }*/
         //
+
         //setContentView(R.layout.activity_main);
         //
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
-        // Set nav header color
-        //int color = Color.parseColor("#2196F3");
-        //NavigationView navView = findViewById(R.id.nav_view);
-        //View header = navView.getHeaderView(0);
-        //header.setBackgroundColor(color);
 
         //
         database = FirebaseFirestore.getInstance();
@@ -638,46 +656,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         progressive6.clearFocus();
     }
 
-    /*private void processMachineOCR(Bitmap bitmap) {
-        FirebaseVisionImage image = FirebaseVisionImage.fromBitmap(bitmap);
-        FirebaseVisionTextRecognizer detector = FirebaseVision.getInstance().getOnDeviceTextRecognizer();
-        Task<FirebaseVisionText> result =
-                detector.processImage(image)
-                        .addOnSuccessListener(new OnSuccessListener<FirebaseVisionText>() {
-                            @Override
-                            public void onSuccess(FirebaseVisionText firebaseVisionText) {
-                                if (firebaseVisionText == null) {
-                                    Log.d("ERROR", "firebaseVisionText is null");
-                                    showToast("No text detected.  Try again.  ");
-                                    return;
-                                }
-                                StringBuilder sb =  new StringBuilder();
-                                String resultText = firebaseVisionText.getText();
-                                for (FirebaseVisionText.TextBlock block: firebaseVisionText.getTextBlocks()) {
-                                    //String blockText = block.getText();
-                                    for (FirebaseVisionText.Line line: block.getLines()) {
-                                        for (FirebaseVisionText.Element element: line.getElements()) {
-                                            String text = element.getText().trim();
-                                            //Float elementConfidence = element.getConfidence();
-                                            if (isDigits(text) && (text.length() > 3)) {
-                                                //sb.append(text);
-                                                //sb.append("\n");
-                                                machineId.setText(text);
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        })
-                        .addOnFailureListener(
-                                new OnFailureListener() {
-                                    @Override
-                                    public void onFailure(@NonNull Exception e) {
-                                        showToast("Error with OCR");
-                                    }
-                                });
-    }*/
-
     private void processProgressivesOCR(Bitmap bitmap) {
 
         FirebaseVisionImage image = FirebaseVisionImage.fromBitmap(bitmap);
@@ -991,7 +969,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                     .document(userId)
                                     .collection("uploadFormData")
                                     .document(document.getId());
-                            documentReference.update("isCompleted", true);
+                            documentReference.update("completed", true);
                             set.add(document.get("machine_id").toString().trim());
                         }
                     } else {

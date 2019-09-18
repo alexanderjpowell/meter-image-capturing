@@ -56,16 +56,16 @@
         <Preference
             app:key="version_number_preference"
             app:title="Version Number"
-            app:summary="1.9.1"
+            app:summary="1.9.4"
             app:selectable="false"/>
 
         <Preference
             app:key="legal_disclaimer"
             app:title="Terms and Conditions"/>
 
-        <!--<Preference
+        <Preference
             app:key="verify_email_button"
-            app:title="Verify email"/>-->
+            app:title="Verify email"/>
 
     </PreferenceCategory>
 

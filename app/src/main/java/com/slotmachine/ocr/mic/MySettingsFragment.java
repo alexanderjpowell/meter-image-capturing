@@ -50,7 +50,7 @@ public class MySettingsFragment extends PreferenceFragmentCompat {
         Preference change_password_button = findPreference("change_password_button");
         Preference delete_account_button = findPreference("delete_account_button");
         Preference terms_and_conditions_button = findPreference("legal_disclaimer");
-        //Preference verify_email_preference_button = findPreference("verify_email_button");
+        Preference verify_email_preference_button = findPreference("verify_email_button");
 
         //EditTextPreference testPref = findPreference("test_pref");
         /*if (display_name_preference != null)
@@ -233,7 +233,7 @@ public class MySettingsFragment extends PreferenceFragmentCompat {
             );
         }
 
-        /*if (verify_email_preference_button != null) {
+        if (verify_email_preference_button != null) {
 
             verify_email_preference_button.setOnPreferenceClickListener(
                     new Preference.OnPreferenceClickListener() {
@@ -244,7 +244,7 @@ public class MySettingsFragment extends PreferenceFragmentCompat {
                         }
                     }
             );
-        }*/
+        }
     }
 
     /*private void showToast(String message) {
