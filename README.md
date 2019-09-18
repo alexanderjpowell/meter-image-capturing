@@ -62,18 +62,33 @@ service cloud.firestore {
 
 MiC uses the Firebase authentication SDK to handle user registration and sign in.  Passwords are encrypted and completely handled by Google's API.  The developers of MiC have no access to a user's password, only the email they are using as a username.  Note that this information is not stored in the Cloud Firestore discussed above.  Completely separate processes are used for authentication and database management.  
 
-Note the current version of Firebase auth used by the application is 4.3.0.
+Note the current version of the google-services api used by the application is 4.3.2.
 
 ## Dependencies ##
 
 The following dependencies are necessary in the app level gradle file
 
 ```
-implementation 'com.google.firebase:firebase-core:17.1.0'
+implementation fileTree(dir: 'libs', include: ['*.jar'])
+implementation 'androidx.appcompat:appcompat:1.1.0'
+implementation 'androidx.legacy:legacy-support-v4:1.0.0'
+implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
+testImplementation 'junit:junit:4.12'
+androidTestImplementation 'androidx.test:runner:1.2.0'
+androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
+
 implementation 'com.google.firebase:firebase-ml-vision:23.0.0'
 implementation 'com.google.firebase:firebase-auth:19.0.0'
-implementation 'com.google.firebase:firebase-firestore:21.0.0'
-implementation 'com.firebaseui:firebase-ui-auth:4.3.0'
+implementation 'com.google.firebase:firebase-firestore:21.1.1'
+implementation 'com.firebaseui:firebase-ui-auth:6.0.2'
+
+implementation 'com.google.android.material:material:1.0.0'
+implementation 'androidx.recyclerview:recyclerview:1.0.0'
+implementation 'androidx.cardview:cardview:1.0.0'
+
+implementation 'androidx.core:core:1.1.0'
+implementation 'androidx.preference:preference:1.1.0'
+implementation 'androidx.exifinterface:exifinterface:1.0.0'
 ```
 
 The current gradle and google-services repositories are:
@@ -81,7 +96,7 @@ The current gradle and google-services repositories are:
 ```
 dependencies {
 	classpath 'com.android.tools.build:gradle:3.5.0'
-	classpath 'com.google.gms:google-services:4.3.0'
+	classpath 'com.google.gms:google-services:4.3.2'
 }
 ```
 
