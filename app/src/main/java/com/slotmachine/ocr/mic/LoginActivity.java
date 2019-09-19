@@ -90,7 +90,9 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                         progressDialog.dismiss();
                         if (task.isSuccessful()) {
                             finish();
-                            startActivity(new Intent(LoginActivity.this, MainActivity.class));
+                            Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                            intent.putExtra("comingFromLogin", true);
+                            startActivity(intent);
                         } else {
                             showToast("Incorrect username or password.  Try again.");
                         }

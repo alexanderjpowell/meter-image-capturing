@@ -138,23 +138,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
 
         //
-
-        if (!firebaseAuth.getCurrentUser().isEmailVerified()) {
-            firebaseAuth.getCurrentUser().reload().addOnCompleteListener(new OnCompleteListener<Void>() {
-                @Override
-                public void onComplete(@NonNull Task<Void> task) {
-                    if (task.isSuccessful()) {
-                        if (!firebaseAuth.getCurrentUser().isEmailVerified()) {
-                            //showToast("Verified: " + Boolean.toString(firebaseAuth.getCurrentUser().isEmailVerified()));
-                            firebaseAuth.getCurrentUser().sendEmailVerification();
-                        }
-                    } else {
-                        showToast("Unable to reload user");
-                    }
-                }
-            });
-        }
-
         /*if (!firebaseAuth.getCurrentUser().isEmailVerified()) {
             String message = "Please click the link sent to \n" + firebaseAuth.getCurrentUser().getEmail() + " to verify your identity.";
             new AlertDialog.Builder(this)
@@ -236,6 +219,23 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         String[] progressiveDescriptionTitles = intent.getStringArrayExtra("progressiveDescriptionTitles");
         if (progressiveDescriptionTitles != null) {
             labelEditTextsFromToDo2(progressiveDescriptionTitles);
+        }
+        // Also check if coming from login activity and send verification email if necessary
+        boolean comingFromLogin = intent.getBooleanExtra("comingFromLogin", false);
+        if (comingFromLogin && !firebaseAuth.getCurrentUser().isEmailVerified()) {
+                firebaseAuth.getCurrentUser().reload().addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if (task.isSuccessful()) {
+                            if (!firebaseAuth.getCurrentUser().isEmailVerified()) {
+                                //showToast("Verified: " + Boolean.toString(firebaseAuth.getCurrentUser().isEmailVerified()));
+                                firebaseAuth.getCurrentUser().sendEmailVerification();
+                            }
+                        } else {
+                            showToast("Unable to reload user");
+                        }
+                    }
+                });
         }
         //
 
