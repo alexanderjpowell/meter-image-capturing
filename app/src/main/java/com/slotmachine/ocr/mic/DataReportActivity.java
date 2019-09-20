@@ -174,21 +174,6 @@ public class DataReportActivity extends AppCompatActivity {// implements Adapter
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-        /*if (id == R.id.action_delete) {
-            String data = "";
-            List<RowData> listRowData = mAdapter.getRowDataList();
-            Iterator<RowData> listRowDataIterator = listRowData.iterator();
-            int count = 0;
-            while (listRowDataIterator.hasNext()) {
-                RowData r = listRowDataIterator.next();
-                RowData rowData2 = listRowData.get(count);
-                if (rowData2.isSelected()) {
-                    data = data + "\n" + r.getMachineId() + ", Index: " + Integer.toString(count);
-                    listRowDataIterator.remove();
-                }
-                count++;
-            }
-        }*/
         if (id == R.id.action_past_hour) {
             dateRange = DateRange.HOUR;
             offset = 3600;
@@ -223,7 +208,7 @@ public class DataReportActivity extends AppCompatActivity {// implements Adapter
                 .whereGreaterThan("timestamp", time)
                 .orderBy("timestamp", Query.Direction.DESCENDING)
                 .startAfter(lastDocumentSnapshot)
-                .limit(QUERY_LIMIT_SIZE);//5
+                .limit(QUERY_LIMIT_SIZE);
         query.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
@@ -266,7 +251,6 @@ public class DataReportActivity extends AppCompatActivity {// implements Adapter
         String machine_id, timestamp, user, progressive1, progressive2, progressive3, progressive4, progressive5, progressive6, notes;
         RowData rowData;
         rowDataList.clear(); // reset the current data list
-        //rowDataListReport.clear();
 
         for (QueryDocumentSnapshot document : snapshot) {
 
@@ -297,7 +281,6 @@ public class DataReportActivity extends AppCompatActivity {// implements Adapter
                     false);
 
             rowDataList.add(rowData);
-            //rowDataListReport.add(rowData);
         }
 
         mAdapter.notifyDataSetChanged();
@@ -337,7 +320,6 @@ public class DataReportActivity extends AppCompatActivity {// implements Adapter
                     false);
 
             rowDataList.add(rowData);
-            //rowDataListReport.add(rowData);
         }
 
         mAdapter.notifyDataSetChanged();
@@ -363,27 +345,7 @@ public class DataReportActivity extends AppCompatActivity {// implements Adapter
         return text;
     }
 
-    /*private String createCsvFile() {
-
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("\"Machine\",\"Progressive1\",\"Progressive2\",\"Progressive3\",\"Progressive4\",\"Progressive5\",\"Progressive6\", \"Notes\",\"Date\",\"User\"\n");
-        for (RowData rowData : rowDataListReport) {
-            stringBuilder.append("\"" + getMachineIdFromString(rowData.getMachineId()) + "\",");
-            stringBuilder.append("\"" + rowData.getProgressive1() + "\",");
-            stringBuilder.append("\"" + rowData.getProgressive2() + "\",");
-            stringBuilder.append("\"" + rowData.getProgressive3() + "\",");
-            stringBuilder.append("\"" + rowData.getProgressive4() + "\",");
-            stringBuilder.append("\"" + rowData.getProgressive5() + "\",");
-            stringBuilder.append("\"" + rowData.getProgressive6() + "\",");
-            stringBuilder.append("\"" + rowData.getNotes() + "\",");
-            stringBuilder.append("\"" + rowData.getDate() + "\",");
-            stringBuilder.append("\"" + rowData.getUser() + "\"\n");
-        }
-
-        return stringBuilder.toString();
-    }*/
-
-    private String createCsvFile2(QuerySnapshot snapshot) {
+    private String createCsvFile(QuerySnapshot snapshot) {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("\"Machine\",\"Progressive1\",\"Progressive2\",\"Progressive3\",\"Progressive4\",\"Progressive5\",\"Progressive6\", \"Notes\",\"Date\",\"User\"\n");
         for (QueryDocumentSnapshot document : snapshot) {
@@ -430,7 +392,7 @@ public class DataReportActivity extends AppCompatActivity {// implements Adapter
                 @Override
                 public void onComplete(@NonNull Task<QuerySnapshot> task) {
                     if (task.isSuccessful()) {
-                        String report_contents = createCsvFile2(task.getResult());
+                        String report_contents = createCsvFile(task.getResult());
                         try {
                             FileOutputStream fos = new FileOutputStream(csvFile);
                             fos.write(report_contents.getBytes());

@@ -42,6 +42,7 @@ There is a composite index on the scans collection with uid ascending and timest
 The following security rules are in place to ensure data stored in our database is secure.  
 
 ```
+rules_version = '2';
 service cloud.firestore {
 	match /databases/{database}/documents {    
 		match /scans/{documentId} {
