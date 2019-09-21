@@ -34,14 +34,14 @@ public class EditScanActivity extends AppCompatActivity {
     private TextInputEditText progressive6;
     private TextInputEditText notes;
 
-    private String machine_id;
+    /*private String machine_id;
     private String progressive_1;
     private String progressive_2;
     private String progressive_3;
     private String progressive_4;
     private String progressive_5;
     private String progressive_6;
-    private String notes_text;
+    private String notes_text;*/
     private String document_id;
 
     @Override
@@ -71,14 +71,14 @@ public class EditScanActivity extends AppCompatActivity {
         notes = findViewById(R.id.notes);
 
         Intent intent = getIntent();
-        machine_id = intent.getStringExtra("MACHINE_ID");
-        progressive_1 = intent.getStringExtra("PROGRESSIVE_1");
-        progressive_2 = intent.getStringExtra("PROGRESSIVE_2");
-        progressive_3 = intent.getStringExtra("PROGRESSIVE_3");
-        progressive_4 = intent.getStringExtra("PROGRESSIVE_4");
-        progressive_5 = intent.getStringExtra("PROGRESSIVE_5");
-        progressive_6 = intent.getStringExtra("PROGRESSIVE_6");
-        notes_text = intent.getStringExtra("NOTES");
+        String machine_id = intent.getStringExtra("MACHINE_ID");
+        String progressive_1 = intent.getStringExtra("PROGRESSIVE_1");
+        String progressive_2 = intent.getStringExtra("PROGRESSIVE_2");
+        String progressive_3 = intent.getStringExtra("PROGRESSIVE_3");
+        String progressive_4 = intent.getStringExtra("PROGRESSIVE_4");
+        String progressive_5 = intent.getStringExtra("PROGRESSIVE_5");
+        String progressive_6 = intent.getStringExtra("PROGRESSIVE_6");
+        String notes_text = intent.getStringExtra("NOTES");
         document_id = intent.getStringExtra("DOCUMENT_ID");
 
         machineId.setText(machine_id);
