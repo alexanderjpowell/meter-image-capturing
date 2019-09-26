@@ -39,7 +39,7 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
 
     implementation 'com.google.firebase:firebase-ml-vision:23.0.0'
-    implementation 'com.google.firebase:firebase-auth:19.0.0'
+    implementation 'com.google.firebase:firebase-auth:19.1.0'
     implementation 'com.google.firebase:firebase-firestore:21.1.1'
     implementation 'com.firebaseui:firebase-ui-auth:6.0.2'
 
