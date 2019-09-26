@@ -1,16 +1,16 @@
 package com.slotmachine.ocr.mic;
 
 import android.content.Context;
-
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.SharedPreferences;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-
+import android.widget.Toast;
 import java.util.List;
 
 public class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAdapter.ViewHolder> {
@@ -19,10 +19,15 @@ public class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAd
     private LayoutInflater mInflater;
     private ItemClickListener mClickListener;
 
+    private String username;
+
     // data is passed into the constructor
     MyRecyclerViewAdapter(Context context, List<String> data) {
         this.mInflater = LayoutInflater.from(context);
         this.mData = data;
+
+        SharedPreferences sharedPref = context.getSharedPreferences(context.getString(R.string.preference_file_key), Context.MODE_PRIVATE);
+        username = sharedPref.getString("username", "");
     }
 
     // inflates the row layout from xml when needed
@@ -33,12 +38,16 @@ public class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAd
         return new ViewHolder(view);
     }
 
-    // binds the data to the TextView in each row
+    // binds the data to the Views in each row
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         String animal = mData.get(position);
         holder.myTextView.setText(animal);
 
+        // Set the check mark
+        if (holder.myTextView.getText().equals(username)) {
+            holder.checkMark.setVisibility(View.VISIBLE);
+        }
     }
 
     // total number of rows
@@ -47,22 +56,26 @@ public class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAd
         return mData.size();
     }
 
-
     // stores and recycles views as they are scrolled off screen
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         TextView myTextView;
         ImageView imageView;
+        ImageView checkMark;
 
         ViewHolder(View itemView) {
             super(itemView);
             myTextView = itemView.findViewById(R.id.userDisplayName);
-            imageView = itemView.findViewById(R.id.checkBox);
+            imageView = itemView.findViewById(R.id.profileIcon);
+            checkMark = itemView.findViewById(R.id.checkMark);
             itemView.setOnClickListener(this);
         }
 
         @Override
         public void onClick(View view) {
             if (mClickListener != null) mClickListener.onItemClick(view, getAdapterPosition());
+
+            //Toast.makeText(view.getContext(), Integer.toString(getAdapterPosition()), Toast.LENGTH_SHORT).show();
+            //checkMark.setVisibility(View.VISIBLE);
         }
     }
 

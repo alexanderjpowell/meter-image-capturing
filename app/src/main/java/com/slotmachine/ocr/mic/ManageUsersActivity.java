@@ -18,6 +18,7 @@ import android.widget.Toast;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -51,6 +52,11 @@ public class ManageUsersActivity extends AppCompatActivity implements MyRecycler
         }
         database = FirebaseFirestore.getInstance();
 
+        //
+        //Intent intent = getIntent();
+        //String displayName = intent.getStringExtra("displayName");
+        //
+
         usersList = new ArrayList<>();
         adapter = new MyRecyclerViewAdapter(this, usersList);
 
@@ -81,7 +87,40 @@ public class ManageUsersActivity extends AppCompatActivity implements MyRecycler
         recyclerView.addOnItemTouchListener(new RecyclerTouchListener(getApplicationContext(), recyclerView, new RecyclerTouchListener.ClickListener() {
             @Override
             public void onClick(View view, int position) {
-                // Add action here
+                // 1. Get pin code from database
+                // 2. Start PinCodeActivity and if correct pin is entered, then return to this activity
+
+
+
+
+                final String username = usersList.get(position);
+                database.collection("users")
+                        .document(firebaseAuth.getCurrentUser().getUid())
+                        .collection("displayNames")
+                        .document(username)
+                        .get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                            @Override
+                            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                if (task.isSuccessful()) {
+                                    DocumentSnapshot document = task.getResult();
+                                    if (document.exists()) {
+                                        Map<String, Object> map = document.getData();
+                                        if (document.contains("pinCode")) {
+                                            displayPinCodeActivity(map.get("pinCode").toString(), username);
+                                        } else {
+                                            showToast("no pin found");
+                                        }
+                                        //String displayName = map.get("displayName").toString();
+                                        //map.get("pinCode");
+                                        //showToast(document.getData().toString());
+                                    } else {
+                                        showToast("No document");
+                                    }
+                                } else {
+                                    showToast("Failed to get username");
+                                }
+                            }
+                        });
             }
 
             @Override
@@ -108,6 +147,13 @@ public class ManageUsersActivity extends AppCompatActivity implements MyRecycler
                 alertDialog.show();
             }
         }));
+    }
+
+    private void displayPinCodeActivity(String pinCode, String username) {
+        Intent intent = new Intent(getApplicationContext(), PinCodeActivity.class);
+        intent.putExtra("pinCode", pinCode);
+        intent.putExtra("username", username);
+        startActivity(intent);
     }
 
     @Override

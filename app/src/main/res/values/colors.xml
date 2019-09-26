@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <color name="colorPrimary">#2196F3</color>
+    <color name="colorPrimary">#2196F3</color><!--2196F3-->
+
+
     <color name="colorPrimaryDark">#3F51B5</color>
+    <!--<color name="colorPrimaryDark">#2398EC</color>-->
     <!--<color name="colorAccent">#D81B60</color>-->
     <color name="colorAccent">#2196F3</color>
     <color name="black">#000000</color>
@@ -28,5 +31,10 @@
     <color name="submit_button_color">#CCFFFFFF</color>
 
     <color name="mtrl_textinput_default_box_stroke_color" tools:override="true">#fff</color>
+
+    <!-- Pin Code Lock Screen Colors -->
+    <color name="start_color_2">#2196F3</color><!--2398EC - 1B5F96-->
+    <color name="end_color_2">#012442</color>
+    <color name="code_lock_screen_pf">#ffffff</color>
 
 </resources>

@@ -10,6 +10,8 @@
     <string name="title_activity_edit_scan">EditScanActivity</string>
     <string name="title_activity_manage_users">ManageUsersActivity</string>
 
+    <string name="preference_file_key">com.slotmachine.ocr.mic.PREFERENCE_FILE_KEY</string>
+
     <string name="current_password_text">Current Password</string>
     <string name="new_password_text">New Password</string>
     <string name="reenter_password_text">Re-enter Password</string>
@@ -76,4 +78,32 @@
     <string name="assigned_to_text">Assigned to</string>
 
     <string name="minimum_value_summary">Smallest value recognized by the OCR</string>
+
+    <!-- Pin Code Lock Screen Strings -->
+    <string name="lock_screen_title_pf">Input pin code</string>
+    <string name="create_pin_title_pf">Create new pin code</string>
+    <string name="reenter_pin_title_pf">Re-enter pin code</string>
+    <string name="next_pf">Next</string>
+    <string name="forgot_pf">Forgot?</string>
+
+    <string name="text_0">0</string>
+    <string name="text_1">1</string>
+    <string name="text_2">2</string>
+    <string name="text_3">3</string>
+    <string name="text_4">4</string>
+    <string name="text_5">5</string>
+    <string name="text_6">6</string>
+    <string name="text_7">7</string>
+    <string name="text_8">8</string>
+    <string name="text_9">9</string>
+
+    <string name="fp_string">fp</string>
+
+    <!-- ImageView Descriptions -->
+    <string name="pin_code_image_view_description">pin code image view description</string>
+    <string name="delete_button_description">delete button</string>
+    <string name="fingerprint_button_description">fingerprint button</string>
+
+    <string name="user_profile_icon_description">user profile icon</string>
+    <string name="check_mark_description">check mark to denote currently selected user</string>
 </resources>

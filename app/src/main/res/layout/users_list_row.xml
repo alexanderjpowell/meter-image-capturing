@@ -13,17 +13,28 @@
     android:background="?android:attr/selectableItemBackground">
 
     <ImageView
-        android:id="@+id/checkMark"
+        android:id="@+id/profileIcon"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@drawable/sharp_person_black_18dp"/>
+        android:src="@drawable/sharp_person_black_18dp"
+        android:contentDescription="@string/user_profile_icon_description"/>
 
     <TextView
         android:id="@+id/userDisplayName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_toRightOf="@+id/checkMark"
+        android:layout_toEndOf="@+id/profileIcon"
         android:paddingStart="18dp"
+        android:paddingEnd="0dp"
         android:textSize="25sp"/>
+
+    <ImageView
+        android:id="@+id/checkMark"
+        android:layout_width="wrap_content"
+        android:layout_height="38dp"
+        android:src="@drawable/round_check_black_18"
+        android:layout_alignParentEnd="true"
+        android:contentDescription="@string/check_mark_description"
+        android:visibility="invisible"/>
 
 </RelativeLayout>

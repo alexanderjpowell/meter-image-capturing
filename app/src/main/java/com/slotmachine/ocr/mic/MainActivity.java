@@ -41,6 +41,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -108,6 +109,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public TextInputLayout inputLayout6;
 
     public Spinner spinner;
+    private String username;
 
     private DrawerLayout mDrawerLayout;
 
@@ -125,39 +127,25 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        setTitle("User:");
-
         // Ensure user is signed in
         firebaseAuth = FirebaseAuth.getInstance();
         if (firebaseAuth.getCurrentUser() == null) {
-            //showToast("sign out user");
             startActivity(new Intent(MainActivity.this, LoginActivity.class));
             finish();
             return;
         }
 
-
-        //
-        /*if (!firebaseAuth.getCurrentUser().isEmailVerified()) {
-            String message = "Please click the link sent to \n" + firebaseAuth.getCurrentUser().getEmail() + " to verify your identity.";
-            new AlertDialog.Builder(this)
-                    .setTitle("Verify Email")
-                    .setMessage(message)
-                    .setPositiveButton("Send", new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int which) {
-                            firebaseAuth.getCurrentUser().sendEmailVerification();
-                        }
-                    })
-                    .setNegativeButton("Later", null)
-                    .show();
-        }*/
-        //
-
-        //setContentView(R.layout.activity_main);
-        //
-
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        //
+        SharedPreferences sharedPref = getApplicationContext().getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
+        username = sharedPref.getString("username", "No user selected");
+
+        setTitle("User: " + username);
+        //
+
+
 
         //
         database = FirebaseFirestore.getInstance();
@@ -475,8 +463,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
         String uid = firebaseAuth.getCurrentUser().getUid();
 
-        MenuItem item = menu.findItem(R.id.action_bar_spinner);
-        spinner = (Spinner)MenuItemCompat.getActionView(item);
+        /*MenuItem item = menu.findItem(R.id.action_bar_spinner);
+        spinner = (Spinner)item.getActionView();
         final List<String> spinnerArray = new ArrayList<>();
         // Populate spinnerArray from database
         database.collection("users")
@@ -505,7 +493,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                             showToast("Error getting users");
                         }
                     }
-                });
+                });*/
+
+        //MenuItem item2 = menu.findItem(R.id.action_bar_spinner);
+        //TextView textView = (TextView)item2.getActionView();
+        //textView.setText("Test");
+
+        //SharedPreferences sharedPref = getApplicationContext().getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
+        //String username = sharedPref.getString("username", "");
 
         return true;
     }
@@ -541,10 +536,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        if (id == R.id.action_bar_spinner) {
+        /*if (id == R.id.action_bar_spinner) {
             showToast(spinner.getSelectedItem().toString());
             return true;
-        }
+        }*/
 
         return super.onOptionsItemSelected(item);
     }
@@ -555,8 +550,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         int id = item.getItemId();
 
         Intent intent;
-        MyApplication app = (MyApplication)getApplication();
-        app.setUsernameIndex(spinner.getSelectedItemPosition());
+        //MyApplication app = (MyApplication)getApplication();
+        //app.setUsernameIndex(spinner.getSelectedItemPosition());
 
         if (id == R.id.nav_gallery) {
             intent = new Intent(MainActivity.this, DataReportActivity.class);
@@ -858,7 +853,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             final String progressiveText6 = progressive6.getText().toString().trim();
             final String emailText = firebaseAuth.getCurrentUser().getEmail().trim();
             final String userId = firebaseAuth.getCurrentUser().getUid().trim();
-            final String userName = (spinner.getSelectedItem() == null) ? "No user selected" : spinner.getSelectedItem().toString();
+            //final String userName = (spinner.getSelectedItem() == null) ? "No user selected" : spinner.getSelectedItem().toString();
+            final String userName = username;
 
             // First, make sure machine id isn't blank
             if (machineIdText.isEmpty()) {
