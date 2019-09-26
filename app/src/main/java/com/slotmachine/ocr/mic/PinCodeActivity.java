@@ -17,6 +17,7 @@ public class PinCodeActivity extends AppCompatActivity {
     private PFCodeView mCodeView;
     private View mDeleteButton;
     private View mFingerprintButton;
+    private TextView title_text_view;
     private boolean authModeEnabled = false;
     private boolean reenterPin = false;
     private String username;
@@ -38,7 +39,7 @@ public class PinCodeActivity extends AppCompatActivity {
         //showToast(pinCode);
         authModeEnabled = true;
 
-        TextView title_text_view = findViewById(R.id.title_text_view);
+        title_text_view = findViewById(R.id.title_text_view);
         if (authModeEnabled) {
             title_text_view.setText(R.string.lock_screen_title_pf);
         } else { // Create pin mode
@@ -105,6 +106,7 @@ public class PinCodeActivity extends AppCompatActivity {
                 final Animation animShake = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.shake_pf);
                 mCodeView.startAnimation(animShake);
                 mCodeView.clearCode();
+                title_text_view.setText(R.string.wrong_pin_title_pf);
             }
         }
     };

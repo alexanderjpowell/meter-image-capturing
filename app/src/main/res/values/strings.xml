@@ -83,6 +83,7 @@
     <string name="lock_screen_title_pf">Input pin code</string>
     <string name="create_pin_title_pf">Create new pin code</string>
     <string name="reenter_pin_title_pf">Re-enter pin code</string>
+    <string name="wrong_pin_title_pf">Wrong pin. Please try again.</string>
     <string name="next_pf">Next</string>
     <string name="forgot_pf">Forgot?</string>
 
