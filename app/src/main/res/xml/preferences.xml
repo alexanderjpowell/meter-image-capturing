@@ -62,9 +62,9 @@
             app:key="legal_disclaimer"
             app:title="Terms and Conditions"/>
 
-        <Preference
+        <!--<Preference
             app:key="verify_email_button"
-            app:title="Verify email"/>
+            app:title="Verify email"/>-->
 
     </PreferenceCategory>
 
