@@ -1,16 +1,19 @@
 package com.slotmachine.ocr.mic;
 
 import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.VibrationEffect;
+import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.os.Vibrator;
 
 public class PinCodeActivity extends AppCompatActivity {
 
@@ -21,10 +24,8 @@ public class PinCodeActivity extends AppCompatActivity {
     private boolean authModeEnabled = false;
     private boolean reenterPin = false;
     private String username;
-
-    //
-    private String pinCode = "3663";
-    //
+    private int LENGTH_OF_VIBRATION_MILLISECONDS = 500;
+    private String pinCode;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,6 +80,8 @@ public class PinCodeActivity extends AppCompatActivity {
 
         mDeleteButton.setOnClickListener(mOnDeleteButtonClickListener);
         mDeleteButton.setOnLongClickListener(mOnDeleteButtonOnLongClickListener);
+
+
     }
 
     private final View.OnClickListener mOnKeyClickListener = new View.OnClickListener() {
@@ -107,6 +110,7 @@ public class PinCodeActivity extends AppCompatActivity {
                 mCodeView.startAnimation(animShake);
                 mCodeView.clearCode();
                 title_text_view.setText(R.string.wrong_pin_title_pf);
+                doVibrate(LENGTH_OF_VIBRATION_MILLISECONDS);
             }
         }
     };
@@ -163,4 +167,17 @@ public class PinCodeActivity extends AppCompatActivity {
             return true;
         }
     };
+
+    private void doVibrate(int m) {
+        try {
+            Vibrator vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                vibrator.vibrate(VibrationEffect.createOneShot(m, VibrationEffect.DEFAULT_AMPLITUDE));
+            } else {
+                vibrator.vibrate(m);
+            }
+        } catch (Exception ex) {
+            Log.d("PinCodeActivity", "Error performing vibration");
+        }
+    }
 }

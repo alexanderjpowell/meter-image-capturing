@@ -40,8 +40,6 @@ public class MySettingsFragment extends PreferenceFragmentCompat {
         // DONT STORE DISPLAY NAME IN PREFERENCES - FETCH FROM FIREBASE AUTH EACH TIME
         //
 
-        //showToast("Name: " + firebaseUser.getDisplayName());
-
         Preference account_email_preference = findPreference("account_email_button");
         EditTextPreference display_name_preference = findPreference("display_name_button");
         EditTextPreference email_recipient_preference = findPreference("email_recipient");
@@ -51,6 +49,7 @@ public class MySettingsFragment extends PreferenceFragmentCompat {
         Preference delete_account_button = findPreference("delete_account_button");
         Preference terms_and_conditions_button = findPreference("legal_disclaimer");
         Preference verify_email_preference_button = findPreference("verify_email_button");
+        Preference version_number_preference = findPreference("version_number_preference");
 
         //EditTextPreference testPref = findPreference("test_pref");
         /*if (display_name_preference != null)
@@ -61,6 +60,10 @@ public class MySettingsFragment extends PreferenceFragmentCompat {
         //showToast(display_name_preference.getText());
 
         //showToast("Name: " + display_name_preference.getText());
+
+        if (version_number_preference != null) {
+            version_number_preference.setSummary(BuildConfig.VERSION_NAME);
+        }
 
         if (account_email_preference != null) {
             account_email_preference.setSummary(firebaseAuth.getCurrentUser().getEmail());

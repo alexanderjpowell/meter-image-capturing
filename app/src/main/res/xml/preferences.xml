@@ -56,7 +56,6 @@
         <Preference
             app:key="version_number_preference"
             app:title="Version Number"
-            app:summary="1.9.4"
             app:selectable="false"/>
 
         <Preference
