@@ -65,6 +65,7 @@
     <string name="completed_scans_nav_bar">Completed Scans</string>
     <string name="manage_users_nav_bar">Manage Users</string>
     <string name="settings_nav_bar">Settings</string>
+    <string name="to_do_list_nav_bar">To Do List</string>
     <string name="title_activity_todo_list">TodoListActivity</string>
 
     <!--<string name="upload_file_empty_state_no_file_message">Upload a CSV file via\nthe web portal</string>-->
