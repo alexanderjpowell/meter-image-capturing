@@ -11,7 +11,7 @@
         <item
             android:id="@+id/to_do_list"
             android:icon="@drawable/sharp_announcement_black_48"
-            android:title="@string/to_do_list_nav_bar"/>
+            android:title="@string/to_do_list_nav_bar" />
         <item
             android:id="@+id/nav_slideshow"
             android:icon="@drawable/sharp_people_black_48"
@@ -20,6 +20,10 @@
             android:id="@+id/nav_settings"
             android:icon="@drawable/ic_menu_manage"
             android:title="@string/settings_nav_bar" />
+
+        <item
+            android:id="@+id/admin"
+            android:title="Admin" />
     <!--</group>-->
 
     <!--<item android:title="Users">
