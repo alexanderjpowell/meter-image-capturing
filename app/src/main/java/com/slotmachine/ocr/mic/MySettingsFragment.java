@@ -46,7 +46,7 @@ public class MySettingsFragment extends PreferenceFragmentCompat {
         EditTextPreference minimum_value = findPreference("minimum_value");
         Preference sign_out_preference_button = findPreference("sign_out_button");
         Preference change_password_button = findPreference("change_password_button");
-        Preference delete_account_button = findPreference("delete_account_button");
+        //Preference delete_account_button = findPreference("delete_account_button");
         Preference terms_and_conditions_button = findPreference("legal_disclaimer");
         //Preference verify_email_preference_button = findPreference("verify_email_button");
         Preference version_number_preference = findPreference("version_number_preference");
@@ -190,7 +190,7 @@ public class MySettingsFragment extends PreferenceFragmentCompat {
             );
         }
 
-        if (delete_account_button != null) {
+        /*if (delete_account_button != null) {
             delete_account_button.setOnPreferenceClickListener(
                     new Preference.OnPreferenceClickListener() {
                         @Override
@@ -222,7 +222,7 @@ public class MySettingsFragment extends PreferenceFragmentCompat {
                         }
                     }
             );
-        }
+        }*/
 
         if (terms_and_conditions_button != null) {
             terms_and_conditions_button.setOnPreferenceClickListener(
