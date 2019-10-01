@@ -13,7 +13,9 @@ import androidx.appcompat.app.AlertDialog;
 
 import android.preference.PreferenceManager;
 import android.text.Editable;
+import android.text.InputType;
 import android.text.TextWatcher;
+import android.text.method.PasswordTransformationMethod;
 import android.view.Menu;
 import android.Manifest;
 import android.content.Intent;
@@ -36,9 +38,11 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -49,7 +53,10 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.textfield.TextInputLayout;
+import com.google.firebase.auth.AuthCredential;
+import com.google.firebase.auth.EmailAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FieldValue;
@@ -562,11 +569,54 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         } else if (id == R.id.nav_slideshow) {
             intent = new Intent(MainActivity.this, ManageUsersActivity.class);
             startActivity(intent);
+        //} else if (id == R.id.nav_settings) {
+        //    intent = new Intent(MainActivity.this, SettingsActivity.class);
+        //    startActivity(intent);
         } else if (id == R.id.nav_settings) {
-            intent = new Intent(MainActivity.this, SettingsActivity.class);
-            startActivity(intent);
-        } else if (id == R.id.admin) {
-            
+            // Show pop up dialog
+            final EditText passwordEditText = new EditText(MainActivity.this);
+            passwordEditText.setTransformationMethod(PasswordTransformationMethod.getInstance());
+            passwordEditText.requestFocus();
+            passwordEditText.setHint("Password");
+
+            final AlertDialog alertDialog = new AlertDialog.Builder(MainActivity.this).create();
+            alertDialog.setView(passwordEditText, 100, 70, 100, 0);
+            alertDialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
+            alertDialog.setTitle("Re-authenticate");
+            alertDialog.setMessage("To use MiC in admin mode please provide the password for your account");
+            alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "SUBMIT",
+                    new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int i) {
+                            String password = passwordEditText.getText().toString().trim();
+                            if (password.equals("")) {
+                                return;
+                            }
+                            FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                            AuthCredential credential = EmailAuthProvider.getCredential(user.getEmail(), password);
+                            user.reauthenticate(credential)
+                                    .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                        @Override
+                                        public void onComplete(@NonNull Task<Void> task) {
+                                            if (task.isSuccessful()) {
+                                                final Intent intent1;
+                                                intent1 = new Intent(MainActivity.this, SettingsActivity.class);
+                                                startActivity(intent1);
+                                            } else {
+                                                showToast("Incorrect password");
+                                            }
+                                            //Log.d(TAG, "User re-authenticated.");
+                                        }
+                                    });
+                            dialog.dismiss();
+                        }
+                    });
+            alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, "CANCEL",
+                    new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int i) {
+                            dialog.dismiss();
+                        }
+                    });
+            alertDialog.show();
         }
 
         DrawerLayout drawer = findViewById(R.id.drawer_layout);

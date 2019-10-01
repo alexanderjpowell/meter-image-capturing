@@ -21,6 +21,10 @@
         app:title="Minimum Value"
         app:summary="Smallest value recognized by the OCR"/>
 
+    <Preference
+        app:key="add_remove_users"
+        app:title="Add/Remove Users"/>
+
     <!--<SeekBarPreference
         app:key="minimum_value2"
         app:title="Minimum Value"

@@ -1,5 +1,6 @@
 package com.slotmachine.ocr.mic;
 
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
@@ -9,15 +10,18 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import android.text.InputFilter;
 import android.text.InputType;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.AuthResult;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -37,6 +41,7 @@ public class ManageUsersActivity extends AppCompatActivity implements MyRecycler
     private List<String> usersList;
     private FirebaseAuth firebaseAuth;
     private FirebaseFirestore database;
+    private boolean adminMode;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,10 +58,16 @@ public class ManageUsersActivity extends AppCompatActivity implements MyRecycler
         }
         database = FirebaseFirestore.getInstance();
 
-        //
-        //Intent intent = getIntent();
-        //String displayName = intent.getStringExtra("displayName");
-        //
+        FloatingActionButton fab = findViewById(R.id.fab);
+
+        Intent intent = getIntent();
+        adminMode = intent.getBooleanExtra("adminMode", false);
+
+        if (adminMode) {
+            fab.show();
+        } else {
+            fab.hide();
+        }
 
         usersList = new ArrayList<>();
         adapter = new MyRecyclerViewAdapter(this, usersList);
@@ -91,61 +102,66 @@ public class ManageUsersActivity extends AppCompatActivity implements MyRecycler
                 // 1. Get pin code from database
                 // 2. Start PinCodeActivity and if correct pin is entered, then return to this activity
 
-
-
-
-                final String username = usersList.get(position);
-                database.collection("users")
-                        .document(firebaseAuth.getCurrentUser().getUid())
-                        .collection("displayNames")
-                        .document(username)
-                        .get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                            @Override
-                            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                                if (task.isSuccessful()) {
-                                    DocumentSnapshot document = task.getResult();
-                                    if (document.exists()) {
-                                        Map<String, Object> map = document.getData();
-                                        if (document.contains("pinCode")) {
-                                            displayPinCodeActivity(map.get("pinCode").toString(), username);
-                                        } else {
-                                            showToast("no pin found");
-                                        }
-                                        //String displayName = map.get("displayName").toString();
-                                        //map.get("pinCode");
-                                        //showToast(document.getData().toString());
+                if (adminMode) {
+                    //
+                } else {
+                    final String username = usersList.get(position);
+                    database.collection("users")
+                            .document(firebaseAuth.getCurrentUser().getUid())
+                            .collection("displayNames")
+                            .document(username)
+                            .get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                        @Override
+                        public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                            if (task.isSuccessful()) {
+                                DocumentSnapshot document = task.getResult();
+                                if (document.exists()) {
+                                    Map<String, Object> map = document.getData();
+                                    if (document.contains("pinCode")) {
+                                        displayPinCodeActivity(map.get("pinCode").toString(), username);
                                     } else {
-                                        showToast("No document");
+                                        showToast("no pin found");
                                     }
+                                    //String displayName = map.get("displayName").toString();
+                                    //map.get("pinCode");
+                                    //showToast(document.getData().toString());
                                 } else {
-                                    showToast("Failed to get username");
+                                    showToast("No document");
                                 }
+                            } else {
+                                showToast("Failed to get username");
                             }
-                        });
+                        }
+                    });
+                }
             }
 
             @Override
             public void onLongClick(View view, final int position) {
                 //showToast("long click on " + Integer.toString(position));
-                AlertDialog alertDialog = new AlertDialog.Builder(ManageUsersActivity.this).create();
-                alertDialog.setMessage("Do you want to delete " + usersList.get(position) + "?");
-                alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "YES",
-                        new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int i) {
-                                deleteUserFromDatabase(usersList.get(position), position);
-                                usersList.remove(position);
-                                adapter.notifyItemRemoved(position);
-                                adapter.notifyItemRangeChanged(position, usersList.size());
-                                dialog.dismiss();
-                            }
-                        });
-                alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, "CANCEL",
-                        new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int i) {
-                                dialog.dismiss();
-                            }
-                        });
-                alertDialog.show();
+                if (adminMode) {
+                    AlertDialog alertDialog = new AlertDialog.Builder(ManageUsersActivity.this).create();
+                    alertDialog.setMessage("Do you want to delete " + usersList.get(position) + "?");
+                    alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "YES",
+                            new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int i) {
+                                    deleteUserFromDatabase(usersList.get(position), position);
+                                    usersList.remove(position);
+                                    adapter.notifyItemRemoved(position);
+                                    adapter.notifyItemRangeChanged(position, usersList.size());
+                                    dialog.dismiss();
+                                }
+                            });
+                    alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, "CANCEL",
+                            new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int i) {
+                                    dialog.dismiss();
+                                }
+                            });
+                    alertDialog.show();
+                } else {
+
+                }
             }
         }));
     }
@@ -169,24 +185,45 @@ public class ManageUsersActivity extends AppCompatActivity implements MyRecycler
     }
 
     public void addNewUser(View view) {
-        final EditText input = new EditText(ManageUsersActivity.this);
-        input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_CAP_SENTENCES);
-        input.requestFocus();
-        input.setHint("Employee name");
+        final EditText input1 = new EditText(ManageUsersActivity.this);
+        input1.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_CAP_SENTENCES);
+        input1.requestFocus();
+        input1.setHint("Employee name");
+
+        final EditText input2 = new EditText(ManageUsersActivity.this);
+        input2.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_CAP_SENTENCES);
+        input2.setInputType(InputType.TYPE_CLASS_NUMBER);
+        // Set max length to 4
+        InputFilter[] filterArray = new InputFilter[1];
+        filterArray[0] = new InputFilter.LengthFilter(4);
+        input2.setFilters(filterArray);
+        input2.setHint("4 Digit Pin");
+
+        Context context = ManageUsersActivity.this.getApplicationContext();
+        LinearLayout layout = new LinearLayout(context);
+        layout.setOrientation(LinearLayout.VERTICAL);
+
+        layout.addView(input1);
+        layout.addView(input2);
+
         AlertDialog alertDialog = new AlertDialog.Builder(ManageUsersActivity.this).create();
-        alertDialog.setView(input, 100, 70, 100, 0);
+        alertDialog.setMessage("Create new user with name and pin code");
+        //alertDialog.setView(input, 100, 70, 100, 0);
+        alertDialog.setView(layout, 100, 70, 100, 0);
         alertDialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
         alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "ADD",
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int i) {
-                        String newName = input.getText().toString().trim();
-                        if (newName.equals("")) {
+                        String newName = input1.getText().toString().trim();
+                        String pinCode = input2.getText().toString().trim();
+                        if (newName.equals("") || pinCode.equals("")) {
                             return;
                         }
 
                         // Add to database
                         Map<String, Object> user = new HashMap<>();
                         user.put("displayName", newName);
+                        user.put("pinCode", pinCode);
                         usersList.add(newName);
                         database.collection("users")
                                 .document(firebaseAuth.getCurrentUser().getUid())

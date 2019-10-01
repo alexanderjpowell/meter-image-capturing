@@ -50,6 +50,7 @@ public class MySettingsFragment extends PreferenceFragmentCompat {
         Preference terms_and_conditions_button = findPreference("legal_disclaimer");
         //Preference verify_email_preference_button = findPreference("verify_email_button");
         Preference version_number_preference = findPreference("version_number_preference");
+        Preference add_remove_users = findPreference("add_remove_users");
 
         //EditTextPreference testPref = findPreference("test_pref");
         /*if (display_name_preference != null)
@@ -148,6 +149,21 @@ public class MySettingsFragment extends PreferenceFragmentCompat {
                         @Override
                         public void onBindEditText(@NonNull EditText editText) {
                             editText.setRawInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
+                        }
+                    }
+            );
+        }
+
+        if (add_remove_users != null) {
+            add_remove_users.setOnPreferenceClickListener(
+                    new Preference.OnPreferenceClickListener() {
+                        @Override
+                        public boolean onPreferenceClick(Preference preference) {
+                            // Start Manage users activity
+                            Intent intent = new Intent(getActivity(), ManageUsersActivity.class);
+                            intent.putExtra("adminMode", true);
+                            startActivity(intent);
+                            return true;
                         }
                     }
             );

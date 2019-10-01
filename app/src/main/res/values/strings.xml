@@ -108,4 +108,5 @@
 
     <string name="user_profile_icon_description">user profile icon</string>
     <string name="check_mark_description">check mark to denote currently selected user</string>
+    <string name="title_activity_admin">AdminActivity</string>
 </resources>
