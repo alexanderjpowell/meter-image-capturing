@@ -224,6 +224,9 @@ public class DataReportActivity extends AppCompatActivity {// implements Adapter
 
     private void deleteScanFromDatabase(String document_id) {
         database.collection("scans").document(document_id).delete();
+
+        // New sub collection
+        database.collection("users").document(firebaseAuth.getCurrentUser().getUid()).collection("scans").document(document_id).delete();
     }
 
     private void executeQuery(DateRange dateRange) {

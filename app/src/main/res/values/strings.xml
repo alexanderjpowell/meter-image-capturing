@@ -54,6 +54,9 @@
     <string name="one_day_text">1 Day</string>
     <string name="one_week_text">1 Week</string>
 
+    <string name="uncheck_user_text">Uncheck user</string>
+    <string name="change_pin_text">Change Pin</string>
+
     <string name="mic_logo_content_description">MiC Logo Image</string>
     <string name="pds_logo_content_description">PDS Logo Image</string>
 

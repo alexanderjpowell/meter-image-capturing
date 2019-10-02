@@ -143,6 +143,25 @@ public class EditScanActivity extends AppCompatActivity {
                         }
                     }
                 });
+
+        // New sub collection
+        database.collection("users")
+                .document(firebaseAuth.getCurrentUser().getUid())
+                .collection("scans")
+                .document(document_id)
+                .update(map)
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if (task.isSuccessful()) {
+                            startActivity(new Intent(EditScanActivity.this, DataReportActivity.class));
+                            finish();
+                        } else {
+                            showToast("No connection");
+                        }
+                    }
+                });
+        //
     }
 
     private void showToast(String message) {

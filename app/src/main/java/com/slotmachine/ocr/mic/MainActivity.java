@@ -955,7 +955,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "SUBMIT ANYWAY",
                             new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int i) {
-                                    Map<String, Object> user = new HashMap<>();
+
+                                    /*Map<String, Object> user = new HashMap<>();
                                     user.put("email", emailText);
                                     user.put("uid", userId);
                                     user.put("progressive1", progressiveText1);
@@ -970,7 +971,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                     user.put("notes", "");
 
                                     database.collection("scans").document().set(user);
-                                    set.add(machineIdText);
+                                    set.add(machineIdText);*/
+
+                                    //
+                                    insertToDatabase(emailText, userId, progressiveText1, progressiveText2, progressiveText3, progressiveText4, progressiveText5, progressiveText6, machineIdText, FieldValue.serverTimestamp(), userName, "");
+                                    //
 
                                     resetMachineId();
                                     resetProgressives();
@@ -985,7 +990,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
             //
 
-            Map<String, Object> user = new HashMap<>();
+            /*Map<String, Object> user = new HashMap<>();
             //user.put("name", displayNameText);
             user.put("email", emailText);
             user.put("uid", userId);
@@ -1001,7 +1006,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             user.put("notes", "");
 
             database.collection("scans").document().set(user);
-            set.add(machineIdText);
+            set.add(machineIdText);*/
+
+            //
+            insertToDatabase(emailText, userId, progressiveText1, progressiveText2, progressiveText3, progressiveText4, progressiveText5, progressiveText6, machineIdText, FieldValue.serverTimestamp(), userName, "");
+            //
 
             // Also mark docs in uploadFormData if machine id matches
             Query query = database.collection("formUploads")
@@ -1042,6 +1051,43 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         } catch (Exception ex) {
             showToast("No connection");
         }
+    }
+
+    private void insertToDatabase(String email,
+                                  String uid,
+                                  String progressive1,
+                                  String progressive2,
+                                  String progressive3,
+                                  String progressive4,
+                                  String progressive5,
+                                  String progressive6,
+                                  String machine_id,
+                                  FieldValue timestamp,
+                                  String userName,
+                                  String notes) {
+        Map<String, Object> user = new HashMap<>();
+        user.put("email", email);
+        user.put("uid", uid);
+        user.put("progressive1", progressive1);
+        user.put("progressive2", progressive2);
+        user.put("progressive3", progressive3);
+        user.put("progressive4", progressive4);
+        user.put("progressive5", progressive5);
+        user.put("progressive6", progressive6);
+        user.put("machine_id", machine_id);
+        user.put("timestamp", timestamp);
+        user.put("userName", userName);
+        user.put("notes", notes);
+
+        DocumentReference dr = database.collection("scans").document();
+        dr.set(user);
+        String docId = dr.getId();
+
+        // New collection
+        user.remove("uid");
+        user.remove("email");
+        DocumentReference dr2 = database.collection("users").document(uid).collection("scans").document(docId);
+        dr2.set(user);
     }
 
     public void hideKeyboard() {

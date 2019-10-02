@@ -3,6 +3,7 @@ package com.slotmachine.ocr.mic;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
@@ -13,6 +14,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.text.InputFilter;
 import android.text.InputType;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.EditText;
@@ -184,6 +187,32 @@ public class ManageUsersActivity extends AppCompatActivity implements MyRecycler
         //Toast.makeText(this, "You clicked " + adapter.getItem(position) + " on row number " + position, Toast.LENGTH_SHORT).show();
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.manage_users_action_bar, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        if (id == R.id.uncheck_user) {
+            Context context = getApplicationContext();
+            SharedPreferences sharedPref = context.getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
+            SharedPreferences.Editor editor = sharedPref.edit();
+            editor.putString("username", "No user selected");
+            editor.apply();
+
+            // Restart Activity
+            Intent intent = getIntent();
+            finish();
+            startActivity(intent);
+        } //else if (id == R.id.change_pin) {
+            //showToast("change pin");
+        //}
+        return super.onOptionsItemSelected(item);
+    }
+
     public void addNewUser(View view) {
         final EditText input1 = new EditText(ManageUsersActivity.this);
         input1.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_CAP_SENTENCES);
@@ -216,7 +245,7 @@ public class ManageUsersActivity extends AppCompatActivity implements MyRecycler
                     public void onClick(DialogInterface dialog, int i) {
                         String newName = input1.getText().toString().trim();
                         String pinCode = input2.getText().toString().trim();
-                        if (newName.equals("") || pinCode.equals("")) {
+                        if (newName.equals("") || pinCode.equals("") || (pinCode.length() != 4)) {
                             return;
                         }
 
