@@ -1,5 +1,6 @@
 package com.slotmachine.ocr.mic;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import android.content.Context;
 import android.content.Intent;
@@ -15,40 +16,55 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.os.Vibrator;
 
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FirebaseFirestore;
+
 public class PinCodeActivity extends AppCompatActivity {
 
     private PFCodeView mCodeView;
     private View mDeleteButton;
     private View mFingerprintButton;
     private TextView title_text_view;
+    private FirebaseAuth firebaseAuth;
+    private FirebaseFirestore database;
     private boolean authModeEnabled = false;
-    private boolean reenterPin = false;
+    private boolean reenterPin;// = false;
+    private boolean changePin = false;
     private String username;
     private int LENGTH_OF_VIBRATION_MILLISECONDS = 500;
     private String pinCode;
+    private String newPinCode;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_pin_code);
 
+        firebaseAuth = FirebaseAuth.getInstance();
+        if (firebaseAuth.getCurrentUser() == null) {
+            finish();
+            startActivity(new Intent(PinCodeActivity.this, LoginActivity.class));
+            return;
+        }
+        database = FirebaseFirestore.getInstance();
+
         Intent intent = getIntent();
         authModeEnabled = intent.getBooleanExtra("authMode", false);
-        reenterPin = intent.getBooleanExtra("reenterPin", false);
+        //reenterPin = intent.getBooleanExtra("reenterPin", false);
         pinCode = intent.getStringExtra("pinCode");
         username = intent.getStringExtra("username");
-        //showToast(pinCode);
+        changePin = intent.getBooleanExtra("changePin", false);
         authModeEnabled = true;
+        reenterPin = false;
 
         title_text_view = findViewById(R.id.title_text_view);
-        if (authModeEnabled) {
+        if (changePin) {
+            title_text_view.setText("Enter new pin code");
+        } else {
             title_text_view.setText(R.string.lock_screen_title_pf);
-        } else { // Create pin mode
-            if (reenterPin) {
-                title_text_view.setText(R.string.reenter_pin_title_pf);
-            } else {
-                title_text_view.setText(R.string.create_pin_title_pf);
-            }
         }
         mCodeView = findViewById(R.id.code_view);
 
@@ -80,24 +96,44 @@ public class PinCodeActivity extends AppCompatActivity {
 
         mDeleteButton.setOnClickListener(mOnDeleteButtonClickListener);
         mDeleteButton.setOnLongClickListener(mOnDeleteButtonOnLongClickListener);
-
-
     }
 
     private final View.OnClickListener mOnKeyClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
+            //showToast("click");
             final String string = ((TextView) view).getText().toString();
             if (string.length() != 1) {
                 return;
             }
             final int codeLength = mCodeView.input(string);
-            //showToast(mCodeView.getCode());
             configureRightButton(codeLength);
+
+            if (changePin && (codeLength == 4)) {
+                if (!reenterPin) { // first pin submission
+                    newPinCode = mCodeView.getCode();
+                    mCodeView.clearCode();
+                    title_text_view.setText("Reenter Pin");
+                    reenterPin = true;
+                } else {
+                    if (mCodeView.getCode().equals(newPinCode)) { // Correctly duplicated pin
+                        // Change pin in database
+                        updatePinInDatabase(newPinCode, username);
+                        //
+                        startActivity(new Intent(getApplicationContext(), ManageUsersActivity.class));
+                    } else {
+                        mCodeView.clearCode();
+                        title_text_view.setText("Pins do not match");
+                        doVibrate(LENGTH_OF_VIBRATION_MILLISECONDS);
+                    }
+                }
+                //Intent intent = new Intent(getApplicationContext(), PinCodeActivity.class);
+                //startActivity(intent);
+                return;
+            }
 
             // Correct Pin Entered
             if (mCodeView.getCode().equals(pinCode)) {
-                //showToast("success!");
                 //Start new activity
                 updateCurrentUser(username);
                 startActivity(new Intent(getApplicationContext(), ManageUsersActivity.class));
@@ -105,7 +141,6 @@ public class PinCodeActivity extends AppCompatActivity {
 
             // Wrong Pin Entered
             if ((codeLength == 4) && !mCodeView.getCode().equals(pinCode)) {
-                //showToast("wrong pin!");
                 final Animation animShake = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.shake_pf);
                 mCodeView.startAnimation(animShake);
                 mCodeView.clearCode();
@@ -114,6 +149,27 @@ public class PinCodeActivity extends AppCompatActivity {
             }
         }
     };
+
+    private void updatePinInDatabase(String pin, String username) {
+        DocumentReference documentReference = database.collection("users")
+                .document(firebaseAuth.getCurrentUser().getUid())
+                .collection("displayNames")
+                .document(username);
+
+        documentReference.update("pinCode", pin)
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        showToast("Pin successfully updated");
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        showToast("Faied to update pin, please check your connection");
+                    }
+                });
+    }
 
     private void updateCurrentUser(String username) {
         Context context = getApplicationContext();

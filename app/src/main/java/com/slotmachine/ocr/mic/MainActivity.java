@@ -470,45 +470,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
         String uid = firebaseAuth.getCurrentUser().getUid();
 
-        /*MenuItem item = menu.findItem(R.id.action_bar_spinner);
-        spinner = (Spinner)item.getActionView();
-        final List<String> spinnerArray = new ArrayList<>();
-        // Populate spinnerArray from database
-        database.collection("users")
-                .document(uid)
-                .collection("displayNames")
-                .get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        if (task.isSuccessful()) {
-                            for (QueryDocumentSnapshot document : task.getResult()) {
-                                spinnerArray.add(document.get("displayName").toString());
-                            }
-                            if (spinnerArray.isEmpty()) {
-                                spinnerArray.add("No users created");
-                            }
-                            Collections.sort(spinnerArray);
-                            ArrayAdapter<String> adapter = new ArrayAdapter<String>(MainActivity.this, R.layout.spinner_item, spinnerArray);
-                            adapter.setDropDownViewResource(R.layout.spinner_item);
-                            spinner.setAdapter(adapter);
-
-                            MyApplication app = (MyApplication)getApplication();
-                            int userNameIndex = app.getUsernameIndex() == null ? 0 : app.getUsernameIndex();
-                            spinner.setSelection(userNameIndex);
-                        } else {
-                            showToast("Error getting users");
-                        }
-                    }
-                });*/
-
-        //MenuItem item2 = menu.findItem(R.id.action_bar_spinner);
-        //TextView textView = (TextView)item2.getActionView();
-        //textView.setText("Test");
-
-        //SharedPreferences sharedPref = getApplicationContext().getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
-        //String username = sharedPref.getString("username", "");
-
         return true;
     }
 
@@ -557,8 +518,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         int id = item.getItemId();
 
         Intent intent;
-        //MyApplication app = (MyApplication)getApplication();
-        //app.setUsernameIndex(spinner.getSelectedItemPosition());
 
         if (id == R.id.nav_gallery) {
             intent = new Intent(MainActivity.this, DataReportActivity.class);

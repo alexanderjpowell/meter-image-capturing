@@ -3,7 +3,6 @@
     package="com.slotmachine.ocr.mic">
 
     <application
-        android:name=".MyApplication"
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name_condensed"
@@ -12,15 +11,6 @@
         <activity
             android:name=".PinCodeActivity"
             android:screenOrientation="portrait">
-
-            <!--
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-            -->
         </activity>
         <activity
             android:name=".DisclaimerActivity"

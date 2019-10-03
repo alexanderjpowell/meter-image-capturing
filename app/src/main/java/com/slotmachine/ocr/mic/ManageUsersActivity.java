@@ -45,6 +45,7 @@ public class ManageUsersActivity extends AppCompatActivity implements MyRecycler
     private FirebaseAuth firebaseAuth;
     private FirebaseFirestore database;
     private boolean adminMode;
+    private String USERNAME;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,6 +72,11 @@ public class ManageUsersActivity extends AppCompatActivity implements MyRecycler
         } else {
             fab.hide();
         }
+
+        //
+        SharedPreferences sharedPref = getApplicationContext().getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
+        USERNAME = sharedPref.getString("username", "No user selected");
+        //
 
         usersList = new ArrayList<>();
         adapter = new MyRecyclerViewAdapter(this, usersList);
@@ -163,16 +169,27 @@ public class ManageUsersActivity extends AppCompatActivity implements MyRecycler
                             });
                     alertDialog.show();
                 } else {
-
+                    // Pass?
                 }
             }
         }));
+
+
     }
 
     private void displayPinCodeActivity(String pinCode, String username) {
         Intent intent = new Intent(getApplicationContext(), PinCodeActivity.class);
         intent.putExtra("pinCode", pinCode);
         intent.putExtra("username", username);
+        intent.putExtra("changePin", false);
+        startActivity(intent);
+    }
+
+    private void changePinCodeActivity(String pinCode, String username) {
+        Intent intent = new Intent(getApplicationContext(), PinCodeActivity.class);
+        intent.putExtra("pinCode", pinCode);
+        intent.putExtra("username", username);
+        intent.putExtra("changePin", true);
         startActivity(intent);
     }
 
@@ -189,7 +206,20 @@ public class ManageUsersActivity extends AppCompatActivity implements MyRecycler
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
+
         getMenuInflater().inflate(R.menu.manage_users_action_bar, menu);
+
+        MenuItem uncheck_user = menu.findItem(R.id.uncheck_user);
+        MenuItem change_pin = menu.findItem(R.id.change_pin);
+
+        if (USERNAME.equals("No user selected")) {
+            uncheck_user.setVisible(false);
+            change_pin.setVisible(false);
+        } else {
+            uncheck_user.setVisible(true);
+            change_pin.setVisible(true);
+        }
+
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -207,9 +237,29 @@ public class ManageUsersActivity extends AppCompatActivity implements MyRecycler
             Intent intent = getIntent();
             finish();
             startActivity(intent);
-        } //else if (id == R.id.change_pin) {
-            //showToast("change pin");
-        //}
+        } else if (id == R.id.change_pin) {
+            database.collection("users")
+                    .document(firebaseAuth.getCurrentUser().getUid())
+                    .collection("displayNames")
+                    .document(USERNAME)
+                    .get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                        @Override
+                        public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                            if (task.isSuccessful()) {
+                                DocumentSnapshot document = task.getResult();
+                                if (document.exists()) {
+                                    Map<String, Object> map = document.getData();
+                                    String pinCode = map.get("pinCode").toString();
+                                    changePinCodeActivity(pinCode, USERNAME);
+                                } else {
+                                    showToast("No pin found");
+                                }
+                            } else {
+                                showToast("No document");
+                            }
+                        }
+            });
+        }
         return super.onOptionsItemSelected(item);
     }
 
@@ -287,9 +337,6 @@ public class ManageUsersActivity extends AppCompatActivity implements MyRecycler
                 .collection("displayNames")
                 .document(name)
                 .delete();
-
-        MyApplication app = (MyApplication)getApplication();
-        app.setUsernameIndex(0); // Hacky fix for indexOutOfRangeException
     }
 
     private void showToast(String message) {

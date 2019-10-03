@@ -5,8 +5,8 @@
         android:title="@string/uncheck_user_text"
         app:showAsAction="never"/>
 
-    <!--<item android:id="@+id/change_pin"
+    <item android:id="@+id/change_pin"
         android:title="@string/change_pin_text"
-        app:showAsAction="never"/>-->
+        app:showAsAction="never"/>
 
 </menu>

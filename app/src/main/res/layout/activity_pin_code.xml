@@ -220,7 +220,7 @@
                 android:layout_height="match_parent"
                 android:layout_weight="1">
 
-                <TextView
+                <!--<TextView
                     android:id="@+id/button_left"
                     android:layout_width="70dp"
                     android:layout_height="70dp"
@@ -231,7 +231,7 @@
                     android:gravity="center"
                     android:text="@string/forgot_pf"
                     android:theme="@style/PFLockScreenHintTextStyle"
-                    style="?pf_hint"/>
+                    style="?pf_hint"/>-->
             </FrameLayout>
 
             <FrameLayout
