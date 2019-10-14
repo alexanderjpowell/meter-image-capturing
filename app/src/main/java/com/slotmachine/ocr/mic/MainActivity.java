@@ -893,6 +893,21 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 return;
             }
 
+            //
+            if (username.equals("No user selected")) {
+                AlertDialog alertDialog = new AlertDialog.Builder(MainActivity.this).create();
+                alertDialog.setMessage("Please select a user from the manage users tab");
+                alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "OK",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int i) {
+                                dialog.dismiss();
+                            }
+                        });
+                alertDialog.show();
+                return;
+            }
+            //
+
             // Check if same machine number has been scanned in last 24 hours
             // maybe compile a collection (set) of all unique machine numbers in the oncreate so this only has to be done once
             // then run cross check based on that and display a popup if necessary.
