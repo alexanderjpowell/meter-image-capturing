@@ -37,7 +37,7 @@ public class TodoListActivity extends AppCompatActivity {
     private List<ToDoListData> toDoDataList;
     private RecyclerView recyclerView;
     private ToDoListDataAdapter mAdapter;
-    private enum Status { INCOMPLETE, COMPLETE }
+    //private enum Status { INCOMPLETE, COMPLETE }
     private enum EmptyState { NO_FILE_UPLOAD, ALL_COMPLETED, NONE_COMPLETED, NORMAL }
     //private Status currentStatus;
 
@@ -139,42 +139,25 @@ public class TodoListActivity extends AppCompatActivity {
                     if (task.getResult().size() == 0)
                         toggleEmptyStateDisplays(EmptyState.NO_FILE_UPLOAD);
                     for (QueryDocumentSnapshot document : task.getResult()) {
-                        /*boolean a = (boolean)document.get("completed");
-                        if (currentStatus.equals(Status.COMPLETE) && a) {
-                            ToDoListData row = new ToDoListData(document.get("location").toString().trim(),
-                                    document.get("machine_id").toString().trim(),
-                                    document.get("description").toString().trim(),
-                                    "",
-                                    1,
-                                    true,
-                                    false);
-                            toDoDataList.add(row);
-                        } else if (!currentStatus.equals(Status.COMPLETE) && !a) {*/
-                        if (true) {
-                            String[] progressiveDescriptions = new String[4];
-                            progressiveDescriptions[0] = (document.get("p_1") == null) ? null : document.get("p_1").toString();
-                            progressiveDescriptions[1] = (document.get("p_2") == null) ? null : document.get("p_2").toString();
-                            progressiveDescriptions[2] = (document.get("p_3") == null) ? null : document.get("p_3").toString();
-                            progressiveDescriptions[3] = (document.get("p_4") == null) ? null : document.get("p_4").toString();
-                            ToDoListData row = new ToDoListData(document.get("location").toString().trim(),
-                                    document.get("machine_id").toString().trim(),
-                                    document.get("description").toString().trim(),
-                                    (document.get("user") == null) ? null : document.get("user").toString(),
-                                    (document.get("progressive_count") == null) ? null : Integer.valueOf((String)document.get("progressive_count")),
-                                    progressiveDescriptions,
-                                    false,
-                                    false);
-                            toDoDataList.add(row);
-                        }
-                        toggleEmptyStateDisplays(EmptyState.NORMAL);
+                        String[] progressiveDescriptions = new String[6];
+                        progressiveDescriptions[0] = (document.get("p_1") == null) ? null : document.get("p_1").toString();
+                        progressiveDescriptions[1] = (document.get("p_2") == null) ? null : document.get("p_2").toString();
+                        progressiveDescriptions[2] = (document.get("p_3") == null) ? null : document.get("p_3").toString();
+                        progressiveDescriptions[3] = (document.get("p_4") == null) ? null : document.get("p_4").toString();
+                        progressiveDescriptions[4] = (document.get("p_5") == null) ? null : document.get("p_5").toString();
+                        progressiveDescriptions[5] = (document.get("p_6") == null) ? null : document.get("p_6").toString();
+                        ToDoListData row = new ToDoListData(document.get("location").toString().trim(),
+                                document.get("machine_id").toString().trim(),
+                                document.get("description").toString().trim(),
+                                (document.get("user") == null) ? null : document.get("user").toString(),
+                                (document.get("progressive_count") == null) ? null : Integer.valueOf((String)document.get("progressive_count")),
+                                progressiveDescriptions,
+                                false,
+                                false);
+                        toDoDataList.add(row);
 
-                        /*if (currentStatus.equals(Status.COMPLETE) && (toDoDataList.size() == 0)) {
-                            toggleEmptyStateDisplays(EmptyState.NONE_COMPLETED);
-                        } else if (!currentStatus.equals(Status.COMPLETE) && (toDoDataList.size() == 0)) {
-                            toggleEmptyStateDisplays(EmptyState.ALL_COMPLETED);
-                        } else {
-                            toggleEmptyStateDisplays(EmptyState.NORMAL);
-                        }*/
+                        //
+                        toggleEmptyStateDisplays(EmptyState.NORMAL);
                     }
                     mAdapter.notifyDataSetChanged();
                 } else {
