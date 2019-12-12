@@ -78,26 +78,26 @@ testImplementation 'junit:junit:4.12'
 androidTestImplementation 'androidx.test:runner:1.2.0'
 androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
 
-implementation 'com.google.firebase:firebase-ml-vision:23.0.0'
-implementation 'com.google.firebase:firebase-auth:19.0.0'
-implementation 'com.google.firebase:firebase-firestore:21.1.1'
+implementation 'com.google.firebase:firebase-ml-vision:24.0.1'
+implementation 'com.google.firebase:firebase-auth:19.2.0'
+implementation 'com.google.firebase:firebase-firestore:21.3.1'
 implementation 'com.firebaseui:firebase-ui-auth:6.0.2'
 
 implementation 'com.google.android.material:material:1.0.0'
-implementation 'androidx.recyclerview:recyclerview:1.0.0'
+implementation 'androidx.recyclerview:recyclerview:1.1.0'
 implementation 'androidx.cardview:cardview:1.0.0'
 
 implementation 'androidx.core:core:1.1.0'
 implementation 'androidx.preference:preference:1.1.0'
-implementation 'androidx.exifinterface:exifinterface:1.0.0'
+implementation 'androidx.exifinterface:exifinterface:1.1.0'
 ```
 
 The current gradle and google-services repositories are:
 
 ```
 dependencies {
-	classpath 'com.android.tools.build:gradle:3.5.0'
-	classpath 'com.google.gms:google-services:4.3.2'
+	classpath 'com.android.tools.build:gradle:3.5.3'
+	classpath 'com.google.gms:google-services:4.3.3'
 }
 ```
 
