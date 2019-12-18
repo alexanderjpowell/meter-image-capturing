@@ -34,7 +34,6 @@ public class PinCodeActivity extends AppCompatActivity {
     private boolean reenterPin;// = false;
     private boolean changePin = false;
     private String username;
-    private int LENGTH_OF_VIBRATION_MILLISECONDS = 500;
     private String pinCode;
     private String newPinCode;
 
@@ -62,7 +61,7 @@ public class PinCodeActivity extends AppCompatActivity {
 
         title_text_view = findViewById(R.id.title_text_view);
         if (changePin) {
-            title_text_view.setText("Enter new pin code");
+            title_text_view.setText(R.string.enter_new_pin_title_pf);
         } else {
             title_text_view.setText(R.string.lock_screen_title_pf);
         }
@@ -113,7 +112,7 @@ public class PinCodeActivity extends AppCompatActivity {
                 if (!reenterPin) { // first pin submission
                     newPinCode = mCodeView.getCode();
                     mCodeView.clearCode();
-                    title_text_view.setText("Reenter Pin");
+                    title_text_view.setText(R.string.reenter_pin_title_pf);
                     reenterPin = true;
                 } else {
                     if (mCodeView.getCode().equals(newPinCode)) { // Correctly duplicated pin
@@ -123,8 +122,8 @@ public class PinCodeActivity extends AppCompatActivity {
                         startActivity(new Intent(getApplicationContext(), ManageUsersActivity.class));
                     } else {
                         mCodeView.clearCode();
-                        title_text_view.setText("Pins do not match");
-                        doVibrate(LENGTH_OF_VIBRATION_MILLISECONDS);
+                        title_text_view.setText(R.string.pin_mismatch_title_pf);
+                        doVibrate();
                     }
                 }
                 //Intent intent = new Intent(getApplicationContext(), PinCodeActivity.class);
@@ -145,7 +144,7 @@ public class PinCodeActivity extends AppCompatActivity {
                 mCodeView.startAnimation(animShake);
                 mCodeView.clearCode();
                 title_text_view.setText(R.string.wrong_pin_title_pf);
-                doVibrate(LENGTH_OF_VIBRATION_MILLISECONDS);
+                doVibrate();
             }
         }
     };
@@ -166,7 +165,7 @@ public class PinCodeActivity extends AppCompatActivity {
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
-                        showToast("Faied to update pin, please check your connection");
+                        showToast("Failed to update pin, please check your connection");
                     }
                 });
     }
@@ -224,13 +223,16 @@ public class PinCodeActivity extends AppCompatActivity {
         }
     };
 
-    private void doVibrate(int m) {
+    private void doVibrate() {
         try {
+            int VIBRATE_LENGTH_MILLISECONDS = 500;
             Vibrator vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                vibrator.vibrate(VibrationEffect.createOneShot(m, VibrationEffect.DEFAULT_AMPLITUDE));
-            } else {
-                vibrator.vibrate(m);
+            if (vibrator != null) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    vibrator.vibrate(VibrationEffect.createOneShot(VIBRATE_LENGTH_MILLISECONDS, VibrationEffect.DEFAULT_AMPLITUDE));
+                } else {
+                    vibrator.vibrate(VIBRATE_LENGTH_MILLISECONDS);
+                }
             }
         } catch (Exception ex) {
             Log.d("PinCodeActivity", "Error performing vibration");
