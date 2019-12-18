@@ -24,8 +24,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
-        android:layout_toRightOf="@id/machineIdTextView"
+        android:layout_toEndOf="@id/machineIdTextView"
         android:paddingStart="20dp"
+        android:paddingEnd="0dp"
         android:textSize="20sp"/>
 
     <TextView
@@ -41,6 +42,7 @@
         android:layout_height="wrap_content"
         android:textSize="14sp"
         android:textColor="@color/green"
+        android:paddingStart="0dp"
         android:paddingEnd="10dp"
         android:layout_below="@id/dateTextView" />
 
@@ -50,9 +52,10 @@
         android:layout_height="wrap_content"
         android:textSize="14sp"
         android:textColor="@color/green"
+        android:paddingStart="0dp"
         android:paddingEnd="10dp"
         android:layout_below="@id/dateTextView"
-        android:layout_toRightOf="@id/progressiveTextView1" />
+        android:layout_toEndOf="@id/progressiveTextView1" />
 
     <TextView
         android:id="@+id/progressiveTextView3"
@@ -60,9 +63,10 @@
         android:layout_height="wrap_content"
         android:textSize="14sp"
         android:textColor="@color/green"
+        android:paddingStart="0dp"
         android:paddingEnd="10dp"
         android:layout_below="@id/dateTextView"
-        android:layout_toRightOf="@id/progressiveTextView2" />
+        android:layout_toEndOf="@id/progressiveTextView2" />
 
     <TextView
         android:id="@+id/progressiveTextView4"
@@ -70,6 +74,7 @@
         android:layout_height="wrap_content"
         android:textSize="14sp"
         android:textColor="@color/green"
+        android:paddingStart="0dp"
         android:paddingEnd="10dp"
         android:layout_below="@id/progressiveTextView1" />
 
@@ -79,9 +84,10 @@
         android:layout_height="wrap_content"
         android:textSize="14sp"
         android:textColor="@color/green"
+        android:paddingStart="0dp"
         android:paddingEnd="10dp"
         android:layout_below="@id/progressiveTextView1"
-        android:layout_toRightOf="@id/progressiveTextView4" />
+        android:layout_toEndOf="@id/progressiveTextView4" />
 
     <TextView
         android:id="@+id/progressiveTextView6"
@@ -90,7 +96,52 @@
         android:textSize="14sp"
         android:textColor="@color/green"
         android:layout_below="@id/progressiveTextView1"
-        android:layout_toRightOf="@id/progressiveTextView5" />
+        android:layout_toEndOf="@id/progressiveTextView5" />
+
+    <!-- -->
+    <TextView
+        android:id="@+id/progressiveTextView7"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="14sp"
+        android:textColor="@color/green"
+        android:paddingStart="0dp"
+        android:paddingEnd="10dp"
+        android:layout_below="@id/progressiveTextView4" />
+
+    <TextView
+        android:id="@+id/progressiveTextView8"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="14sp"
+        android:textColor="@color/green"
+        android:paddingStart="0dp"
+        android:paddingEnd="10dp"
+        android:layout_below="@id/progressiveTextView4"
+        android:layout_toEndOf="@id/progressiveTextView7" />
+
+    <TextView
+        android:id="@+id/progressiveTextView9"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="14sp"
+        android:textColor="@color/green"
+        android:paddingStart="0dp"
+        android:paddingEnd="10dp"
+        android:layout_below="@id/progressiveTextView4"
+        android:layout_toEndOf="@id/progressiveTextView8" />
+
+    <TextView
+        android:id="@+id/progressiveTextView10"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="14sp"
+        android:textColor="@color/green"
+        android:paddingStart="0dp"
+        android:paddingEnd="10dp"
+        android:layout_below="@id/progressiveTextView7" />
+
+    <!-- -->
 
     <TextView
         android:id="@+id/notesTextView"
@@ -98,13 +149,14 @@
         android:layout_height="wrap_content"
         android:textSize="14sp"
         android:layout_below="@id/dateTextView"
-        android:layout_toRightOf="@id/progressiveTextView3" />
+        android:layout_toEndOf="@id/progressiveTextView3"
+        android:visibility="gone" />
 
     <CheckBox
         android:id="@+id/checkBox"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
-        android:visibility="invisible"/>
+        android:layout_alignParentEnd="true"
+        android:visibility="gone"/>
 
 </RelativeLayout>

@@ -1,9 +1,7 @@
 package com.slotmachine.ocr.mic;
 
 import android.graphics.Rect;
-
 import com.google.firebase.ml.vision.document.FirebaseVisionDocumentText;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -52,9 +50,9 @@ public class TextParser {
                         dollarSignRect = word.getBoundingBox();
                     }
                 } else { // Not dollar sign
-                    Double dollarSignMidpoint = (dollarSignRect.bottom - dollarSignRect.top) / 2.0 + dollarSignRect.top;
-                    Integer dollarSignHeight = dollarSignRect.bottom - dollarSignRect.top;
-                    Integer currentHeight = word.getBoundingBox().bottom - word.getBoundingBox().top;
+                    double dollarSignMidpoint = (dollarSignRect.bottom - dollarSignRect.top) / 2.0 + dollarSignRect.top;
+                    int dollarSignHeight = dollarSignRect.bottom - dollarSignRect.top;
+                    int currentHeight = word.getBoundingBox().bottom - word.getBoundingBox().top;
                     boolean lessThanHalfHeight = currentHeight < dollarSignHeight / 2.0;
                     boolean greaterThanDoubleHeight = currentHeight > dollarSignHeight * 2.0;
                     boolean higherThanMidpoint = word.getBoundingBox().top > dollarSignMidpoint;

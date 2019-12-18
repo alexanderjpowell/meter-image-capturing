@@ -3,7 +3,7 @@ package com.slotmachine.ocr.mic;
 // POJO for scan data displayed to the user
 public class RowData {
 
-    private String documentId, machineId, date, user, progressive1, progressive2, progressive3, progressive4, progressive5, progressive6, notes;
+    private String documentId, machineId, date, user, progressive1, progressive2, progressive3, progressive4, progressive5, progressive6, progressive7, progressive8, progressive9, progressive10, notes;
     private boolean isSelected;
 
     public RowData(String documentId,
@@ -16,6 +16,10 @@ public class RowData {
                    String progressive4,
                    String progressive5,
                    String progressive6,
+                   String progressive7,
+                   String progressive8,
+                   String progressive9,
+                   String progressive10,
                    String notes,
                    boolean isSelected) {
         this.documentId = documentId;
@@ -28,6 +32,10 @@ public class RowData {
         this.progressive4 = progressive4;
         this.progressive5 = progressive5;
         this.progressive6 = progressive6;
+        this.progressive7 = progressive7;
+        this.progressive8 = progressive8;
+        this.progressive9 = progressive9;
+        this.progressive10 = progressive10;
         this.notes = notes;
         this.isSelected = isSelected;
     }
@@ -96,6 +104,34 @@ public class RowData {
     }
     public void setProgressive6(String progressive6) {
         this.progressive6 = progressive6;
+    }
+
+    public String getProgressive7() {
+        return this.progressive7;
+    }
+    public void setProgressive7(String progressive7) {
+        this.progressive7 = progressive7;
+    }
+
+    public String getProgressive8() {
+        return this.progressive8;
+    }
+    public void setProgressive8(String progressive8) {
+        this.progressive8 = progressive8;
+    }
+
+    public String getProgressive9() {
+        return this.progressive9;
+    }
+    public void setProgressive9(String progressive9) {
+        this.progressive9 = progressive9;
+    }
+
+    public String getProgressive10() {
+        return this.progressive10;
+    }
+    public void setProgressive10(String progressive10) {
+        this.progressive10 = progressive10;
     }
 
     public String getNotes() { return this.notes; }

@@ -1,5 +1,6 @@
 package com.slotmachine.ocr.mic;
 
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -15,28 +16,27 @@ import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
-import android.preference.PreferenceManager;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
-
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
-
 import java.io.File;
 import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.text.SimpleDateFormat;
 
 public class DataReportActivity extends AppCompatActivity {// implements AdapterView.OnItemSelectedListener {
 
@@ -58,6 +58,7 @@ public class DataReportActivity extends AppCompatActivity {// implements Adapter
 
     int offset = 0;
     private int QUERY_LIMIT_SIZE = 10;
+    private int NUMBER_OF_PROGRESSIVES;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -112,6 +113,10 @@ public class DataReportActivity extends AppCompatActivity {// implements Adapter
                 intent.putExtra("PROGRESSIVE_4", removeDollarSignFromString(rowData.getProgressive4()));
                 intent.putExtra("PROGRESSIVE_5", removeDollarSignFromString(rowData.getProgressive5()));
                 intent.putExtra("PROGRESSIVE_6", removeDollarSignFromString(rowData.getProgressive6()));
+                intent.putExtra("PROGRESSIVE_7", removeDollarSignFromString(rowData.getProgressive7()));
+                intent.putExtra("PROGRESSIVE_8", removeDollarSignFromString(rowData.getProgressive8()));
+                intent.putExtra("PROGRESSIVE_9", removeDollarSignFromString(rowData.getProgressive9()));
+                intent.putExtra("PROGRESSIVE_10", removeDollarSignFromString(rowData.getProgressive10()));
                 intent.putExtra("NOTES", rowData.getNotes());
                 intent.putExtra("DOCUMENT_ID", rowData.getDocumentId());
                 startActivity(intent);
@@ -190,7 +195,7 @@ public class DataReportActivity extends AppCompatActivity {// implements Adapter
         return super.onOptionsItemSelected(item);
     }
 
-    private int getOffsetFromDateRange(DateRange dateRange) {
+    /*private int getOffsetFromDateRange(DateRange dateRange) {
         int ret = 86400;
         if (dateRange.equals(DateRange.HOUR))
             ret = 3600;
@@ -199,7 +204,7 @@ public class DataReportActivity extends AppCompatActivity {// implements Adapter
         else if (dateRange.equals(DateRange.WEEK))
             ret = offset = 604800;
         return ret;
-    }
+    }*/
 
     private void loadMoreRecords() {
         Date time = new Date(System.currentTimeMillis() - offset * 1000);
@@ -213,7 +218,7 @@ public class DataReportActivity extends AppCompatActivity {// implements Adapter
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
                 if (task.isSuccessful()) {
-                    updateData(task.getResult());
+                    prepareData(task.getResult(), true);
                 } else {
                     showToast("Unable to refresh.  Check your connection.");
                 }
@@ -223,6 +228,7 @@ public class DataReportActivity extends AppCompatActivity {// implements Adapter
     }
 
     private void deleteScanFromDatabase(String document_id) {
+        // Old sub collection
         database.collection("scans").document(document_id).delete();
 
         // New sub collection
@@ -240,7 +246,7 @@ public class DataReportActivity extends AppCompatActivity {// implements Adapter
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
                 if (task.isSuccessful()) {
-                    prepareData(task.getResult());
+                    prepareData(task.getResult(), false);
                 } else {
                     showToast("Unable to refresh.  Check your connection.");
                 }
@@ -249,30 +255,67 @@ public class DataReportActivity extends AppCompatActivity {// implements Adapter
         });
     }
 
-    private void prepareData(QuerySnapshot snapshot) {
+    private void prepareData(QuerySnapshot snapshot, boolean update) {
 
-        String machine_id, timestamp, user, progressive1, progressive2, progressive3, progressive4, progressive5, progressive6, notes;
+        String machine_id, user, notes;
+        Timestamp timestamp;
+        String progressive1, progressive2, progressive3, progressive4, progressive5, progressive6, progressive7, progressive8, progressive9, progressive10;
+        progressive1 = progressive2 = progressive3 = progressive4 = progressive5 = progressive6 = progressive7 = progressive8 = progressive9 = progressive10 = "";
         RowData rowData;
-        rowDataList.clear(); // reset the current data list
+        if (!update) {
+            rowDataList.clear(); // reset the current data list
+        }
 
         for (QueryDocumentSnapshot document : snapshot) {
 
             lastDocumentSnapshot = document;
 
+            Map<String, Object> map = document.getData();
+            if (map.containsKey("progressive1")) {
+                progressive1 = addDollarSign((String)map.get("progressive1"));
+            }
+            if (map.containsKey("progressive2")) {
+                progressive2 = addDollarSign((String)map.get("progressive2"));
+            }
+            if (map.containsKey("progressive3")) {
+                progressive3 = addDollarSign((String)map.get("progressive3"));
+            }
+            if (map.containsKey("progressive4")) {
+                progressive4 = addDollarSign((String)map.get("progressive4"));
+            }
+            if (map.containsKey("progressive5")) {
+                progressive5 = addDollarSign((String)map.get("progressive5"));
+            }
+            if (map.containsKey("progressive6")) {
+                progressive6 = addDollarSign((String)map.get("progressive6"));
+            }
+            if (map.containsKey("progressive7")) {
+                progressive7 = addDollarSign((String)map.get("progressive7"));
+            }
+            if (map.containsKey("progressive8")) {
+                progressive8 = addDollarSign((String)map.get("progressive8"));
+            }
+            if (map.containsKey("progressive9")) {
+                progressive9 = addDollarSign((String)map.get("progressive9"));
+            }
+            if (map.containsKey("progressive10")) {
+                progressive10 = addDollarSign((String)map.get("progressive10"));
+            }
+
+            Date date = new Date();
             machine_id = document.get("machine_id").toString();
-            timestamp = document.getTimestamp("timestamp").toDate().toString();
+            timestamp = document.getTimestamp("timestamp");
+            if (timestamp != null) {
+                date = timestamp.toDate();
+            }
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("MMM dd, HH:mm:ss", Locale.US);
+            String formattedTimestamp = simpleDateFormat.format(date);
             user = (document.get("userName") == null) ? "User not specified" : document.get("userName").toString();
-            progressive1 = document.get("progressive1").toString().trim().isEmpty() ? "" : "$" + document.get("progressive1").toString().trim();
-            progressive2 = document.get("progressive2").toString().trim().isEmpty() ? "" : "$" + document.get("progressive2").toString().trim();
-            progressive3 = document.get("progressive3").toString().trim().isEmpty() ? "" : "$" + document.get("progressive3").toString().trim();
-            progressive4 = document.get("progressive4").toString().trim().isEmpty() ? "" : "$" + document.get("progressive4").toString().trim();
-            progressive5 = document.get("progressive5").toString().trim().isEmpty() ? "" : "$" + document.get("progressive5").toString().trim();
-            progressive6 = document.get("progressive6").toString().trim().isEmpty() ? "" : "$" + document.get("progressive6").toString().trim();
             notes = (document.get("notes") == null) ? "" : document.get("notes").toString().trim();
 
             rowData = new RowData(document.getId(),
                     "Machine ID: " + machine_id,
-                    timestamp,
+                    formattedTimestamp,
                     user,
                     progressive1,
                     progressive2,
@@ -280,6 +323,10 @@ public class DataReportActivity extends AppCompatActivity {// implements Adapter
                     progressive4,
                     progressive5,
                     progressive6,
+                    progressive7,
+                    progressive8,
+                    progressive9,
+                    progressive10,
                     notes,
                     false);
 
@@ -289,43 +336,12 @@ public class DataReportActivity extends AppCompatActivity {// implements Adapter
         mAdapter.notifyDataSetChanged();
     }
 
-    private void updateData(QuerySnapshot snapshot) {
-
-        String machine_id, timestamp, user, progressive1, progressive2, progressive3, progressive4, progressive5, progressive6, notes;
-        RowData rowData;
-
-        for (QueryDocumentSnapshot document : snapshot) {
-
-            lastDocumentSnapshot = document;
-
-            machine_id = document.get("machine_id").toString();
-            timestamp = document.getTimestamp("timestamp").toDate().toString();
-            user = (document.get("userName") == null) ? "User not specified" : document.get("userName").toString();
-            progressive1 = document.get("progressive1").toString().trim().isEmpty() ? "" : "$" + document.get("progressive1").toString().trim();
-            progressive2 = document.get("progressive2").toString().trim().isEmpty() ? "" : "$" + document.get("progressive2").toString().trim();
-            progressive3 = document.get("progressive3").toString().trim().isEmpty() ? "" : "$" + document.get("progressive3").toString().trim();
-            progressive4 = document.get("progressive4").toString().trim().isEmpty() ? "" : "$" + document.get("progressive4").toString().trim();
-            progressive5 = document.get("progressive5").toString().trim().isEmpty() ? "" : "$" + document.get("progressive5").toString().trim();
-            progressive6 = document.get("progressive6").toString().trim().isEmpty() ? "" : "$" + document.get("progressive6").toString().trim();
-            notes = (document.get("notes") == null) ? "" : document.get("notes").toString().trim();
-
-            rowData = new RowData(document.getId(),
-                    "Machine ID: " + machine_id,
-                    timestamp,
-                    user,
-                    progressive1,
-                    progressive2,
-                    progressive3,
-                    progressive4,
-                    progressive5,
-                    progressive6,
-                    notes,
-                    false);
-
-            rowDataList.add(rowData);
+    private String addDollarSign(String progressive) {
+        if (!progressive.trim().isEmpty()) {
+            return "$" + progressive.trim();
+        } else {
+            return "";
         }
-
-        mAdapter.notifyDataSetChanged();
     }
 
     private void showToast(String message) {
@@ -350,26 +366,122 @@ public class DataReportActivity extends AppCompatActivity {// implements Adapter
 
     private String createCsvFile(QuerySnapshot snapshot) {
         StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("\"Machine\",\"Progressive1\",\"Progressive2\",\"Progressive3\",\"Progressive4\",\"Progressive5\",\"Progressive6\", \"Notes\",\"Date\",\"User\"\n");
+        if (NUMBER_OF_PROGRESSIVES == 6) {
+            stringBuilder.append("\"Machine\",\"Progressive1\",\"Progressive2\",\"Progressive3\",\"Progressive4\",\"Progressive5\",\"Progressive6\",\"Notes\",\"Date\",\"User\"\n");
+        } else if (NUMBER_OF_PROGRESSIVES == 7) {
+            stringBuilder.append("\"Machine\",\"Progressive1\",\"Progressive2\",\"Progressive3\",\"Progressive4\",\"Progressive5\",\"Progressive6\",\"Progressive7\",\"Notes\",\"Date\",\"User\"\n");
+        } else if (NUMBER_OF_PROGRESSIVES == 8) {
+            stringBuilder.append("\"Machine\",\"Progressive1\",\"Progressive2\",\"Progressive3\",\"Progressive4\",\"Progressive5\",\"Progressive6\",\"Progressive7\",\"Progressive8\",\"Notes\",\"Date\",\"User\"\n");
+        } else if (NUMBER_OF_PROGRESSIVES == 9) {
+            stringBuilder.append("\"Machine\",\"Progressive1\",\"Progressive2\",\"Progressive3\",\"Progressive4\",\"Progressive5\",\"Progressive6\",\"Progressive7\",\"Progressive8\",\"Progressive9\",\"Notes\",\"Date\",\"User\"\n");
+        } else if (NUMBER_OF_PROGRESSIVES == 10) {
+            stringBuilder.append("\"Machine\",\"Progressive1\",\"Progressive2\",\"Progressive3\",\"Progressive4\",\"Progressive5\",\"Progressive6\",\"Progressive7\",\"Progressive8\",\"Progressive9\",\"Progressive10\",\"Notes\",\"Date\",\"User\"\n");
+        }
+
+        String progressive1, progressive2, progressive3, progressive4, progressive5, progressive6, progressive7, progressive8, progressive9, progressive10;
+        progressive1 = progressive2 = progressive3 = progressive4 = progressive5 = progressive6 = progressive7 = progressive8 = progressive9 = progressive10 = "";
+
         for (QueryDocumentSnapshot document : snapshot) {
             String machine_id = document.get("machine_id").toString();
             String timestamp = document.getTimestamp("timestamp").toDate().toString();
             String user = (document.get("userName") == null) ? "User not specified" : document.get("userName").toString();
-            String progressive1 = document.get("progressive1").toString().trim().isEmpty() ? "" : "$" + document.get("progressive1").toString().trim();
-            String progressive2 = document.get("progressive2").toString().trim().isEmpty() ? "" : "$" + document.get("progressive2").toString().trim();
-            String progressive3 = document.get("progressive3").toString().trim().isEmpty() ? "" : "$" + document.get("progressive3").toString().trim();
-            String progressive4 = document.get("progressive4").toString().trim().isEmpty() ? "" : "$" + document.get("progressive4").toString().trim();
-            String progressive5 = document.get("progressive5").toString().trim().isEmpty() ? "" : "$" + document.get("progressive5").toString().trim();
-            String progressive6 = document.get("progressive6").toString().trim().isEmpty() ? "" : "$" + document.get("progressive6").toString().trim();
+            if (NUMBER_OF_PROGRESSIVES == 6) {
+                progressive1 = document.get("progressive1").toString().trim().isEmpty() ? "" : "$" + document.get("progressive1").toString().trim();
+                progressive2 = document.get("progressive2").toString().trim().isEmpty() ? "" : "$" + document.get("progressive2").toString().trim();
+                progressive3 = document.get("progressive3").toString().trim().isEmpty() ? "" : "$" + document.get("progressive3").toString().trim();
+                progressive4 = document.get("progressive4").toString().trim().isEmpty() ? "" : "$" + document.get("progressive4").toString().trim();
+                progressive5 = document.get("progressive5").toString().trim().isEmpty() ? "" : "$" + document.get("progressive5").toString().trim();
+                progressive6 = document.get("progressive6").toString().trim().isEmpty() ? "" : "$" + document.get("progressive6").toString().trim();
+            } else if (NUMBER_OF_PROGRESSIVES == 7) {
+                progressive1 = document.get("progressive1").toString().trim().isEmpty() ? "" : "$" + document.get("progressive1").toString().trim();
+                progressive2 = document.get("progressive2").toString().trim().isEmpty() ? "" : "$" + document.get("progressive2").toString().trim();
+                progressive3 = document.get("progressive3").toString().trim().isEmpty() ? "" : "$" + document.get("progressive3").toString().trim();
+                progressive4 = document.get("progressive4").toString().trim().isEmpty() ? "" : "$" + document.get("progressive4").toString().trim();
+                progressive5 = document.get("progressive5").toString().trim().isEmpty() ? "" : "$" + document.get("progressive5").toString().trim();
+                progressive6 = document.get("progressive6").toString().trim().isEmpty() ? "" : "$" + document.get("progressive6").toString().trim();
+                progressive7 = document.get("progressive7").toString().trim().isEmpty() ? "" : "$" + document.get("progressive7").toString().trim();
+            } else if (NUMBER_OF_PROGRESSIVES == 8) {
+                progressive1 = document.get("progressive1").toString().trim().isEmpty() ? "" : "$" + document.get("progressive1").toString().trim();
+                progressive2 = document.get("progressive2").toString().trim().isEmpty() ? "" : "$" + document.get("progressive2").toString().trim();
+                progressive3 = document.get("progressive3").toString().trim().isEmpty() ? "" : "$" + document.get("progressive3").toString().trim();
+                progressive4 = document.get("progressive4").toString().trim().isEmpty() ? "" : "$" + document.get("progressive4").toString().trim();
+                progressive5 = document.get("progressive5").toString().trim().isEmpty() ? "" : "$" + document.get("progressive5").toString().trim();
+                progressive6 = document.get("progressive6").toString().trim().isEmpty() ? "" : "$" + document.get("progressive6").toString().trim();
+                progressive7 = document.get("progressive7").toString().trim().isEmpty() ? "" : "$" + document.get("progressive7").toString().trim();
+                progressive8 = document.get("progressive8").toString().trim().isEmpty() ? "" : "$" + document.get("progressive8").toString().trim();
+            } else if (NUMBER_OF_PROGRESSIVES == 9) {
+                progressive1 = document.get("progressive1").toString().trim().isEmpty() ? "" : "$" + document.get("progressive1").toString().trim();
+                progressive2 = document.get("progressive2").toString().trim().isEmpty() ? "" : "$" + document.get("progressive2").toString().trim();
+                progressive3 = document.get("progressive3").toString().trim().isEmpty() ? "" : "$" + document.get("progressive3").toString().trim();
+                progressive4 = document.get("progressive4").toString().trim().isEmpty() ? "" : "$" + document.get("progressive4").toString().trim();
+                progressive5 = document.get("progressive5").toString().trim().isEmpty() ? "" : "$" + document.get("progressive5").toString().trim();
+                progressive6 = document.get("progressive6").toString().trim().isEmpty() ? "" : "$" + document.get("progressive6").toString().trim();
+                progressive7 = document.get("progressive7").toString().trim().isEmpty() ? "" : "$" + document.get("progressive7").toString().trim();
+                progressive8 = document.get("progressive8").toString().trim().isEmpty() ? "" : "$" + document.get("progressive8").toString().trim();
+                progressive9 = document.get("progressive9").toString().trim().isEmpty() ? "" : "$" + document.get("progressive9").toString().trim();
+            } else if (NUMBER_OF_PROGRESSIVES == 10) {
+                progressive1 = document.get("progressive1").toString().trim().isEmpty() ? "" : "$" + document.get("progressive1").toString().trim();
+                progressive2 = document.get("progressive2").toString().trim().isEmpty() ? "" : "$" + document.get("progressive2").toString().trim();
+                progressive3 = document.get("progressive3").toString().trim().isEmpty() ? "" : "$" + document.get("progressive3").toString().trim();
+                progressive4 = document.get("progressive4").toString().trim().isEmpty() ? "" : "$" + document.get("progressive4").toString().trim();
+                progressive5 = document.get("progressive5").toString().trim().isEmpty() ? "" : "$" + document.get("progressive5").toString().trim();
+                progressive6 = document.get("progressive6").toString().trim().isEmpty() ? "" : "$" + document.get("progressive6").toString().trim();
+                progressive7 = document.get("progressive7").toString().trim().isEmpty() ? "" : "$" + document.get("progressive7").toString().trim();
+                progressive8 = document.get("progressive8").toString().trim().isEmpty() ? "" : "$" + document.get("progressive8").toString().trim();
+                progressive9 = document.get("progressive9").toString().trim().isEmpty() ? "" : "$" + document.get("progressive9").toString().trim();
+                progressive10 = document.get("progressive10").toString().trim().isEmpty() ? "" : "$" + document.get("progressive10").toString().trim();
+            }
+            //
+            //
             String notes = (document.get("notes") == null) ? "" : document.get("notes").toString().trim();
 
             stringBuilder.append("\"" + machine_id + "\",");
-            stringBuilder.append("\"" + progressive1 + "\",");
-            stringBuilder.append("\"" + progressive2 + "\",");
-            stringBuilder.append("\"" + progressive3 + "\",");
-            stringBuilder.append("\"" + progressive4 + "\",");
-            stringBuilder.append("\"" + progressive5 + "\",");
-            stringBuilder.append("\"" + progressive6 + "\",");
+            if (NUMBER_OF_PROGRESSIVES == 6) {
+                stringBuilder.append("\"" + progressive1 + "\",");
+                stringBuilder.append("\"" + progressive2 + "\",");
+                stringBuilder.append("\"" + progressive3 + "\",");
+                stringBuilder.append("\"" + progressive4 + "\",");
+                stringBuilder.append("\"" + progressive5 + "\",");
+                stringBuilder.append("\"" + progressive6 + "\",");
+            } else if (NUMBER_OF_PROGRESSIVES == 7) {
+                stringBuilder.append("\"" + progressive1 + "\",");
+                stringBuilder.append("\"" + progressive2 + "\",");
+                stringBuilder.append("\"" + progressive3 + "\",");
+                stringBuilder.append("\"" + progressive4 + "\",");
+                stringBuilder.append("\"" + progressive5 + "\",");
+                stringBuilder.append("\"" + progressive6 + "\",");
+                stringBuilder.append("\"" + progressive7 + "\",");
+            } else if (NUMBER_OF_PROGRESSIVES == 8) {
+                stringBuilder.append("\"" + progressive1 + "\",");
+                stringBuilder.append("\"" + progressive2 + "\",");
+                stringBuilder.append("\"" + progressive3 + "\",");
+                stringBuilder.append("\"" + progressive4 + "\",");
+                stringBuilder.append("\"" + progressive5 + "\",");
+                stringBuilder.append("\"" + progressive6 + "\",");
+                stringBuilder.append("\"" + progressive7 + "\",");
+                stringBuilder.append("\"" + progressive8 + "\",");
+            } else if (NUMBER_OF_PROGRESSIVES == 9) {
+                stringBuilder.append("\"" + progressive1 + "\",");
+                stringBuilder.append("\"" + progressive2 + "\",");
+                stringBuilder.append("\"" + progressive3 + "\",");
+                stringBuilder.append("\"" + progressive4 + "\",");
+                stringBuilder.append("\"" + progressive5 + "\",");
+                stringBuilder.append("\"" + progressive6 + "\",");
+                stringBuilder.append("\"" + progressive7 + "\",");
+                stringBuilder.append("\"" + progressive8 + "\",");
+                stringBuilder.append("\"" + progressive9 + "\",");
+            } else if (NUMBER_OF_PROGRESSIVES == 10) {
+                stringBuilder.append("\"" + progressive1 + "\",");
+                stringBuilder.append("\"" + progressive2 + "\",");
+                stringBuilder.append("\"" + progressive3 + "\",");
+                stringBuilder.append("\"" + progressive4 + "\",");
+                stringBuilder.append("\"" + progressive5 + "\",");
+                stringBuilder.append("\"" + progressive6 + "\",");
+                stringBuilder.append("\"" + progressive7 + "\",");
+                stringBuilder.append("\"" + progressive8 + "\",");
+                stringBuilder.append("\"" + progressive9 + "\",");
+                stringBuilder.append("\"" + progressive10 + "\",");
+            }
             stringBuilder.append("\"" + notes + "\",");
             stringBuilder.append("\"" + timestamp + "\",");
             stringBuilder.append("\"" + user + "\"\n");
@@ -379,9 +491,11 @@ public class DataReportActivity extends AppCompatActivity {// implements Adapter
 
     public void generateReport(View view) {
 
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        final String report_recipient_email = sharedPreferences.getString("email_recipient", "");
-        final String[] emails = report_recipient_email.split(",");
+        SharedPreferences sharedPreferences = getApplicationContext().getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
+        final String report_recipient_emails = sharedPreferences.getString("email_recipient", "");
+        NUMBER_OF_PROGRESSIVES = sharedPreferences.getInt("number_of_progressives", 6);
+
+        final String[] emails = report_recipient_emails.split(",");
         final File csvFile = new File(getFilesDir(), "report.csv");
 
         if (isExternalStorageWritable()) {
@@ -403,7 +517,7 @@ public class DataReportActivity extends AppCompatActivity {// implements Adapter
 
                             Uri uri = FileProvider.getUriForFile(DataReportActivity.this, "com.slotmachine.ocr.mic.fileprovider", csvFile);
                             Intent intent = new Intent(Intent.ACTION_SEND);
-                            if (!report_recipient_email.isEmpty()) {
+                            if (!report_recipient_emails.isEmpty()) {
                                 intent.putExtra(Intent.EXTRA_EMAIL, emails);
                             }
                             intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);

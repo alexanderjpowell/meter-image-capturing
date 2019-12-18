@@ -9,6 +9,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -24,24 +25,18 @@ public class EditScanActivity extends AppCompatActivity {
 
     private FirebaseAuth firebaseAuth;
     private FirebaseFirestore database;
-
-    private TextInputEditText machineId;
-    private TextInputEditText progressive1;
-    private TextInputEditText progressive2;
-    private TextInputEditText progressive3;
-    private TextInputEditText progressive4;
-    private TextInputEditText progressive5;
-    private TextInputEditText progressive6;
-    private TextInputEditText notes;
-
-    /*private String machine_id;
-    private String progressive_1;
-    private String progressive_2;
-    private String progressive_3;
-    private String progressive_4;
-    private String progressive_5;
-    private String progressive_6;
-    private String notes_text;*/
+    private EditText machineId;
+    private EditText progressive1;
+    private EditText progressive2;
+    private EditText progressive3;
+    private EditText progressive4;
+    private EditText progressive5;
+    private EditText progressive6;
+    private EditText progressive7;
+    private EditText progressive8;
+    private EditText progressive9;
+    private EditText progressive10;
+    private EditText notes;
     private String document_id;
 
     @Override
@@ -68,6 +63,10 @@ public class EditScanActivity extends AppCompatActivity {
         progressive4 = findViewById(R.id.progressive4);
         progressive5 = findViewById(R.id.progressive5);
         progressive6 = findViewById(R.id.progressive6);
+        progressive7 = findViewById(R.id.progressive7);
+        progressive8 = findViewById(R.id.progressive8);
+        progressive9 = findViewById(R.id.progressive9);
+        progressive10 = findViewById(R.id.progressive10);
         notes = findViewById(R.id.notes);
 
         Intent intent = getIntent();
@@ -78,6 +77,10 @@ public class EditScanActivity extends AppCompatActivity {
         String progressive_4 = intent.getStringExtra("PROGRESSIVE_4");
         String progressive_5 = intent.getStringExtra("PROGRESSIVE_5");
         String progressive_6 = intent.getStringExtra("PROGRESSIVE_6");
+        String progressive_7 = intent.getStringExtra("PROGRESSIVE_7");
+        String progressive_8 = intent.getStringExtra("PROGRESSIVE_8");
+        String progressive_9 = intent.getStringExtra("PROGRESSIVE_9");
+        String progressive_10 = intent.getStringExtra("PROGRESSIVE_10");
         String notes_text = intent.getStringExtra("NOTES");
         document_id = intent.getStringExtra("DOCUMENT_ID");
 
@@ -88,6 +91,10 @@ public class EditScanActivity extends AppCompatActivity {
         progressive4.setText(progressive_4);
         progressive5.setText(progressive_5);
         progressive6.setText(progressive_6);
+        progressive7.setText(progressive_7);
+        progressive8.setText(progressive_8);
+        progressive9.setText(progressive_9);
+        progressive10.setText(progressive_10);
         notes.setText(notes_text);
     }
 
@@ -125,6 +132,10 @@ public class EditScanActivity extends AppCompatActivity {
         map.put("progressive4", progressive4.getText().toString());
         map.put("progressive5", progressive5.getText().toString());
         map.put("progressive6", progressive6.getText().toString());
+        map.put("progressive7", progressive7.getText().toString());
+        map.put("progressive8", progressive8.getText().toString());
+        map.put("progressive9", progressive9.getText().toString());
+        map.put("progressive10", progressive10.getText().toString());
         map.put("machine_id", machineId.getText().toString());
         map.put("timestamp", FieldValue.serverTimestamp());
         map.put("notes", notes.getText().toString());

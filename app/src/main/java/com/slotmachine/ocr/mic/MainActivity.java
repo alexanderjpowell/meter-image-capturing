@@ -44,6 +44,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -91,7 +92,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public static final int REQUEST_TAKE_PHOTO_MACHINE_ID = 2;
     public static final int REQUEST_SETTINGS_ACTIVITY = 3;
     public static final int REQUEST_DATA_REPORT_ACTIVITY = 4;
-
     private static final int REQ_CODE_SPEECH_INPUT = 100;
 
     private static final String EMPTY_PROGRESSIVE_VALUE = "";
@@ -105,6 +105,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public TextInputEditText progressive4;
     public TextInputEditText progressive5;
     public TextInputEditText progressive6;
+    public TextInputEditText progressive7;
+    public TextInputEditText progressive8;
+    public TextInputEditText progressive9;
+    public TextInputEditText progressive10;
     public TextInputEditText machineId;
 
     public TextInputLayout inputLayout0;
@@ -114,6 +118,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public TextInputLayout inputLayout4;
     public TextInputLayout inputLayout5;
     public TextInputLayout inputLayout6;
+    public TextInputLayout inputLayout7;
+    public TextInputLayout inputLayout8;
+    public TextInputLayout inputLayout9;
+    public TextInputLayout inputLayout10;
+
+    private RelativeLayout relativeLayoutProgressive7;
+    private RelativeLayout relativeLayoutProgressive8;
+    private RelativeLayout relativeLayoutProgressive9;
+    private RelativeLayout relativeLayoutProgressive10;
 
     public Spinner spinner;
     private String username;
@@ -124,10 +137,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private FirebaseFirestore database;
 
     private Double minimumProgressiveValue;
+    private int NUMBER_OF_PROGRESSIVES;
 
     private Set<String> set = new HashSet<>();
 
     private Intent intent;
+
+    private boolean DEBUG = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -153,6 +169,41 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         //
 
 
+        //
+        relativeLayoutProgressive7 = findViewById(R.id.progressive7_relative_layout);
+        relativeLayoutProgressive8 = findViewById(R.id.progressive8_relative_layout);
+        relativeLayoutProgressive9 = findViewById(R.id.progressive9_relative_layout);
+        relativeLayoutProgressive10 = findViewById(R.id.progressive10_relative_layout);
+
+        NUMBER_OF_PROGRESSIVES = sharedPref.getInt("number_of_progressives", 6);
+        //showToast(Integer.toString(NUMBER_OF_PROGRESSIVES));
+        if (NUMBER_OF_PROGRESSIVES == 6) {
+            relativeLayoutProgressive7.setVisibility(View.GONE);
+            relativeLayoutProgressive8.setVisibility(View.GONE);
+            relativeLayoutProgressive9.setVisibility(View.GONE);
+            relativeLayoutProgressive10.setVisibility(View.GONE);
+        } else if (NUMBER_OF_PROGRESSIVES == 7) {
+            relativeLayoutProgressive7.setVisibility(View.VISIBLE);
+            relativeLayoutProgressive8.setVisibility(View.GONE);
+            relativeLayoutProgressive9.setVisibility(View.GONE);
+            relativeLayoutProgressive10.setVisibility(View.GONE);
+        } else if (NUMBER_OF_PROGRESSIVES == 8) {
+            relativeLayoutProgressive7.setVisibility(View.VISIBLE);
+            relativeLayoutProgressive8.setVisibility(View.VISIBLE);
+            relativeLayoutProgressive9.setVisibility(View.GONE);
+            relativeLayoutProgressive10.setVisibility(View.GONE);
+        } else if (NUMBER_OF_PROGRESSIVES == 9) {
+            relativeLayoutProgressive7.setVisibility(View.VISIBLE);
+            relativeLayoutProgressive8.setVisibility(View.VISIBLE);
+            relativeLayoutProgressive9.setVisibility(View.VISIBLE);
+            relativeLayoutProgressive10.setVisibility(View.GONE);
+        } else if (NUMBER_OF_PROGRESSIVES == 10) {
+            relativeLayoutProgressive7.setVisibility(View.VISIBLE);
+            relativeLayoutProgressive8.setVisibility(View.VISIBLE);
+            relativeLayoutProgressive9.setVisibility(View.VISIBLE);
+            relativeLayoutProgressive10.setVisibility(View.VISIBLE);
+        }
+        //
 
         //
         database = FirebaseFirestore.getInstance();
@@ -176,6 +227,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         progressive4 = findViewById(R.id.progressive4);
         progressive5 = findViewById(R.id.progressive5);
         progressive6 = findViewById(R.id.progressive6);
+        //
+        progressive7 = findViewById(R.id.progressive7);
+        progressive8 = findViewById(R.id.progressive8);
+        progressive9 = findViewById(R.id.progressive9);
+        progressive10 = findViewById(R.id.progressive10);
+        //
         machineId = findViewById(R.id.machineId);
         submitButton = findViewById(R.id.submit_button);
 
@@ -186,6 +243,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         inputLayout4 = findViewById(R.id.inputLayout4);
         inputLayout5 = findViewById(R.id.inputLayout5);
         inputLayout6 = findViewById(R.id.inputLayout6);
+        //
+        inputLayout7 = findViewById(R.id.inputLayout7);
+        inputLayout8 = findViewById(R.id.inputLayout8);
+        inputLayout9 = findViewById(R.id.inputLayout9);
+        inputLayout10 = findViewById(R.id.inputLayout10);
+        //
 
         resetProgressives();
 
@@ -195,6 +258,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         progressive4.setOnTouchListener(this);
         progressive5.setOnTouchListener(this);
         progressive6.setOnTouchListener(this);
+        //
+        progressive7.setOnTouchListener(this);
+        progressive8.setOnTouchListener(this);
+        progressive9.setOnTouchListener(this);
+        progressive10.setOnTouchListener(this);
+        //
         machineId.setOnTouchListener(this);
 
         progressive1.addTextChangedListener(new GenericTextWatcher(progressive1));
@@ -203,6 +272,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         progressive4.addTextChangedListener(new GenericTextWatcher(progressive4));
         progressive5.addTextChangedListener(new GenericTextWatcher(progressive5));
         progressive6.addTextChangedListener(new GenericTextWatcher(progressive6));
+        //
+        progressive7.addTextChangedListener(new GenericTextWatcher(progressive7));
+        progressive8.addTextChangedListener(new GenericTextWatcher(progressive8));
+        progressive9.addTextChangedListener(new GenericTextWatcher(progressive9));
+        progressive10.addTextChangedListener(new GenericTextWatcher(progressive10));
+        //
         machineId.addTextChangedListener(new GenericTextWatcher(machineId));
 
         // Populate machine id if coming from to do list activity
@@ -233,7 +308,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 });
         }
         //
-
 
         // Set minimum progressive value
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
@@ -323,10 +397,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public boolean onTouch(View v, MotionEvent event) {
 
         final int DRAWABLE_RIGHT = 2;
-        switch(v.getId()){
+        switch (v.getId()) {
             case R.id.progressive1:
-                if(event.getAction() == MotionEvent.ACTION_UP) {
-                    if(event.getRawX() >= (progressive1.getRight() - progressive1.getCompoundDrawables()[DRAWABLE_RIGHT].getBounds().width() - 15)) {
+                if (event.getAction() == MotionEvent.ACTION_UP) {
+                    if (event.getRawX() >= (progressive1.getRight() - progressive1.getCompoundDrawables()[DRAWABLE_RIGHT].getBounds().width() - 15)) {
                         if (progressive1.getError() == null) {
                             if (progressive1.getText().toString().equals("")) {
                                 progressive = 1;
@@ -341,8 +415,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 }
                 break;
             case R.id.progressive2:
-                if(event.getAction() == MotionEvent.ACTION_UP) {
-                    if(event.getRawX() >= (progressive2.getRight() - progressive2.getCompoundDrawables()[DRAWABLE_RIGHT].getBounds().width() - 15)) {
+                if (event.getAction() == MotionEvent.ACTION_UP) {
+                    if (event.getRawX() >= (progressive2.getRight() - progressive2.getCompoundDrawables()[DRAWABLE_RIGHT].getBounds().width() - 15)) {
                         if (progressive2.getError() == null) {
                             if (progressive2.getText().toString().equals("")) {
                                 progressive = 2;
@@ -357,8 +431,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 }
                 break;
             case R.id.progressive3:
-                if(event.getAction() == MotionEvent.ACTION_UP) {
-                    if(event.getRawX() >= (progressive3.getRight() - progressive3.getCompoundDrawables()[DRAWABLE_RIGHT].getBounds().width() - 15)) {
+                if (event.getAction() == MotionEvent.ACTION_UP) {
+                    if (event.getRawX() >= (progressive3.getRight() - progressive3.getCompoundDrawables()[DRAWABLE_RIGHT].getBounds().width() - 15)) {
                         if (progressive3.getError() == null) {
                             if (progressive3.getText().toString().equals("")) {
                                 progressive = 3;
@@ -373,8 +447,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 }
                 break;
             case R.id.progressive4:
-                if(event.getAction() == MotionEvent.ACTION_UP) {
-                    if(event.getRawX() >= (progressive4.getRight() - progressive4.getCompoundDrawables()[DRAWABLE_RIGHT].getBounds().width() - 15)) {
+                if (event.getAction() == MotionEvent.ACTION_UP) {
+                    if (event.getRawX() >= (progressive4.getRight() - progressive4.getCompoundDrawables()[DRAWABLE_RIGHT].getBounds().width() - 15)) {
                         if (progressive4.getError() == null) {
                             if (progressive4.getText().toString().equals("")) {
                                 progressive = 4;
@@ -389,8 +463,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 }
                 break;
             case R.id.progressive5:
-                if(event.getAction() == MotionEvent.ACTION_UP) {
-                    if(event.getRawX() >= (progressive5.getRight() - progressive5.getCompoundDrawables()[DRAWABLE_RIGHT].getBounds().width() - 15)) {
+                if (event.getAction() == MotionEvent.ACTION_UP) {
+                    if (event.getRawX() >= (progressive5.getRight() - progressive5.getCompoundDrawables()[DRAWABLE_RIGHT].getBounds().width() - 15)) {
                         if (progressive5.getError() == null) {
                             if (progressive5.getText().toString().equals("")) {
                                 progressive = 5;
@@ -405,8 +479,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 }
                 break;
             case R.id.progressive6:
-                if(event.getAction() == MotionEvent.ACTION_UP) {
-                    if(event.getRawX() >= (progressive6.getRight() - progressive6.getCompoundDrawables()[DRAWABLE_RIGHT].getBounds().width() - 15)) {
+                if (event.getAction() == MotionEvent.ACTION_UP) {
+                    if (event.getRawX() >= (progressive6.getRight() - progressive6.getCompoundDrawables()[DRAWABLE_RIGHT].getBounds().width() - 15)) {
                         if (progressive6.getError() == null) {
                             if (progressive6.getText().toString().equals("")) {
                                 progressive = 6;
@@ -420,13 +494,79 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     }
                 }
                 break;
-            case R.id.machineId:
-                if(event.getAction() == MotionEvent.ACTION_UP) {
-                    if(event.getRawX() >= (machineId.getRight() - machineId.getCompoundDrawables()[DRAWABLE_RIGHT].getBounds().width() - 15)) {
-                        if (machineId.getError() == null) {
-                            if (machineId.getText().toString().equals("")) {
+            //
+            case R.id.progressive7:
+                if (event.getAction() == MotionEvent.ACTION_UP) {
+                    if (event.getRawX() >= (progressive7.getRight() - progressive7.getCompoundDrawables()[DRAWABLE_RIGHT].getBounds().width() - 15)) {
+                        if (progressive7.getError() == null) {
+                            if (progressive7.getText().toString().equals("")) {
                                 progressive = 7;
                                 startVoiceInput(7);
+                                return true;
+                            } else {
+                                event.setAction(MotionEvent.ACTION_CANCEL);
+                                progressive7.setText("");
+                            }
+                        }
+                    }
+                }
+                break;
+            case R.id.progressive8:
+                if (event.getAction() == MotionEvent.ACTION_UP) {
+                    if (event.getRawX() >= (progressive8.getRight() - progressive8.getCompoundDrawables()[DRAWABLE_RIGHT].getBounds().width() - 15)) {
+                        if (progressive8.getError() == null) {
+                            if (progressive8.getText().toString().equals("")) {
+                                progressive = 8;
+                                startVoiceInput(8);
+                                return true;
+                            } else {
+                                event.setAction(MotionEvent.ACTION_CANCEL);
+                                progressive8.setText("");
+                            }
+                        }
+                    }
+                }
+                break;
+            case R.id.progressive9:
+                if (event.getAction() == MotionEvent.ACTION_UP) {
+                    if (event.getRawX() >= (progressive9.getRight() - progressive9.getCompoundDrawables()[DRAWABLE_RIGHT].getBounds().width() - 15)) {
+                        if (progressive9.getError() == null) {
+                            if (progressive9.getText().toString().equals("")) {
+                                progressive = 9;
+                                startVoiceInput(9);
+                                return true;
+                            } else {
+                                event.setAction(MotionEvent.ACTION_CANCEL);
+                                progressive9.setText("");
+                            }
+                        }
+                    }
+                }
+                break;
+            case R.id.progressive10:
+                if (event.getAction() == MotionEvent.ACTION_UP) {
+                    if (event.getRawX() >= (progressive10.getRight() - progressive10.getCompoundDrawables()[DRAWABLE_RIGHT].getBounds().width() - 15)) {
+                        if (progressive10.getError() == null) {
+                            if (progressive10.getText().toString().equals("")) {
+                                progressive = 10;
+                                startVoiceInput(10);
+                                return true;
+                            } else {
+                                event.setAction(MotionEvent.ACTION_CANCEL);
+                                progressive10.setText("");
+                            }
+                        }
+                    }
+                }
+                break;
+            //
+            case R.id.machineId:
+                if (event.getAction() == MotionEvent.ACTION_UP) {
+                    if (event.getRawX() >= (machineId.getRight() - machineId.getCompoundDrawables()[DRAWABLE_RIGHT].getBounds().width() - 15)) {
+                        if (machineId.getError() == null) {
+                            if (machineId.getText().toString().equals("")) {
+                                progressive = 0;
+                                startVoiceInput(0);
                                 return true;
                             } else {
                                 event.setAction(MotionEvent.ACTION_CANCEL);
@@ -532,50 +672,56 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         //    intent = new Intent(MainActivity.this, SettingsActivity.class);
         //    startActivity(intent);
         } else if (id == R.id.nav_settings) {
-            // Show pop up dialog
-            final EditText passwordEditText = new EditText(MainActivity.this);
-            passwordEditText.setTransformationMethod(PasswordTransformationMethod.getInstance());
-            passwordEditText.requestFocus();
-            passwordEditText.setHint("Password");
 
-            final AlertDialog alertDialog = new AlertDialog.Builder(MainActivity.this).create();
-            alertDialog.setView(passwordEditText, 100, 70, 100, 0);
-            alertDialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
-            alertDialog.setTitle("Re-authenticate");
-            alertDialog.setMessage("To use MiC in admin mode please provide the password for your account");
-            alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "SUBMIT",
-                    new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int i) {
-                            String password = passwordEditText.getText().toString().trim();
-                            if (password.equals("")) {
-                                return;
-                            }
-                            FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-                            AuthCredential credential = EmailAuthProvider.getCredential(user.getEmail(), password);
-                            user.reauthenticate(credential)
-                                    .addOnCompleteListener(new OnCompleteListener<Void>() {
-                                        @Override
-                                        public void onComplete(@NonNull Task<Void> task) {
-                                            if (task.isSuccessful()) {
-                                                final Intent intent1;
-                                                intent1 = new Intent(MainActivity.this, SettingsActivity.class);
-                                                startActivity(intent1);
-                                            } else {
-                                                showToast("Incorrect password");
+            if (DEBUG) {
+                startActivity(new Intent(MainActivity.this, SettingsActivity.class));
+            } else {
+
+                // Show pop up dialog
+                final EditText passwordEditText = new EditText(MainActivity.this);
+                passwordEditText.setTransformationMethod(PasswordTransformationMethod.getInstance());
+                passwordEditText.requestFocus();
+                passwordEditText.setHint("Password");
+
+                final AlertDialog alertDialog = new AlertDialog.Builder(MainActivity.this).create();
+                alertDialog.setView(passwordEditText, 100, 70, 100, 0);
+                alertDialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
+                alertDialog.setTitle("Re-authenticate");
+                alertDialog.setMessage("To use MiC in admin mode please provide the password for your account");
+                alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "SUBMIT",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int i) {
+                                String password = passwordEditText.getText().toString().trim();
+                                if (password.equals("")) {
+                                    return;
+                                }
+                                FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                                AuthCredential credential = EmailAuthProvider.getCredential(user.getEmail(), password);
+                                user.reauthenticate(credential)
+                                        .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                            @Override
+                                            public void onComplete(@NonNull Task<Void> task) {
+                                                if (task.isSuccessful()) {
+                                                    final Intent intent1;
+                                                    intent1 = new Intent(MainActivity.this, SettingsActivity.class);
+                                                    startActivity(intent1);
+                                                } else {
+                                                    showToast("Incorrect password");
+                                                }
+                                                //Log.d(TAG, "User re-authenticated.");
                                             }
-                                            //Log.d(TAG, "User re-authenticated.");
-                                        }
-                                    });
-                            dialog.dismiss();
-                        }
-                    });
-            alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, "CANCEL",
-                    new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int i) {
-                            dialog.dismiss();
-                        }
-                    });
-            alertDialog.show();
+                                        });
+                                dialog.dismiss();
+                            }
+                        });
+                alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, "CANCEL",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int i) {
+                                dialog.dismiss();
+                            }
+                        });
+                alertDialog.show();
+            }
         }
 
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
@@ -626,6 +772,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         } else if (progressive == 6) {
                             progressive6.setText(formatVoiceToSpeech(result.get(0), true));
                         } else if (progressive == 7) {
+                            progressive7.setText(formatVoiceToSpeech(result.get(0), true));
+                        } else if (progressive == 8) {
+                            progressive8.setText(formatVoiceToSpeech(result.get(0), true));
+                        } else if (progressive == 9) {
+                            progressive9.setText(formatVoiceToSpeech(result.get(0), true));
+                        } else if (progressive == 10) {
+                            progressive10.setText(formatVoiceToSpeech(result.get(0), true));
+                        } else if (progressive == 0) {
                             machineId.setText(formatVoiceToSpeech(result.get(0), false));
                         }
                     }
@@ -654,12 +808,21 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         progressive4.setText(EMPTY_PROGRESSIVE_VALUE);
         progressive5.setText(EMPTY_PROGRESSIVE_VALUE);
         progressive6.setText(EMPTY_PROGRESSIVE_VALUE);
+        progressive7.setText(EMPTY_PROGRESSIVE_VALUE);
+        progressive8.setText(EMPTY_PROGRESSIVE_VALUE);
+        progressive9.setText(EMPTY_PROGRESSIVE_VALUE);
+        progressive10.setText(EMPTY_PROGRESSIVE_VALUE);
+
         progressive1.clearFocus();
         progressive2.clearFocus();
         progressive3.clearFocus();
         progressive4.clearFocus();
         progressive5.clearFocus();
         progressive6.clearFocus();
+        progressive7.clearFocus();
+        progressive8.clearFocus();
+        progressive9.clearFocus();
+        progressive10.clearFocus();
     }
 
     private void processProgressivesOCR(Bitmap bitmap) {
@@ -711,7 +874,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
                                 List<String> dollarValues = TextParser.parse(filteredWords);
                                 if (minimumProgressiveValue != null) {
-                                    List<String> newDollarValues = new ArrayList<String>() {};
+                                    List<String> newDollarValues = new ArrayList<>();
                                     for (int i = 0; i < dollarValues.size(); i++) {
                                         if (Double.parseDouble(dollarValues.get(i)) >= minimumProgressiveValue) {
                                             newDollarValues.add(dollarValues.get(i));
@@ -719,17 +882,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                     }
                                     dollarValues = newDollarValues;
                                 }
-                                //StringBuilder builder = new StringBuilder();
-                                //for (String dollar : dollarValues) {
-                                //    builder.append(dollar + "\n");
-                                //}
-                                //mTextView.setText(builder.toString());
-
-                                //Log.d("WORD: ", Integer.toString(filteredWords.size()));
-
-                                //for (FirebaseVisionDocumentText.Word word : filteredWords) {
-                                //    Log.d("WORD: ", word.getText() + " :: " + word.getBoundingBox().toString());
-                                //}
 
                                 // Add to TextViews
                                 machineId.setText(machineCode);
@@ -752,6 +904,18 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                     }
                                     if (i == 5) {
                                         progressive6.setText(dollarValues.get(i));
+                                    }
+                                    if (i == 6) {
+                                        progressive7.setText(dollarValues.get(i));
+                                    }
+                                    if (i == 7) {
+                                        progressive8.setText(dollarValues.get(i));
+                                    }
+                                    if (i == 8) {
+                                        progressive9.setText(dollarValues.get(i));
+                                    }
+                                    if (i == 9) {
+                                        progressive10.setText(dollarValues.get(i));
                                     }
                                 }
                                 //
@@ -846,7 +1010,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 && progressive3.getText().toString().trim().isEmpty()
                 && progressive4.getText().toString().trim().isEmpty()
                 && progressive5.getText().toString().trim().isEmpty()
-                && progressive6.getText().toString().trim().isEmpty());
+                && progressive6.getText().toString().trim().isEmpty()
+                && progressive7.getText().toString().trim().isEmpty()
+                && progressive8.getText().toString().trim().isEmpty()
+                && progressive9.getText().toString().trim().isEmpty()
+                && progressive10.getText().toString().trim().isEmpty());
     }
 
     public void submitOnClick(View view) {
@@ -862,9 +1030,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             final String progressiveText4 = progressive4.getText().toString().trim();
             final String progressiveText5 = progressive5.getText().toString().trim();
             final String progressiveText6 = progressive6.getText().toString().trim();
+            final String progressiveText7 = progressive7.getText().toString().trim();
+            final String progressiveText8 = progressive8.getText().toString().trim();
+            final String progressiveText9 = progressive9.getText().toString().trim();
+            final String progressiveText10 = progressive10.getText().toString().trim();
+
             final String emailText = firebaseAuth.getCurrentUser().getEmail().trim();
             final String userId = firebaseAuth.getCurrentUser().getUid().trim();
-            //final String userName = (spinner.getSelectedItem() == null) ? "No user selected" : spinner.getSelectedItem().toString();
             final String userName = username;
 
             // First, make sure machine id isn't blank
@@ -880,6 +1052,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 alertDialog.show();
                 return;
             }
+            // Make sure at least one progressive has been entered
             if (allProgressivesEmpty()) {
                 AlertDialog alertDialog = new AlertDialog.Builder(MainActivity.this).create();
                 alertDialog.setMessage("Please enter at lease one progressive value");
@@ -893,7 +1066,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 return;
             }
 
-            //
+            // Make sure a user has been selected
             if (username.equals("No user selected")) {
                 AlertDialog alertDialog = new AlertDialog.Builder(MainActivity.this).create();
                 alertDialog.setMessage("Please select a user from the manage users tab");
@@ -930,25 +1103,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                             new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int i) {
 
-                                    /*Map<String, Object> user = new HashMap<>();
-                                    user.put("email", emailText);
-                                    user.put("uid", userId);
-                                    user.put("progressive1", progressiveText1);
-                                    user.put("progressive2", progressiveText2);
-                                    user.put("progressive3", progressiveText3);
-                                    user.put("progressive4", progressiveText4);
-                                    user.put("progressive5", progressiveText5);
-                                    user.put("progressive6", progressiveText6);
-                                    user.put("machine_id", machineIdText);
-                                    user.put("timestamp", FieldValue.serverTimestamp());
-                                    user.put("userName", userName);
-                                    user.put("notes", "");
-
-                                    database.collection("scans").document().set(user);
-                                    set.add(machineIdText);*/
-
                                     //
-                                    insertToDatabase(emailText, userId, progressiveText1, progressiveText2, progressiveText3, progressiveText4, progressiveText5, progressiveText6, machineIdText, FieldValue.serverTimestamp(), userName, "");
+                                    insertToDatabase(emailText, userId, progressiveText1, progressiveText2, progressiveText3, progressiveText4, progressiveText5, progressiveText6, progressiveText7, progressiveText8, progressiveText9, progressiveText10, machineIdText, FieldValue.serverTimestamp(), userName, "");
                                     //
 
                                     resetMachineId();
@@ -964,26 +1120,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
             //
 
-            /*Map<String, Object> user = new HashMap<>();
-            //user.put("name", displayNameText);
-            user.put("email", emailText);
-            user.put("uid", userId);
-            user.put("progressive1", progressiveText1);
-            user.put("progressive2", progressiveText2);
-            user.put("progressive3", progressiveText3);
-            user.put("progressive4", progressiveText4);
-            user.put("progressive5", progressiveText5);
-            user.put("progressive6", progressiveText6);
-            user.put("machine_id", machineIdText);
-            user.put("timestamp", FieldValue.serverTimestamp());
-            user.put("userName", userName);
-            user.put("notes", "");
-
-            database.collection("scans").document().set(user);
-            set.add(machineIdText);*/
-
             //
-            insertToDatabase(emailText, userId, progressiveText1, progressiveText2, progressiveText3, progressiveText4, progressiveText5, progressiveText6, machineIdText, FieldValue.serverTimestamp(), userName, "");
+            insertToDatabase(emailText, userId, progressiveText1, progressiveText2, progressiveText3, progressiveText4, progressiveText5, progressiveText6, progressiveText7, progressiveText8, progressiveText9, progressiveText10, machineIdText, FieldValue.serverTimestamp(), userName, "");
             //
 
             // Also mark docs in uploadFormData if machine id matches
@@ -1035,6 +1173,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                   String progressive4,
                                   String progressive5,
                                   String progressive6,
+                                  String progressive7,
+                                  String progressive8,
+                                  String progressive9,
+                                  String progressive10,
                                   String machine_id,
                                   FieldValue timestamp,
                                   String userName,
@@ -1048,6 +1190,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         user.put("progressive4", progressive4);
         user.put("progressive5", progressive5);
         user.put("progressive6", progressive6);
+        user.put("progressive7", progressive7);
+        user.put("progressive8", progressive8);
+        user.put("progressive9", progressive9);
+        user.put("progressive10", progressive10);
         user.put("machine_id", machine_id);
         user.put("timestamp", timestamp);
         user.put("userName", userName);
@@ -1065,16 +1211,20 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     public void hideKeyboard() {
-        LinearLayout layout = findViewById(R.id.mainLinearLayout);
-        InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
-        imm.hideSoftInputFromWindow(layout.getWindowToken(), 0);
+        try {
+            LinearLayout layout = findViewById(R.id.mainLinearLayout);
+            InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+            imm.hideSoftInputFromWindow(layout.getWindowToken(), 0);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
     }
 
     private void startVoiceInput(int progressive) {
         Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
         intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
         intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault());
-        if (progressive == 7)
+        if (progressive == 0)
             intent.putExtra(RecognizerIntent.EXTRA_PROMPT, "What is the slot machine ID number?");
         else
             intent.putExtra(RecognizerIntent.EXTRA_PROMPT, "What is the current progressive value?");
@@ -1181,6 +1331,18 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         if (isDouble(progressive6.getText().toString())) {
             values.add(Double.parseDouble(progressive6.getText().toString()));
         }
+        if (isDouble(progressive7.getText().toString())) {
+            values.add(Double.parseDouble(progressive7.getText().toString()));
+        }
+        if (isDouble(progressive8.getText().toString())) {
+            values.add(Double.parseDouble(progressive8.getText().toString()));
+        }
+        if (isDouble(progressive9.getText().toString())) {
+            values.add(Double.parseDouble(progressive9.getText().toString()));
+        }
+        if (isDouble(progressive10.getText().toString())) {
+            values.add(Double.parseDouble(progressive10.getText().toString()));
+        }
 
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         boolean sort = sharedPreferences.getBoolean("auto_sort_progressives_preference", true);
@@ -1206,7 +1368,31 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 progressive5.setText(df.format(values.get(i)));
             } else if (i == 5) {
                 progressive6.setText(df.format(values.get(i)));
+            } else if (i == 6) {
+                progressive7.setText(df.format(values.get(i)));
+            } else if (i == 7) {
+                progressive8.setText(df.format(values.get(i)));
+            } else if (i == 8) {
+                progressive9.setText(df.format(values.get(i)));
+            } else if (i == 9) {
+                progressive10.setText(df.format(values.get(i)));
             }
+        }
+
+        if (NUMBER_OF_PROGRESSIVES == 6) {
+            progressive7.setText("");
+            progressive8.setText("");
+            progressive9.setText("");
+            progressive10.setText("");
+        } else if (NUMBER_OF_PROGRESSIVES == 7) {
+            progressive8.setText("");
+            progressive9.setText("");
+            progressive10.setText("");
+        } else if (NUMBER_OF_PROGRESSIVES == 8) {
+            progressive9.setText("");
+            progressive10.setText("");
+        } else if (NUMBER_OF_PROGRESSIVES == 9) {
+            progressive10.setText("");
         }
     }
 }

@@ -25,11 +25,20 @@
         app:key="add_remove_users"
         app:title="Add/Remove Users"/>
 
+    <ListPreference
+        app:key="number_of_progressives"
+        app:title="Number of Progressives"
+        app:entries="@array/entries_list"
+        app:entryValues="@array/entryValues_list"
+        app:defaultValue="6"/>
+
     <!--<SeekBarPreference
         app:key="minimum_value2"
         app:title="Minimum Value"
         app:summary="Smallest value recognized by the OCR"
         app:max="100"/>-->
+
+    <!-- -->
 
     <PreferenceCategory
         app:key="notifications_category"

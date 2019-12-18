@@ -1,8 +1,8 @@
 package com.slotmachine.ocr.mic;
 
-import android.app.AlertDialog;
-import android.content.DialogInterface;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.InputType;
 import android.text.TextUtils;
@@ -10,6 +10,7 @@ import android.widget.EditText;
 import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.preference.EditTextPreference;
+import androidx.preference.ListPreference;
 import androidx.preference.Preference;
 import androidx.preference.Preference.SummaryProvider;
 import androidx.preference.PreferenceFragmentCompat;
@@ -22,14 +23,13 @@ import com.google.firebase.auth.UserProfileChangeRequest;
 
 public class MySettingsFragment extends PreferenceFragmentCompat {
 
-    private FirebaseAuth firebaseAuth;
     private FirebaseUser firebaseUser;
 
     @Override
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
         setPreferencesFromResource(R.xml.preferences, rootKey);
 
-        firebaseAuth = FirebaseAuth.getInstance();
+        FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
         firebaseUser = firebaseAuth.getCurrentUser();
         if (firebaseUser == null) {
             startActivity(new Intent(getContext(), LoginActivity.class));
@@ -39,6 +39,8 @@ public class MySettingsFragment extends PreferenceFragmentCompat {
         //
         // DONT STORE DISPLAY NAME IN PREFERENCES - FETCH FROM FIREBASE AUTH EACH TIME
         //
+
+        final SharedPreferences sharedPref = getContext().getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
 
         Preference account_email_preference = findPreference("account_email_button");
         EditTextPreference display_name_preference = findPreference("display_name_button");
@@ -52,15 +54,24 @@ public class MySettingsFragment extends PreferenceFragmentCompat {
         Preference version_number_preference = findPreference("version_number_preference");
         Preference add_remove_users = findPreference("add_remove_users");
 
-        //EditTextPreference testPref = findPreference("test_pref");
-        /*if (display_name_preference != null)
-            showToast("not null");
-        else
-            showToast("null");*/
-
-        //showToast(display_name_preference.getText());
-
-        //showToast("Name: " + display_name_preference.getText());
+        //
+        final ListPreference number_of_progressives_preference = findPreference("number_of_progressives");
+        if (number_of_progressives_preference != null) {
+            number_of_progressives_preference.setSummary(number_of_progressives_preference.getValue() + " progressive options");
+            number_of_progressives_preference.setOnPreferenceChangeListener(
+                    new Preference.OnPreferenceChangeListener() {
+                        @Override
+                        public boolean onPreferenceChange(Preference preference, Object newValue) {
+                            preference.setSummary(newValue.toString() + " progressive options");
+                            SharedPreferences.Editor editor = sharedPref.edit();
+                            editor.putInt("number_of_progressives", Integer.valueOf(newValue.toString()));
+                            editor.apply();
+                            return true;
+                        }
+                    }
+            );
+        }
+        //
 
         if (version_number_preference != null) {
             version_number_preference.setSummary(BuildConfig.VERSION_NAME);
@@ -71,21 +82,13 @@ public class MySettingsFragment extends PreferenceFragmentCompat {
         }
 
         if (display_name_preference != null) {
-            //display_name_preference.setSummary(firebaseUser.getDisplayName());
             display_name_preference.setSummaryProvider(new SummaryProvider<EditTextPreference>() {
                 @Override
                 public CharSequence provideSummary(EditTextPreference preference) {
-                    //showToast("provideSummary");
-                    //String text = preference.getText();
-
                     if (firebaseUser.getDisplayName() == null)
                         return "Not set";
                     else
                         return firebaseUser.getDisplayName();
-                    //else if (TextUtils.isEmpty(text)) {
-                    //    return "Not set";
-                    //}
-                    //return text;
                 }
             });
             display_name_preference.setOnPreferenceChangeListener(
@@ -119,6 +122,9 @@ public class MySettingsFragment extends PreferenceFragmentCompat {
                     new Preference.OnPreferenceChangeListener() {
                         @Override
                         public boolean onPreferenceChange(Preference preference, Object newValue) {
+                            SharedPreferences.Editor editor = sharedPref.edit();
+                            editor.putString("email_recipient", newValue.toString());
+                            editor.apply();
                             return true;
                         }
                     }

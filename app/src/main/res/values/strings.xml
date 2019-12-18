@@ -27,6 +27,10 @@
     <string name="progressive_4_text">Progressive 4</string>
     <string name="progressive_5_text">Progressive 5</string>
     <string name="progressive_6_text">Progressive 6</string>
+    <string name="progressive_7_text">Progressive 7</string>
+    <string name="progressive_8_text">Progressive 8</string>
+    <string name="progressive_9_text">Progressive 9</string>
+    <string name="progressive_10_text">Progressive 10</string>
     <string name="notes_text">Notes</string>
 
     <string name="name_text">Name</string>
@@ -112,4 +116,20 @@
     <string name="user_profile_icon_description">user profile icon</string>
     <string name="check_mark_description">check mark to denote currently selected user</string>
     <string name="title_activity_admin">AdminActivity</string>
+
+    <string-array name="entries_list">
+        <item>6</item>
+        <item>7</item>
+        <item>8</item>
+        <item>9</item>
+        <item>10</item>
+    </string-array>
+
+    <string-array name="entryValues_list">
+        <item>6</item>
+        <item>7</item>
+        <item>8</item>
+        <item>9</item>
+        <item>10</item>
+    </string-array>
 </resources>
