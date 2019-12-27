@@ -111,3 +111,12 @@ The google-services.json file should be placed in the app level directory of the
 
 <img src="https://raw.githubusercontent.com/alexanderjpowell/meter-image-capturing/master/docs/nav_bar.png" width="250">
 
+## Permissions ##
+
+The MiC app requires the following permissions to be granted by the user to properly function:
+ * INTERNET
+ * RECORD_AUDIO
+ * VIBRATE
+ * CAMERA
+ * READ_EXTERNAL_STORAGE
+ * WRITE_EXTERNAL_STORAGE
