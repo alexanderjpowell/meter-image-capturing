@@ -338,7 +338,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 Color.GREEN
         };
         ColorStateList colorStateList = new ColorStateList(states, colors);
-        TextInputLayout[] array = { inputLayout1, inputLayout2, inputLayout3, inputLayout4, inputLayout5, inputLayout6 };
+        TextInputLayout[] array = { inputLayout1, inputLayout2, inputLayout3, inputLayout4, inputLayout5, inputLayout6, inputLayout7, inputLayout8, inputLayout9, inputLayout10 };
         for (int i = 0; i < progressiveDescriptionTitles.length; i++) {
             if (progressiveDescriptionTitles[i] != null) {
                 array[i].setHint(progressiveDescriptionTitles[i]);
@@ -348,7 +348,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     private void labelEditTextsFromToDo(String machine_id, int numberOfProgressives) {
-        numberOfProgressives = (numberOfProgressives > 6) ? 6 : numberOfProgressives;
+        //numberOfProgressives = (numberOfProgressives > 6) ? 6 : numberOfProgressives;
+        numberOfProgressives = (numberOfProgressives > 10) ? 10 : numberOfProgressives;
         int[][] states = new int[][] {
                 new int[] { android.R.attr.state_enabled }, // enabled
                 new int[] { -android.R.attr.state_enabled }, // disabled
@@ -363,7 +364,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         };
         ColorStateList colorStateList = new ColorStateList(states, colors);
         machineId.setText(machine_id);
-        TextInputLayout[] array = { inputLayout1, inputLayout2, inputLayout3, inputLayout4, inputLayout5, inputLayout6 };
+        TextInputLayout[] array = { inputLayout1, inputLayout2, inputLayout3, inputLayout4, inputLayout5, inputLayout6, inputLayout7, inputLayout8, inputLayout9, inputLayout10 };
         for (int i = 0; i < numberOfProgressives; i++) {
             array[i].setDefaultHintTextColor(colorStateList);
         }

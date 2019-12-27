@@ -130,7 +130,6 @@ public class TodoListActivity extends AppCompatActivity {
         toDoDataList.clear();
         uploadFormDataCollectionReference
                 .whereEqualTo("completed", false)
-                //.orderBy("timestamp", Query.Direction.DESCENDING) // Need to add index
                 .orderBy("location")
                 .get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
@@ -139,13 +138,17 @@ public class TodoListActivity extends AppCompatActivity {
                     if (task.getResult().size() == 0)
                         toggleEmptyStateDisplays(EmptyState.NO_FILE_UPLOAD);
                     for (QueryDocumentSnapshot document : task.getResult()) {
-                        String[] progressiveDescriptions = new String[6];
+                        String[] progressiveDescriptions = new String[10];
                         progressiveDescriptions[0] = (document.get("p_1") == null) ? null : document.get("p_1").toString();
                         progressiveDescriptions[1] = (document.get("p_2") == null) ? null : document.get("p_2").toString();
                         progressiveDescriptions[2] = (document.get("p_3") == null) ? null : document.get("p_3").toString();
                         progressiveDescriptions[3] = (document.get("p_4") == null) ? null : document.get("p_4").toString();
                         progressiveDescriptions[4] = (document.get("p_5") == null) ? null : document.get("p_5").toString();
                         progressiveDescriptions[5] = (document.get("p_6") == null) ? null : document.get("p_6").toString();
+                        progressiveDescriptions[6] = (document.get("p_7") == null) ? null : document.get("p_7").toString();
+                        progressiveDescriptions[7] = (document.get("p_8") == null) ? null : document.get("p_8").toString();
+                        progressiveDescriptions[8] = (document.get("p_9") == null) ? null : document.get("p_9").toString();
+                        progressiveDescriptions[9] = (document.get("p_10") == null) ? null : document.get("p_10").toString();
                         ToDoListData row = new ToDoListData(document.get("location").toString().trim(),
                                 document.get("machine_id").toString().trim(),
                                 document.get("description").toString().trim(),
