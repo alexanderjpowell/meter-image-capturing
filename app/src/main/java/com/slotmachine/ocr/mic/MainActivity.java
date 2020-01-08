@@ -128,10 +128,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private RelativeLayout relativeLayoutProgressive9;
     private RelativeLayout relativeLayoutProgressive10;
 
-    public Spinner spinner;
+    //public Spinner spinner;
     private String username;
 
-    private DrawerLayout mDrawerLayout;
+    //private DrawerLayout mDrawerLayout;
 
     private FirebaseAuth firebaseAuth;
     private FirebaseFirestore database;
@@ -227,12 +227,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         progressive4 = findViewById(R.id.progressive4);
         progressive5 = findViewById(R.id.progressive5);
         progressive6 = findViewById(R.id.progressive6);
-        //
         progressive7 = findViewById(R.id.progressive7);
         progressive8 = findViewById(R.id.progressive8);
         progressive9 = findViewById(R.id.progressive9);
         progressive10 = findViewById(R.id.progressive10);
-        //
         machineId = findViewById(R.id.machineId);
         submitButton = findViewById(R.id.submit_button);
 
@@ -243,12 +241,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         inputLayout4 = findViewById(R.id.inputLayout4);
         inputLayout5 = findViewById(R.id.inputLayout5);
         inputLayout6 = findViewById(R.id.inputLayout6);
-        //
         inputLayout7 = findViewById(R.id.inputLayout7);
         inputLayout8 = findViewById(R.id.inputLayout8);
         inputLayout9 = findViewById(R.id.inputLayout9);
         inputLayout10 = findViewById(R.id.inputLayout10);
-        //
 
         resetProgressives();
 
@@ -258,12 +254,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         progressive4.setOnTouchListener(this);
         progressive5.setOnTouchListener(this);
         progressive6.setOnTouchListener(this);
-        //
         progressive7.setOnTouchListener(this);
         progressive8.setOnTouchListener(this);
         progressive9.setOnTouchListener(this);
         progressive10.setOnTouchListener(this);
-        //
         machineId.setOnTouchListener(this);
 
         progressive1.addTextChangedListener(new GenericTextWatcher(progressive1));
@@ -289,6 +283,35 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         String[] progressiveDescriptionTitles = intent.getStringArrayExtra("progressiveDescriptionTitles");
         if (progressiveDescriptionTitles != null) {
             labelEditTextsFromToDo2(progressiveDescriptionTitles);
+
+            // Set additional progressive text boxes if needed
+            if (progressiveDescriptionTitles.length <= 6) {
+                relativeLayoutProgressive7.setVisibility(View.GONE);
+                relativeLayoutProgressive8.setVisibility(View.GONE);
+                relativeLayoutProgressive9.setVisibility(View.GONE);
+                relativeLayoutProgressive10.setVisibility(View.GONE);
+            } else if (progressiveDescriptionTitles.length == 7) {
+                relativeLayoutProgressive7.setVisibility(View.VISIBLE);
+                relativeLayoutProgressive8.setVisibility(View.GONE);
+                relativeLayoutProgressive9.setVisibility(View.GONE);
+                relativeLayoutProgressive10.setVisibility(View.GONE);
+            } else if (progressiveDescriptionTitles.length == 8) {
+                relativeLayoutProgressive7.setVisibility(View.VISIBLE);
+                relativeLayoutProgressive8.setVisibility(View.VISIBLE);
+                relativeLayoutProgressive9.setVisibility(View.GONE);
+                relativeLayoutProgressive10.setVisibility(View.GONE);
+            } else if (progressiveDescriptionTitles.length == 9) {
+                relativeLayoutProgressive7.setVisibility(View.VISIBLE);
+                relativeLayoutProgressive8.setVisibility(View.VISIBLE);
+                relativeLayoutProgressive9.setVisibility(View.VISIBLE);
+                relativeLayoutProgressive10.setVisibility(View.GONE);
+            } else if (progressiveDescriptionTitles.length == 10) {
+                relativeLayoutProgressive7.setVisibility(View.VISIBLE);
+                relativeLayoutProgressive8.setVisibility(View.VISIBLE);
+                relativeLayoutProgressive9.setVisibility(View.VISIBLE);
+                relativeLayoutProgressive10.setVisibility(View.VISIBLE);
+            }
+            //
         }
         // Also check if coming from login activity and send verification email if necessary
         boolean comingFromLogin = intent.getBooleanExtra("comingFromLogin", false);
@@ -324,29 +347,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
     }
 
-    private void labelEditTextsFromToDo2(String[] progressiveDescriptionTitles) {
-        int[][] states = new int[][] {
-                new int[] { android.R.attr.state_enabled }, // enabled
-                new int[] { -android.R.attr.state_enabled }, // disabled
-                new int[] { -android.R.attr.state_checked }, // unchecked
-                new int[] { android.R.attr.state_pressed }  // pressed
-        };
-        int[] colors = new int[] {
-                Color.GREEN,
-                Color.GREEN,
-                Color.GREEN,
-                Color.GREEN
-        };
-        ColorStateList colorStateList = new ColorStateList(states, colors);
-        TextInputLayout[] array = { inputLayout1, inputLayout2, inputLayout3, inputLayout4, inputLayout5, inputLayout6, inputLayout7, inputLayout8, inputLayout9, inputLayout10 };
-        for (int i = 0; i < progressiveDescriptionTitles.length; i++) {
-            if (progressiveDescriptionTitles[i] != null) {
-                array[i].setHint(progressiveDescriptionTitles[i]);
-                array[i].setDefaultHintTextColor(colorStateList);
-            }
-        }
-    }
-
     private void labelEditTextsFromToDo(String machine_id, int numberOfProgressives) {
         //numberOfProgressives = (numberOfProgressives > 6) ? 6 : numberOfProgressives;
         numberOfProgressives = (numberOfProgressives > 10) ? 10 : numberOfProgressives;
@@ -367,6 +367,29 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         TextInputLayout[] array = { inputLayout1, inputLayout2, inputLayout3, inputLayout4, inputLayout5, inputLayout6, inputLayout7, inputLayout8, inputLayout9, inputLayout10 };
         for (int i = 0; i < numberOfProgressives; i++) {
             array[i].setDefaultHintTextColor(colorStateList);
+        }
+    }
+
+    private void labelEditTextsFromToDo2(String[] progressiveDescriptionTitles) {
+        int[][] states = new int[][] {
+                new int[] { android.R.attr.state_enabled }, // enabled
+                new int[] { -android.R.attr.state_enabled }, // disabled
+                new int[] { -android.R.attr.state_checked }, // unchecked
+                new int[] { android.R.attr.state_pressed }  // pressed
+        };
+        int[] colors = new int[] {
+                Color.GREEN,
+                Color.GREEN,
+                Color.GREEN,
+                Color.GREEN
+        };
+        ColorStateList colorStateList = new ColorStateList(states, colors);
+        TextInputLayout[] array = { inputLayout1, inputLayout2, inputLayout3, inputLayout4, inputLayout5, inputLayout6, inputLayout7, inputLayout8, inputLayout9, inputLayout10 };
+        for (int i = 0; i < progressiveDescriptionTitles.length; i++) {
+            if (progressiveDescriptionTitles[i] != null) {
+                array[i].setHint(progressiveDescriptionTitles[i]);
+                array[i].setDefaultHintTextColor(colorStateList);
+            }
         }
     }
 
@@ -1380,7 +1403,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
         }
 
-        if (NUMBER_OF_PROGRESSIVES == 6) {
+        /*if (NUMBER_OF_PROGRESSIVES == 6) {
             progressive7.setText("");
             progressive8.setText("");
             progressive9.setText("");
@@ -1394,6 +1417,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             progressive10.setText("");
         } else if (NUMBER_OF_PROGRESSIVES == 9) {
             progressive10.setText("");
-        }
+        }*/
     }
 }

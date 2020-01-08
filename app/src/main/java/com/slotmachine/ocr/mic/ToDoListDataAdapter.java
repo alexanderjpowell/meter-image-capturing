@@ -55,8 +55,10 @@ public class ToDoListDataAdapter extends RecyclerView.Adapter<ToDoListDataAdapte
         }
 
         String progressiveDescriptions = "";
+        int len = toDoListData.getProgressiveDescriptions().length;
         //for (int i = 0; i < 6; i++) {
-        for (int i = 0; i < 10; i++) {
+        //for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < len; i++) {
             if ((toDoListData.getProgressiveDescriptions()[i] != null) && !toDoListData.getProgressiveDescriptions()[i].isEmpty()) {
                 progressiveDescriptions += toDoListData.getProgressiveDescriptions()[i] + " ";
             }

@@ -111,6 +111,7 @@ public class TodoListActivity extends AppCompatActivity {
                 intent.putExtra("position", position);
                 String[] progressiveDescriptionTitles = toDoDataList.get(position).getProgressiveDescriptions();
                 intent.putExtra("progressiveDescriptionTitles", progressiveDescriptionTitles);
+                //showToast(Integer.toString(progressiveDescriptionTitles.length));
                 startActivityForResult(intent, SUBMIT_PROGRESSIVE_RECORD);
             }
 
@@ -121,6 +122,17 @@ public class TodoListActivity extends AppCompatActivity {
         }));
 
         populateRecyclerView();
+    }
+
+    private String[] resizeProgressiveDescriptionsArray(String[] array) {
+        List<String> tmp = new ArrayList<String>();
+        for (int i = 0; i < array.length; i++) {
+            if (array[i] != null) {
+                tmp.add(array[i]);
+            }
+        }
+        String[] ret = tmp.toArray(new String[tmp.size()]);
+        return ret;
     }
 
     private void populateRecyclerView() {
@@ -139,6 +151,8 @@ public class TodoListActivity extends AppCompatActivity {
                         toggleEmptyStateDisplays(EmptyState.NO_FILE_UPLOAD);
                     for (QueryDocumentSnapshot document : task.getResult()) {
                         String[] progressiveDescriptions = new String[10];
+                        String[] progressiveDescriptionsNew;
+
                         progressiveDescriptions[0] = (document.get("p_1") == null) ? null : document.get("p_1").toString();
                         progressiveDescriptions[1] = (document.get("p_2") == null) ? null : document.get("p_2").toString();
                         progressiveDescriptions[2] = (document.get("p_3") == null) ? null : document.get("p_3").toString();
@@ -149,12 +163,17 @@ public class TodoListActivity extends AppCompatActivity {
                         progressiveDescriptions[7] = (document.get("p_8") == null) ? null : document.get("p_8").toString();
                         progressiveDescriptions[8] = (document.get("p_9") == null) ? null : document.get("p_9").toString();
                         progressiveDescriptions[9] = (document.get("p_10") == null) ? null : document.get("p_10").toString();
+
+                        //
+                        progressiveDescriptionsNew = resizeProgressiveDescriptionsArray(progressiveDescriptions);
+                        //
+
                         ToDoListData row = new ToDoListData(document.get("location").toString().trim(),
                                 document.get("machine_id").toString().trim(),
                                 document.get("description").toString().trim(),
                                 (document.get("user") == null) ? null : document.get("user").toString(),
                                 (document.get("progressive_count") == null) ? null : Integer.valueOf((String)document.get("progressive_count")),
-                                progressiveDescriptions,
+                                progressiveDescriptionsNew,
                                 false,
                                 false);
                         toDoDataList.add(row);
