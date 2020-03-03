@@ -1142,35 +1142,16 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     return;
                 }
             }
-            //
 
-            //
             insertToDatabase(emailText, userId, progressiveText1, progressiveText2, progressiveText3, progressiveText4, progressiveText5, progressiveText6, progressiveText7, progressiveText8, progressiveText9, progressiveText10, machineIdText, FieldValue.serverTimestamp(), userName, "");
-            //
 
-            // Also mark docs in uploadFormData if machine id matches
-            Query query = database.collection("formUploads")
-                    .document(userId)
-                    .collection("uploadFormData")
-                    .whereEqualTo("machine_id", machineIdText);
-            query.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                @Override
-                public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                    if (task.isSuccessful()) {
-                        for (QueryDocumentSnapshot document : task.getResult()) {
-                            DocumentReference documentReference = database.collection("formUploads")
-                                    .document(userId)
-                                    .collection("uploadFormData")
-                                    .document(document.getId());
-                            documentReference.update("completed", true);
-                            set.add(document.get("machine_id").toString().trim());
-                        }
-                    } else {
-                        showToast("Unable to refresh.  Check your connection.");
-                    }
-                }
-            });
-            //
+            // Remove element from uploadArray
+            if (intent.hasExtra("hashMap")) {
+                HashMap<String, Object> hashMap = (HashMap<String, Object>)intent.getSerializableExtra("hashMap");
+                DocumentReference documentReference = database.collection("formUploads").document(userId);
+                documentReference.update("uploadArray", FieldValue.arrayRemove(hashMap));
+            }
+
             // if coming from to do activity - go back and
             if (intent.hasExtra("machine_id")) {
                 //super.onBackPressed();

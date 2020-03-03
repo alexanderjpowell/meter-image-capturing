@@ -22,6 +22,8 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
@@ -29,6 +31,7 @@ import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class TodoListActivity extends AppCompatActivity {
 
@@ -37,21 +40,21 @@ public class TodoListActivity extends AppCompatActivity {
     private List<ToDoListData> toDoDataList;
     private RecyclerView recyclerView;
     private ToDoListDataAdapter mAdapter;
-    //private enum Status { INCOMPLETE, COMPLETE }
     private enum EmptyState { NO_FILE_UPLOAD, ALL_COMPLETED, NONE_COMPLETED, NORMAL }
-    //private Status currentStatus;
 
     private FirebaseAuth firebaseAuth;
     private FirebaseFirestore database;
 
     private SwipeRefreshLayout swipeRefreshLayout;
 
-    private CollectionReference uploadFormDataCollectionReference;
+    private DocumentReference uploadFormDataDocumentReference;
 
     private TextView empty_state_text_view;
     private TextView empty_state_completed_text_view;
     private TextView empty_state_uncompleted_text_view;
     private ProgressBar progressBar;
+
+    private String TAG = "TodoListActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,9 +78,13 @@ public class TodoListActivity extends AppCompatActivity {
         progressBar = findViewById(R.id.progress_bar);
 
         database = FirebaseFirestore.getInstance();
-        uploadFormDataCollectionReference = database.collection("formUploads")
-                .document(firebaseAuth.getCurrentUser().getUid())
-                .collection("uploadFormData");
+        //uploadFormDataCollectionReference = database.collection("formUploads")
+        //        .document(firebaseAuth.getCurrentUser().getUid())
+        //        .collection("uploadFormData");
+        //
+        uploadFormDataDocumentReference = database.collection("formUploads")
+                .document(firebaseAuth.getCurrentUser().getUid());
+        //
 
         //currentStatus = Status.INCOMPLETE;
         swipeRefreshLayout = findViewById(R.id.swipeRefresh);
@@ -111,7 +118,8 @@ public class TodoListActivity extends AppCompatActivity {
                 intent.putExtra("position", position);
                 String[] progressiveDescriptionTitles = toDoDataList.get(position).getProgressiveDescriptions();
                 intent.putExtra("progressiveDescriptionTitles", progressiveDescriptionTitles);
-                //showToast(Integer.toString(progressiveDescriptionTitles.length));
+
+                intent.putExtra("hashMap", toDoDataList.get(position).getMap());
                 startActivityForResult(intent, SUBMIT_PROGRESSIVE_RECORD);
             }
 
@@ -140,7 +148,7 @@ public class TodoListActivity extends AppCompatActivity {
         empty_state_text_view.setVisibility(View.GONE);
         progressBar.setVisibility(View.VISIBLE);
         toDoDataList.clear();
-        uploadFormDataCollectionReference
+        /*uploadFormDataCollectionReference
                 .whereEqualTo("completed", false)
                 .orderBy("location")
                 .get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
@@ -185,6 +193,59 @@ public class TodoListActivity extends AppCompatActivity {
                 } else {
                     showToast("Unable to refresh.  Check your connection.");
                 }
+                progressBar.setVisibility(View.GONE);
+                swipeRefreshLayout.setRefreshing(false);
+            }
+        });*/
+        uploadFormDataDocumentReference.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if (task.isSuccessful()) {
+                    DocumentSnapshot document = task.getResult();
+                    if (document.exists()) {
+                        if (document.contains("timestamp") && document.contains("uploadArray")) {
+                            List<Map<String, Object>> mapList = (List<Map<String, Object>>)document.get("uploadArray");
+                            for (int i = 0; i < mapList.size(); i++) {
+
+                                String description = mapList.get(i).get("description").toString();
+                                String location = mapList.get(i).get("location").toString();
+                                String machine_id = mapList.get(i).get("machine_id").toString();
+                                String user = mapList.get(i).get("user").toString();
+                                Integer progressive_count = Integer.valueOf(mapList.get(i).get("progressive_count").toString());
+                                String p_1 = mapList.get(i).get("p_1").toString();
+                                String p_2 = mapList.get(i).get("p_2").toString();
+                                String p_3 = mapList.get(i).get("p_3").toString();
+                                String p_4 = mapList.get(i).get("p_4").toString();
+                                String p_5 = mapList.get(i).get("p_5").toString();
+                                String p_6 = mapList.get(i).get("p_6").toString();
+                                String p_7 = mapList.get(i).get("p_7").toString();
+                                String p_8 = mapList.get(i).get("p_8").toString();
+                                String p_9 = mapList.get(i).get("p_9").toString();
+                                String p_10 = mapList.get(i).get("p_10").toString();
+
+                                ToDoListData row = new ToDoListData(location,
+                                        machine_id,
+                                        description,
+                                        user,
+                                        progressive_count,
+                                        new String[] {p_1, p_2, p_3, p_4, p_5, p_6, p_7, p_8, p_9, p_10},
+                                        false,
+                                        false);
+                                toDoDataList.add(row);
+                                toggleEmptyStateDisplays(EmptyState.NORMAL);
+                            }
+                        }
+                        mAdapter.notifyDataSetChanged();
+                    } else {
+                        showToast("No such document");
+                        Log.d(TAG, "No such document");
+                    }
+                } else {
+                    showToast(task.getException().getMessage());
+                    Log.d(TAG, "get failed with ", task.getException());
+                }
+
+                // Finish things up
                 progressBar.setVisibility(View.GONE);
                 swipeRefreshLayout.setRefreshing(false);
             }
