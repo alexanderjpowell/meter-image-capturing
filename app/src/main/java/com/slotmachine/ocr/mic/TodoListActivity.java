@@ -9,7 +9,6 @@ import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.DefaultItemAnimator;
@@ -17,19 +16,14 @@ import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
-
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.Query;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
-
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -78,15 +72,9 @@ public class TodoListActivity extends AppCompatActivity {
         progressBar = findViewById(R.id.progress_bar);
 
         database = FirebaseFirestore.getInstance();
-        //uploadFormDataCollectionReference = database.collection("formUploads")
-        //        .document(firebaseAuth.getCurrentUser().getUid())
-        //        .collection("uploadFormData");
-        //
         uploadFormDataDocumentReference = database.collection("formUploads")
                 .document(firebaseAuth.getCurrentUser().getUid());
-        //
 
-        //currentStatus = Status.INCOMPLETE;
         swipeRefreshLayout = findViewById(R.id.swipeRefresh);
         swipeRefreshLayout.setOnRefreshListener(
                 new SwipeRefreshLayout.OnRefreshListener() {
@@ -114,12 +102,14 @@ public class TodoListActivity extends AppCompatActivity {
             public void onClick(View view, int position) {
                 Intent intent = new Intent(TodoListActivity.this, MainActivity.class);
                 intent.putExtra("machine_id", toDoDataList.get(position).getMachineId());
-                intent.putExtra("numberOfProgressives", toDoDataList.get(position).getNumberOfProgressives());
+                intent.putExtra("numberOfProgressives", toDoDataList.get(position).getDescriptionsLength());
                 intent.putExtra("position", position);
                 String[] progressiveDescriptionTitles = toDoDataList.get(position).getProgressiveDescriptions();
-                intent.putExtra("progressiveDescriptionTitles", progressiveDescriptionTitles);
+                ArrayList<String> progressiveDescriptionTitlesList = toDoDataList.get(position).getProgressiveDescriptionsList();
+                //intent.putExtra("progressiveDescriptionTitles", progressiveDescriptionTitles);
+                intent.putStringArrayListExtra("progressiveDescriptionTitles", progressiveDescriptionTitlesList);
 
-                intent.putExtra("hashMap", toDoDataList.get(position).getMap());
+                intent.putExtra("hashMap", (HashMap)toDoDataList.get(position).getMap());
                 startActivityForResult(intent, SUBMIT_PROGRESSIVE_RECORD);
             }
 
@@ -148,96 +138,27 @@ public class TodoListActivity extends AppCompatActivity {
         empty_state_text_view.setVisibility(View.GONE);
         progressBar.setVisibility(View.VISIBLE);
         toDoDataList.clear();
-        /*uploadFormDataCollectionReference
-                .whereEqualTo("completed", false)
-                .orderBy("location")
-                .get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                if (task.isSuccessful()) {
-                    if (task.getResult().size() == 0)
-                        toggleEmptyStateDisplays(EmptyState.NO_FILE_UPLOAD);
-                    for (QueryDocumentSnapshot document : task.getResult()) {
-                        String[] progressiveDescriptions = new String[10];
-                        String[] progressiveDescriptionsNew;
-
-                        progressiveDescriptions[0] = (document.get("p_1") == null) ? null : document.get("p_1").toString();
-                        progressiveDescriptions[1] = (document.get("p_2") == null) ? null : document.get("p_2").toString();
-                        progressiveDescriptions[2] = (document.get("p_3") == null) ? null : document.get("p_3").toString();
-                        progressiveDescriptions[3] = (document.get("p_4") == null) ? null : document.get("p_4").toString();
-                        progressiveDescriptions[4] = (document.get("p_5") == null) ? null : document.get("p_5").toString();
-                        progressiveDescriptions[5] = (document.get("p_6") == null) ? null : document.get("p_6").toString();
-                        progressiveDescriptions[6] = (document.get("p_7") == null) ? null : document.get("p_7").toString();
-                        progressiveDescriptions[7] = (document.get("p_8") == null) ? null : document.get("p_8").toString();
-                        progressiveDescriptions[8] = (document.get("p_9") == null) ? null : document.get("p_9").toString();
-                        progressiveDescriptions[9] = (document.get("p_10") == null) ? null : document.get("p_10").toString();
-
-                        //
-                        progressiveDescriptionsNew = resizeProgressiveDescriptionsArray(progressiveDescriptions);
-                        //
-
-                        ToDoListData row = new ToDoListData(document.get("location").toString().trim(),
-                                document.get("machine_id").toString().trim(),
-                                document.get("description").toString().trim(),
-                                (document.get("user") == null) ? null : document.get("user").toString(),
-                                (document.get("progressive_count") == null) ? null : Integer.valueOf((String)document.get("progressive_count")),
-                                progressiveDescriptionsNew,
-                                false,
-                                false);
-                        toDoDataList.add(row);
-
-                        //
-                        toggleEmptyStateDisplays(EmptyState.NORMAL);
-                    }
-                    mAdapter.notifyDataSetChanged();
-                } else {
-                    showToast("Unable to refresh.  Check your connection.");
-                }
-                progressBar.setVisibility(View.GONE);
-                swipeRefreshLayout.setRefreshing(false);
-            }
-        });*/
         uploadFormDataDocumentReference.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                 if (task.isSuccessful()) {
                     DocumentSnapshot document = task.getResult();
-                    if (document.exists()) {
-                        if (document.contains("timestamp") && document.contains("uploadArray")) {
+                    if ((document != null) && document.exists()) {
+                        if (document.contains("uploadArray")) {
+
                             List<Map<String, Object>> mapList = (List<Map<String, Object>>)document.get("uploadArray");
+
                             for (int i = 0; i < mapList.size(); i++) {
-
-                                String description = mapList.get(i).get("description").toString();
-                                String location = mapList.get(i).get("location").toString();
-                                String machine_id = mapList.get(i).get("machine_id").toString();
-                                String user = mapList.get(i).get("user").toString();
-                                Integer progressive_count = Integer.valueOf(mapList.get(i).get("progressive_count").toString());
-                                String p_1 = mapList.get(i).get("p_1").toString();
-                                String p_2 = mapList.get(i).get("p_2").toString();
-                                String p_3 = mapList.get(i).get("p_3").toString();
-                                String p_4 = mapList.get(i).get("p_4").toString();
-                                String p_5 = mapList.get(i).get("p_5").toString();
-                                String p_6 = mapList.get(i).get("p_6").toString();
-                                String p_7 = mapList.get(i).get("p_7").toString();
-                                String p_8 = mapList.get(i).get("p_8").toString();
-                                String p_9 = mapList.get(i).get("p_9").toString();
-                                String p_10 = mapList.get(i).get("p_10").toString();
-
-                                ToDoListData row = new ToDoListData(location,
-                                        machine_id,
-                                        description,
-                                        user,
-                                        progressive_count,
-                                        new String[] {p_1, p_2, p_3, p_4, p_5, p_6, p_7, p_8, p_9, p_10},
-                                        false,
-                                        false);
+                                Map<String, Object> map = mapList.get(i);
+                                ToDoListData row = new ToDoListData(map);
                                 toDoDataList.add(row);
-                                toggleEmptyStateDisplays(EmptyState.NORMAL);
                             }
+                            toggleEmptyStateDisplays(EmptyState.NORMAL);
                         }
                         mAdapter.notifyDataSetChanged();
                     } else {
-                        showToast("No such document");
+                        //showToast("No such document");
+                        toggleEmptyStateDisplays(EmptyState.NO_FILE_UPLOAD);
                         Log.d(TAG, "No such document");
                     }
                 } else {
@@ -303,19 +224,6 @@ public class TodoListActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-
-        /*if ((id == R.id.incompleteScans) && (!currentStatus.equals(Status.INCOMPLETE))) {
-            currentStatus = Status.INCOMPLETE;
-            populateRecyclerView();
-            setTitle("Incomplete Scans");
-            return true;
-        } else if ((id == R.id.completedScans) && (!currentStatus.equals(Status.COMPLETE))) {
-            currentStatus = Status.COMPLETE;
-            populateRecyclerView();
-            setTitle("Completed Scans");
-            return true;
-        }*/
-
         return super.onOptionsItemSelected(item);
     }
 

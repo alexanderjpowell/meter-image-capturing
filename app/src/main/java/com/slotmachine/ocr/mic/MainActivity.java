@@ -278,34 +278,36 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         intent = getIntent();
         String machine_id = intent.getStringExtra("machine_id");
         int numberOfProgressives = intent.getIntExtra("numberOfProgressives",0);
+        //int numberOfProgressives = 10;
         labelEditTextsFromToDo(machine_id, numberOfProgressives);
 
-        String[] progressiveDescriptionTitles = intent.getStringArrayExtra("progressiveDescriptionTitles");
+        //String[] progressiveDescriptionTitles = intent.getStringArrayExtra("progressiveDescriptionTitles");
+        List<String> progressiveDescriptionTitles = intent.getStringArrayListExtra("progressiveDescriptionTitles");
         if (progressiveDescriptionTitles != null) {
             labelEditTextsFromToDo2(progressiveDescriptionTitles);
 
             // Set additional progressive text boxes if needed
-            if (progressiveDescriptionTitles.length <= 6) {
+            if (progressiveDescriptionTitles.size() <= 6) {
                 relativeLayoutProgressive7.setVisibility(View.GONE);
                 relativeLayoutProgressive8.setVisibility(View.GONE);
                 relativeLayoutProgressive9.setVisibility(View.GONE);
                 relativeLayoutProgressive10.setVisibility(View.GONE);
-            } else if (progressiveDescriptionTitles.length == 7) {
+            } else if (progressiveDescriptionTitles.size() == 7) {
                 relativeLayoutProgressive7.setVisibility(View.VISIBLE);
                 relativeLayoutProgressive8.setVisibility(View.GONE);
                 relativeLayoutProgressive9.setVisibility(View.GONE);
                 relativeLayoutProgressive10.setVisibility(View.GONE);
-            } else if (progressiveDescriptionTitles.length == 8) {
+            } else if (progressiveDescriptionTitles.size() == 8) {
                 relativeLayoutProgressive7.setVisibility(View.VISIBLE);
                 relativeLayoutProgressive8.setVisibility(View.VISIBLE);
                 relativeLayoutProgressive9.setVisibility(View.GONE);
                 relativeLayoutProgressive10.setVisibility(View.GONE);
-            } else if (progressiveDescriptionTitles.length == 9) {
+            } else if (progressiveDescriptionTitles.size() == 9) {
                 relativeLayoutProgressive7.setVisibility(View.VISIBLE);
                 relativeLayoutProgressive8.setVisibility(View.VISIBLE);
                 relativeLayoutProgressive9.setVisibility(View.VISIBLE);
                 relativeLayoutProgressive10.setVisibility(View.GONE);
-            } else if (progressiveDescriptionTitles.length == 10) {
+            } else if (progressiveDescriptionTitles.size() == 10) {
                 relativeLayoutProgressive7.setVisibility(View.VISIBLE);
                 relativeLayoutProgressive8.setVisibility(View.VISIBLE);
                 relativeLayoutProgressive9.setVisibility(View.VISIBLE);
@@ -370,7 +372,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
     }
 
-    private void labelEditTextsFromToDo2(String[] progressiveDescriptionTitles) {
+    //private void labelEditTextsFromToDo2(String[] progressiveDescriptionTitles) {
+    private void labelEditTextsFromToDo2(List<String> progressiveDescriptionTitles) {
         int[][] states = new int[][] {
                 new int[] { android.R.attr.state_enabled }, // enabled
                 new int[] { -android.R.attr.state_enabled }, // disabled
@@ -385,9 +388,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         };
         ColorStateList colorStateList = new ColorStateList(states, colors);
         TextInputLayout[] array = { inputLayout1, inputLayout2, inputLayout3, inputLayout4, inputLayout5, inputLayout6, inputLayout7, inputLayout8, inputLayout9, inputLayout10 };
-        for (int i = 0; i < progressiveDescriptionTitles.length; i++) {
-            if (progressiveDescriptionTitles[i] != null) {
-                array[i].setHint(progressiveDescriptionTitles[i]);
+        for (int i = 0; i < progressiveDescriptionTitles.size(); i++) {
+            if (progressiveDescriptionTitles.get(i) != null) {
+                array[i].setHint(progressiveDescriptionTitles.get(i));
                 array[i].setDefaultHintTextColor(colorStateList);
             }
         }
