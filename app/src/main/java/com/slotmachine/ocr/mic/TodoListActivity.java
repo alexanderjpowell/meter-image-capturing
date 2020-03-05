@@ -104,7 +104,7 @@ public class TodoListActivity extends AppCompatActivity {
                 intent.putExtra("machine_id", toDoDataList.get(position).getMachineId());
                 intent.putExtra("numberOfProgressives", toDoDataList.get(position).getDescriptionsLength());
                 intent.putExtra("position", position);
-                String[] progressiveDescriptionTitles = toDoDataList.get(position).getProgressiveDescriptions();
+                //String[] progressiveDescriptionTitles = toDoDataList.get(position).getProgressiveDescriptions();
                 ArrayList<String> progressiveDescriptionTitlesList = toDoDataList.get(position).getProgressiveDescriptionsList();
                 //intent.putExtra("progressiveDescriptionTitles", progressiveDescriptionTitles);
                 intent.putStringArrayListExtra("progressiveDescriptionTitles", progressiveDescriptionTitlesList);
@@ -122,7 +122,7 @@ public class TodoListActivity extends AppCompatActivity {
         populateRecyclerView();
     }
 
-    private String[] resizeProgressiveDescriptionsArray(String[] array) {
+    /*private String[] resizeProgressiveDescriptionsArray(String[] array) {
         List<String> tmp = new ArrayList<String>();
         for (int i = 0; i < array.length; i++) {
             if (array[i] != null) {
@@ -131,7 +131,7 @@ public class TodoListActivity extends AppCompatActivity {
         }
         String[] ret = tmp.toArray(new String[tmp.size()]);
         return ret;
-    }
+    }*/
 
     private void populateRecyclerView() {
         recyclerView.setVisibility(View.GONE);
@@ -223,7 +223,7 @@ public class TodoListActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
+        //int id = item.getItemId();
         return super.onOptionsItemSelected(item);
     }
 

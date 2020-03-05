@@ -38,28 +38,17 @@
         android:layout_below="@id/machineIdTextView"
         android:textSize="15sp"/>
 
-    <!--<TextView
-        android:id="@+id/numberOfProgressivesTextView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentEnd="true"
-        android:layout_below="@id/descriptionTextView"
-        android:textSize="15sp"/>-->
-
     <TextView
         android:id="@+id/userTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentEnd="true"
-        android:layout_toEndOf="@id/locationTextView"
+        android:layout_below="@id/descriptionTextView"
         android:textSize="15sp"/>
 
     <TextView
         android:id="@+id/progressiveDescriptionTitles"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentEnd="true"
         android:layout_below="@id/userTextView"
         android:textSize="15sp"/>
 
