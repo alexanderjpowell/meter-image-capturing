@@ -1,12 +1,16 @@
 package com.slotmachine.ocr.mic;
 
+import android.app.SearchManager;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.InputType;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ProgressBar;
+import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
 import androidx.annotation.NonNull;
@@ -32,6 +36,7 @@ public class TodoListActivity extends AppCompatActivity {
     public static final int SUBMIT_PROGRESSIVE_RECORD = 0;
 
     private List<ToDoListData> toDoDataList;
+    private List<ToDoListData> toDoDataListAll;
     private RecyclerView recyclerView;
     private ToDoListDataAdapter mAdapter;
     private enum EmptyState { NO_FILE_UPLOAD, ALL_COMPLETED, NONE_COMPLETED, NORMAL }
@@ -82,13 +87,14 @@ public class TodoListActivity extends AppCompatActivity {
                     public void onRefresh() {
                         // This method performs the actual data-refresh operation.
                         // The method calls setRefreshing(false) when it's finished.
-                        populateRecyclerView();
+                        populateRecyclerView("");
                     }
                 }
         );
 
         recyclerView = findViewById(R.id.recycler_view_to_do_list);
         toDoDataList = new ArrayList<>();
+        toDoDataListAll = new ArrayList<>();
         mAdapter = new ToDoListDataAdapter(TodoListActivity.this, toDoDataList);
 
         final LinearLayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
@@ -104,11 +110,8 @@ public class TodoListActivity extends AppCompatActivity {
                 intent.putExtra("machine_id", toDoDataList.get(position).getMachineId());
                 intent.putExtra("numberOfProgressives", toDoDataList.get(position).getDescriptionsLength());
                 intent.putExtra("position", position);
-                //String[] progressiveDescriptionTitles = toDoDataList.get(position).getProgressiveDescriptions();
                 ArrayList<String> progressiveDescriptionTitlesList = toDoDataList.get(position).getProgressiveDescriptionsList();
-                //intent.putExtra("progressiveDescriptionTitles", progressiveDescriptionTitles);
                 intent.putStringArrayListExtra("progressiveDescriptionTitles", progressiveDescriptionTitlesList);
-
                 intent.putExtra("hashMap", (HashMap)toDoDataList.get(position).getMap());
                 startActivityForResult(intent, SUBMIT_PROGRESSIVE_RECORD);
             }
@@ -119,7 +122,9 @@ public class TodoListActivity extends AppCompatActivity {
             }
         }));
 
-        populateRecyclerView();
+        populateRecyclerView("");
+
+        //handleIntent(getIntent());
     }
 
     /*private String[] resizeProgressiveDescriptionsArray(String[] array) {
@@ -133,7 +138,7 @@ public class TodoListActivity extends AppCompatActivity {
         return ret;
     }*/
 
-    private void populateRecyclerView() {
+    private void populateRecyclerView(final String machineIdQuery) {
         recyclerView.setVisibility(View.GONE);
         empty_state_text_view.setVisibility(View.GONE);
         progressBar.setVisibility(View.VISIBLE);
@@ -151,13 +156,19 @@ public class TodoListActivity extends AppCompatActivity {
                             for (int i = 0; i < mapList.size(); i++) {
                                 Map<String, Object> map = mapList.get(i);
                                 ToDoListData row = new ToDoListData(map);
-                                toDoDataList.add(row);
+                                if (machineIdQuery.isEmpty()) {
+                                    toDoDataList.add(row);
+                                } else {
+                                    if (row.getMachineId().equals(machineIdQuery)) {
+                                        toDoDataList.add(row);
+                                    }
+                                }
                             }
+                            toDoDataListAll.addAll(toDoDataList);
                             toggleEmptyStateDisplays(EmptyState.NORMAL);
                         }
                         mAdapter.notifyDataSetChanged();
                     } else {
-                        //showToast("No such document");
                         toggleEmptyStateDisplays(EmptyState.NO_FILE_UPLOAD);
                         Log.d(TAG, "No such document");
                     }
@@ -218,12 +229,62 @@ public class TodoListActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.to_do_list_action_bar, menu);
+
+        /*SearchManager searchManager = (SearchManager)getSystemService(Context.SEARCH_SERVICE);
+        SearchView searchView = (SearchView)menu.findItem(R.id.search).getActionView();
+        searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
+        searchView.setIconifiedByDefault(false);*/
+
+        SearchView searchView = (SearchView)menu.findItem(R.id.search).getActionView();
+        searchView.setIconifiedByDefault(false);
+        searchView.setQueryHint("Search...");
+        searchView.setInputType(InputType.TYPE_CLASS_NUMBER);
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String s) {
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String s) {
+                //mAdapter.getFilter().filter(s);
+                doSearch(s);
+                return false;
+            }
+        });
+
         return true;
     }
 
+    private void doSearch(String searchPattern) {
+        List<ToDoListData> filteredList = new ArrayList<>();
+        for (ToDoListData i : toDoDataListAll) {
+            if (i.getMachineId().startsWith(searchPattern.trim())) {
+                filteredList.add(i);
+            }
+        }
+        toDoDataList.clear();
+        toDoDataList.addAll(filteredList);
+        mAdapter.notifyDataSetChanged();
+    }
+
+    /*@Override
+    protected void onNewIntent(Intent intent) {
+        setIntent(intent);
+        handleIntent(intent);
+        super.onNewIntent(intent);
+    }*/
+
+    /*private void handleIntent(Intent intent) {
+        if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
+            String machine_id_query = intent.getStringExtra(SearchManager.QUERY);
+            //Toast.makeText(getApplicationContext(), machine_id_query, Toast.LENGTH_SHORT).show();
+            populateRecyclerView(machine_id_query);
+        }
+    }*/
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        //int id = item.getItemId();
         return super.onOptionsItemSelected(item);
     }
 

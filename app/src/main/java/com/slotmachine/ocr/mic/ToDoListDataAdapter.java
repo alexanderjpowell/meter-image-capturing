@@ -4,20 +4,26 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Filter;
+import android.widget.Filterable;
 import android.widget.TextView;
+import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-public class ToDoListDataAdapter extends RecyclerView.Adapter<ToDoListDataAdapter.ToDoListDataHolder> {
+public class ToDoListDataAdapter extends RecyclerView.Adapter<ToDoListDataAdapter.ToDoListDataHolder> implements Filterable {
 
     private Context context;
     private List<ToDoListData> rowDataList;
+    private List<ToDoListData> rowDataListAll;
 
     public ToDoListDataAdapter(Context context, List<ToDoListData> rowDataList) {
         this.context = context;
         this.rowDataList = rowDataList;
+        this.rowDataListAll = new ArrayList<>(rowDataList);
     }
 
     @Override
@@ -26,6 +32,46 @@ public class ToDoListDataAdapter extends RecyclerView.Adapter<ToDoListDataAdapte
         View view  = LayoutInflater.from(context).inflate(R.layout.to_do_list_item_row, parent,false);
         return new ToDoListDataAdapter.ToDoListDataHolder(view);
     }
+
+    @Override
+    public Filter getFilter() {
+        //this.rowDataListAll = new ArrayList<>(rowDataList);
+        return filter;
+    }
+
+    private Filter filter = new Filter() {
+        @Override
+        protected FilterResults performFiltering(CharSequence charSequence) {
+            //rowDataListAll =
+            List<ToDoListData> filteredList = new ArrayList<>();
+
+            if (charSequence.toString().trim().isEmpty()) {
+                filteredList.addAll(rowDataListAll);
+                //Toast.makeText(context, rowDataListAll.toString(), Toast.LENGTH_SHORT).show();
+            } else {
+                for (ToDoListData i : rowDataListAll) {
+                    if (i.getMachineId().startsWith(charSequence.toString().trim())) {
+                        //Toast.makeText(context, "here", Toast.LENGTH_SHORT).show();
+                        filteredList.add(i);
+                    }
+                }
+            }
+
+            Toast.makeText(context, rowDataListAll.toString(), Toast.LENGTH_SHORT).show();
+
+            FilterResults filterResults = new FilterResults();
+            filterResults.values = filteredList;
+
+            return filterResults;
+        }
+
+        @Override
+        protected void publishResults(CharSequence charSequence, FilterResults filterResults) {
+            rowDataList.clear();
+            rowDataList.addAll((List)filterResults.values);
+            notifyDataSetChanged();
+        }
+    };
 
     @Override
     public void onBindViewHolder(@NonNull final ToDoListDataAdapter.ToDoListDataHolder holder, final int position) {
@@ -82,7 +128,6 @@ public class ToDoListDataAdapter extends RecyclerView.Adapter<ToDoListDataAdapte
 
         TextView machineIdTextView;
         TextView descriptionTextView, locationTextView;
-        TextView numberOfProgressivesTextView;
         TextView userTextView;
         TextView progressiveDescriptionTitles;
 
@@ -92,7 +137,6 @@ public class ToDoListDataAdapter extends RecyclerView.Adapter<ToDoListDataAdapte
             machineIdTextView = itemView.findViewById(R.id.machineIdTextView);
             descriptionTextView = itemView.findViewById(R.id.descriptionTextView);
             locationTextView = itemView.findViewById(R.id.locationTextView);
-            //numberOfProgressivesTextView = itemView.findViewById(R.id.numberOfProgressivesTextView);
             userTextView = itemView.findViewById(R.id.userTextView);
             progressiveDescriptionTitles = itemView.findViewById(R.id.progressiveDescriptionTitles);
         }
