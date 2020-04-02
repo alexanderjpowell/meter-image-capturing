@@ -168,9 +168,9 @@ public class ManageUsersActivity extends AppCompatActivity implements MyRecycler
                                 }
                             });
                     alertDialog.show();
-                } else {
+                } //else {
                     // Pass?
-                }
+                //}
             }
         }));
 

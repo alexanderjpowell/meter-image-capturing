@@ -52,7 +52,7 @@ public class PFCodeView extends LinearLayout {
         for (int i = 0; i < mCodeLength; i++) {
             LayoutInflater inflater = (LayoutInflater) getContext()
                     .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            CheckBox view = (CheckBox) inflater.inflate(R.layout.view_pf_code_checkbox, null);
+            CheckBox view = (CheckBox)inflater.inflate(R.layout.view_pf_code_checkbox, null);
 
             LinearLayout.LayoutParams layoutParams = new LayoutParams(
                     ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);

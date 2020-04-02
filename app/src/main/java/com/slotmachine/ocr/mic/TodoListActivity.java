@@ -9,6 +9,8 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.FrameLayout;
 import android.widget.ProgressBar;
 import android.widget.SearchView;
 import android.widget.TextView;
@@ -109,6 +111,7 @@ public class TodoListActivity extends AppCompatActivity {
                 Intent intent = new Intent(TodoListActivity.this, MainActivity.class);
                 intent.putExtra("machine_id", toDoDataList.get(position).getMachineId());
                 intent.putExtra("numberOfProgressives", toDoDataList.get(position).getDescriptionsLength());
+                intent.putExtra("location", toDoDataList.get(position).getLocation());
                 intent.putExtra("position", position);
                 ArrayList<String> progressiveDescriptionTitlesList = toDoDataList.get(position).getProgressiveDescriptionsList();
                 intent.putStringArrayListExtra("progressiveDescriptionTitles", progressiveDescriptionTitlesList);
@@ -142,6 +145,7 @@ public class TodoListActivity extends AppCompatActivity {
         recyclerView.setVisibility(View.GONE);
         empty_state_text_view.setVisibility(View.GONE);
         progressBar.setVisibility(View.VISIBLE);
+        toDoDataListAll.clear();
         toDoDataList.clear();
         uploadFormDataDocumentReference.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
@@ -224,6 +228,8 @@ public class TodoListActivity extends AppCompatActivity {
         toDoDataList.remove(position);
         mAdapter.notifyItemRemoved(position);
         mAdapter.notifyItemRangeChanged(position, toDoDataList.size());
+
+        toDoDataListAll.clear(); toDoDataListAll.addAll(toDoDataList);
     }
 
     @Override
@@ -235,9 +241,29 @@ public class TodoListActivity extends AppCompatActivity {
         searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
         searchView.setIconifiedByDefault(false);*/
 
+        MenuItem menuItem = menu.findItem(R.id.search);
+        menuItem.setOnActionExpandListener(new MenuItem.OnActionExpandListener() {
+            @Override
+            public boolean onMenuItemActionExpand(MenuItem item) {
+                //SearchView searchView = (SearchView)menu.findItem(R.id.search).getActionView();
+                SearchView s = (SearchView)item.getActionView();
+                s.requestFocus();
+                return true;
+            }
+
+            @Override
+            public boolean onMenuItemActionCollapse(MenuItem item) {
+                //Toast.makeText(getApplicationContext(), "closed", Toast.LENGTH_SHORT).show();
+                hideKeyboard();
+                revertRecyclerViewToNormal();
+                return true;
+            }
+        });
+
         SearchView searchView = (SearchView)menu.findItem(R.id.search).getActionView();
         searchView.setIconifiedByDefault(false);
-        searchView.setQueryHint("Search...");
+        SearchManager searchManager = (SearchManager)getSystemService(Context.SEARCH_SERVICE);
+        searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
         searchView.setInputType(InputType.TYPE_CLASS_NUMBER);
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
@@ -247,13 +273,25 @@ public class TodoListActivity extends AppCompatActivity {
 
             @Override
             public boolean onQueryTextChange(String s) {
-                //mAdapter.getFilter().filter(s);
                 doSearch(s);
                 return false;
             }
         });
+        /*searchView.setOnCloseListener(new SearchView.OnCloseListener() {
+            @Override
+            public boolean onClose() {
+                Toast.makeText(getApplicationContext(), "closed", Toast.LENGTH_SHORT).show();
+                return false;
+            }
+        });*/
 
         return true;
+    }
+
+    private void revertRecyclerViewToNormal() {
+        toDoDataList.clear();
+        toDoDataList.addAll(toDoDataListAll);
+        mAdapter.notifyDataSetChanged();
     }
 
     private void doSearch(String searchPattern) {
@@ -290,5 +328,15 @@ public class TodoListActivity extends AppCompatActivity {
 
     private void showToast(String message) {
         Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG).show();
+    }
+
+    public void hideKeyboard() {
+        try {
+            FrameLayout layout = findViewById(R.id.to_do_list_frame_layout);
+            InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+            imm.hideSoftInputFromWindow(layout.getWindowToken(), 0);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
     }
 }

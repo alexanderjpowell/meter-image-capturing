@@ -15,7 +15,6 @@ import android.widget.Toast;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.os.Vibrator;
-
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;

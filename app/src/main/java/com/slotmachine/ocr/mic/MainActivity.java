@@ -1056,6 +1056,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             final String progressiveText9 = progressive9.getText().toString().trim();
             final String progressiveText10 = progressive10.getText().toString().trim();
 
+            //
+            String location = getIntent().getStringExtra("location");
+            final String locationText = location == null ? "" : location;
+            //
+
             final String emailText = firebaseAuth.getCurrentUser().getEmail().trim();
             final String userId = firebaseAuth.getCurrentUser().getUid().trim();
             final String userName = username;
@@ -1125,7 +1130,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                 public void onClick(DialogInterface dialog, int i) {
 
                                     //
-                                    insertToDatabase(emailText, userId, progressiveText1, progressiveText2, progressiveText3, progressiveText4, progressiveText5, progressiveText6, progressiveText7, progressiveText8, progressiveText9, progressiveText10, machineIdText, FieldValue.serverTimestamp(), userName, "");
+                                    insertToDatabase(emailText, userId, progressiveText1, progressiveText2, progressiveText3, progressiveText4, progressiveText5, progressiveText6, progressiveText7, progressiveText8, progressiveText9, progressiveText10, machineIdText, FieldValue.serverTimestamp(), userName, "", locationText);
                                     //
 
                                     resetMachineId();
@@ -1140,7 +1145,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 }
             }
 
-            insertToDatabase(emailText, userId, progressiveText1, progressiveText2, progressiveText3, progressiveText4, progressiveText5, progressiveText6, progressiveText7, progressiveText8, progressiveText9, progressiveText10, machineIdText, FieldValue.serverTimestamp(), userName, "");
+            //
+
+            //
+
+            insertToDatabase(emailText, userId, progressiveText1, progressiveText2, progressiveText3, progressiveText4, progressiveText5, progressiveText6, progressiveText7, progressiveText8, progressiveText9, progressiveText10, machineIdText, FieldValue.serverTimestamp(), userName, "", locationText);
 
             // Remove element from uploadArray
             if (intent.hasExtra("hashMap")) {
@@ -1195,7 +1204,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                   String machine_id,
                                   FieldValue timestamp,
                                   String userName,
-                                  String notes) {
+                                  String notes,
+                                  String location) {
         Map<String, Object> user = new HashMap<>();
         user.put("email", email);
         user.put("uid", uid);
@@ -1213,6 +1223,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         user.put("timestamp", timestamp);
         user.put("userName", userName);
         user.put("notes", notes);
+        user.put("location", location);
 
         DocumentReference dr = database.collection("scans").document();
         dr.set(user);
