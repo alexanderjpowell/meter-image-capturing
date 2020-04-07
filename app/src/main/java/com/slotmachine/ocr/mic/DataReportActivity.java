@@ -261,6 +261,7 @@ public class DataReportActivity extends AppCompatActivity {// implements Adapter
         Timestamp timestamp;
         String progressive1, progressive2, progressive3, progressive4, progressive5, progressive6, progressive7, progressive8, progressive9, progressive10;
         progressive1 = progressive2 = progressive3 = progressive4 = progressive5 = progressive6 = progressive7 = progressive8 = progressive9 = progressive10 = "";
+        String location = "";
         RowData rowData;
         if (!update) {
             rowDataList.clear(); // reset the current data list
@@ -302,6 +303,10 @@ public class DataReportActivity extends AppCompatActivity {// implements Adapter
                 progressive10 = addDollarSign((String)map.get("progressive10"));
             }
 
+            if (map.containsKey("location")) {
+                location = (String)map.get("location");
+            }
+
             Date date = new Date();
             machine_id = document.get("machine_id").toString();
             timestamp = document.getTimestamp("timestamp");
@@ -327,6 +332,7 @@ public class DataReportActivity extends AppCompatActivity {// implements Adapter
                     progressive8,
                     progressive9,
                     progressive10,
+                    location,
                     notes,
                     false);
 
@@ -367,15 +373,15 @@ public class DataReportActivity extends AppCompatActivity {// implements Adapter
     private String createCsvFile(QuerySnapshot snapshot) {
         StringBuilder stringBuilder = new StringBuilder();
         if (NUMBER_OF_PROGRESSIVES == 6) {
-            stringBuilder.append("\"Machine\",\"Progressive1\",\"Progressive2\",\"Progressive3\",\"Progressive4\",\"Progressive5\",\"Progressive6\",\"Notes\",\"Date\",\"User\"\n");
+            stringBuilder.append("\"Machine\",\"Progressive1\",\"Progressive2\",\"Progressive3\",\"Progressive4\",\"Progressive5\",\"Progressive6\",\"Location\",\"Notes\",\"Date\",\"User\"\n");
         } else if (NUMBER_OF_PROGRESSIVES == 7) {
-            stringBuilder.append("\"Machine\",\"Progressive1\",\"Progressive2\",\"Progressive3\",\"Progressive4\",\"Progressive5\",\"Progressive6\",\"Progressive7\",\"Notes\",\"Date\",\"User\"\n");
+            stringBuilder.append("\"Machine\",\"Progressive1\",\"Progressive2\",\"Progressive3\",\"Progressive4\",\"Progressive5\",\"Progressive6\",\"Progressive7\",\"Location\",\"Notes\",\"Date\",\"User\"\n");
         } else if (NUMBER_OF_PROGRESSIVES == 8) {
-            stringBuilder.append("\"Machine\",\"Progressive1\",\"Progressive2\",\"Progressive3\",\"Progressive4\",\"Progressive5\",\"Progressive6\",\"Progressive7\",\"Progressive8\",\"Notes\",\"Date\",\"User\"\n");
+            stringBuilder.append("\"Machine\",\"Progressive1\",\"Progressive2\",\"Progressive3\",\"Progressive4\",\"Progressive5\",\"Progressive6\",\"Progressive7\",\"Progressive8\",\"Location\",\"Notes\",\"Date\",\"User\"\n");
         } else if (NUMBER_OF_PROGRESSIVES == 9) {
-            stringBuilder.append("\"Machine\",\"Progressive1\",\"Progressive2\",\"Progressive3\",\"Progressive4\",\"Progressive5\",\"Progressive6\",\"Progressive7\",\"Progressive8\",\"Progressive9\",\"Notes\",\"Date\",\"User\"\n");
+            stringBuilder.append("\"Machine\",\"Progressive1\",\"Progressive2\",\"Progressive3\",\"Progressive4\",\"Progressive5\",\"Progressive6\",\"Progressive7\",\"Progressive8\",\"Progressive9\",\"Location\",\"Notes\",\"Date\",\"User\"\n");
         } else if (NUMBER_OF_PROGRESSIVES == 10) {
-            stringBuilder.append("\"Machine\",\"Progressive1\",\"Progressive2\",\"Progressive3\",\"Progressive4\",\"Progressive5\",\"Progressive6\",\"Progressive7\",\"Progressive8\",\"Progressive9\",\"Progressive10\",\"Notes\",\"Date\",\"User\"\n");
+            stringBuilder.append("\"Machine\",\"Progressive1\",\"Progressive2\",\"Progressive3\",\"Progressive4\",\"Progressive5\",\"Progressive6\",\"Progressive7\",\"Progressive8\",\"Progressive9\",\"Progressive10\",\"Location\",\"Notes\",\"Date\",\"User\"\n");
         }
 
         String progressive1, progressive2, progressive3, progressive4, progressive5, progressive6, progressive7, progressive8, progressive9, progressive10;
@@ -434,6 +440,7 @@ public class DataReportActivity extends AppCompatActivity {// implements Adapter
             //
             //
             String notes = (document.get("notes") == null) ? "" : document.get("notes").toString().trim();
+            String location = (document.get("location") == null) ? "" : document.get("location").toString().trim();
 
             stringBuilder.append("\"" + machine_id + "\",");
             if (NUMBER_OF_PROGRESSIVES == 6) {
@@ -482,6 +489,7 @@ public class DataReportActivity extends AppCompatActivity {// implements Adapter
                 stringBuilder.append("\"" + progressive9 + "\",");
                 stringBuilder.append("\"" + progressive10 + "\",");
             }
+            stringBuilder.append("\"" + location + "\",");
             stringBuilder.append("\"" + notes + "\",");
             stringBuilder.append("\"" + timestamp + "\",");
             stringBuilder.append("\"" + user + "\"\n");

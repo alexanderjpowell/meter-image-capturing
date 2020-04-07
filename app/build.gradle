@@ -6,8 +6,8 @@ android {
         applicationId "com.slotmachine.ocr.mic"
         minSdkVersion 23
         targetSdkVersion 29
-        versionCode 202
-        versionName "2.0.2"
+        versionCode 203
+        versionName "2.0.3"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
@@ -40,7 +40,7 @@ dependencies {
 
     implementation 'com.google.firebase:firebase-ml-vision:24.0.1'
     implementation 'com.google.firebase:firebase-auth:19.3.0'
-    implementation 'com.google.firebase:firebase-firestore:21.4.1'
+    implementation 'com.google.firebase:firebase-firestore:21.4.2'
     implementation 'com.firebaseui:firebase-ui-auth:6.0.2'
 
     implementation 'com.google.android.material:material:1.1.0'
@@ -49,7 +49,7 @@ dependencies {
 
     implementation 'androidx.core:core:1.2.0'
     implementation 'androidx.preference:preference:1.1.0'
-    implementation 'androidx.exifinterface:exifinterface:1.1.0'
+    implementation 'androidx.exifinterface:exifinterface:1.2.0'
 }
 
 apply plugin: 'com.google.gms.google-services'

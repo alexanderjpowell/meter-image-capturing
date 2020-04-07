@@ -57,6 +57,8 @@ public class TodoListActivity extends AppCompatActivity {
 
     private String TAG = "TodoListActivity";
 
+    private SearchView searchView;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -220,32 +222,32 @@ public class TodoListActivity extends AppCompatActivity {
             if (requestCode == SUBMIT_PROGRESSIVE_RECORD) {
                 int position = intent.getIntExtra("position", 0);
                 removeRowFromRecyclerView(position);
+
+                if (searchView.hasFocus()) {
+                    //searchView.clearFocus();
+                    //searchView.onActionViewCollapsed();
+                    searchView.setQuery("", false);
+                    populateRecyclerView("");
+                }
             }
         }
     }
 
     private void removeRowFromRecyclerView(int position) {
         toDoDataList.remove(position);
-        mAdapter.notifyItemRemoved(position);
-        mAdapter.notifyItemRangeChanged(position, toDoDataList.size());
-
-        toDoDataListAll.clear(); toDoDataListAll.addAll(toDoDataList);
+        mAdapter.notifyDataSetChanged();
+        //mAdapter.notifyItemRemoved(position);
+        //mAdapter.notifyItemRangeChanged(position, toDoDataList.size());
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.to_do_list_action_bar, menu);
 
-        /*SearchManager searchManager = (SearchManager)getSystemService(Context.SEARCH_SERVICE);
-        SearchView searchView = (SearchView)menu.findItem(R.id.search).getActionView();
-        searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
-        searchView.setIconifiedByDefault(false);*/
-
         MenuItem menuItem = menu.findItem(R.id.search);
         menuItem.setOnActionExpandListener(new MenuItem.OnActionExpandListener() {
             @Override
             public boolean onMenuItemActionExpand(MenuItem item) {
-                //SearchView searchView = (SearchView)menu.findItem(R.id.search).getActionView();
                 SearchView s = (SearchView)item.getActionView();
                 s.requestFocus();
                 return true;
@@ -253,18 +255,17 @@ public class TodoListActivity extends AppCompatActivity {
 
             @Override
             public boolean onMenuItemActionCollapse(MenuItem item) {
-                //Toast.makeText(getApplicationContext(), "closed", Toast.LENGTH_SHORT).show();
                 hideKeyboard();
                 revertRecyclerViewToNormal();
                 return true;
             }
         });
 
-        SearchView searchView = (SearchView)menu.findItem(R.id.search).getActionView();
+        searchView = (SearchView)menu.findItem(R.id.search).getActionView();
         searchView.setIconifiedByDefault(false);
         SearchManager searchManager = (SearchManager)getSystemService(Context.SEARCH_SERVICE);
         searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
-        searchView.setInputType(InputType.TYPE_CLASS_NUMBER);
+        //searchView.setInputType(InputType.TYPE_CLASS_NUMBER);
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String s) {
@@ -273,19 +274,27 @@ public class TodoListActivity extends AppCompatActivity {
 
             @Override
             public boolean onQueryTextChange(String s) {
-                doSearch(s);
+                if (!s.trim().isEmpty()) {
+                    doSearch(s);
+                } else {
+                    revertRecyclerViewToNormal();
+                }
                 return false;
             }
         });
-        /*searchView.setOnCloseListener(new SearchView.OnCloseListener() {
-            @Override
-            public boolean onClose() {
-                Toast.makeText(getApplicationContext(), "closed", Toast.LENGTH_SHORT).show();
-                return false;
-            }
-        });*/
 
         return true;
+    }
+
+    @Override
+    public void onNewIntent(Intent intent) {
+        if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
+            String query = intent.getStringExtra(SearchManager.QUERY);
+            if (query != null) {
+                searchView.setQuery(query.replaceAll("\\s+", ""), false);
+            }
+        }
+        super.onNewIntent(intent);
     }
 
     private void revertRecyclerViewToNormal() {
@@ -305,21 +314,6 @@ public class TodoListActivity extends AppCompatActivity {
         toDoDataList.addAll(filteredList);
         mAdapter.notifyDataSetChanged();
     }
-
-    /*@Override
-    protected void onNewIntent(Intent intent) {
-        setIntent(intent);
-        handleIntent(intent);
-        super.onNewIntent(intent);
-    }*/
-
-    /*private void handleIntent(Intent intent) {
-        if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
-            String machine_id_query = intent.getStringExtra(SearchManager.QUERY);
-            //Toast.makeText(getApplicationContext(), machine_id_query, Toast.LENGTH_SHORT).show();
-            populateRecyclerView(machine_id_query);
-        }
-    }*/
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
