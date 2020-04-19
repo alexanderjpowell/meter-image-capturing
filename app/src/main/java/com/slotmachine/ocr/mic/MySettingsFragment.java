@@ -42,12 +42,13 @@ public class MySettingsFragment extends PreferenceFragmentCompat {
 
         final SharedPreferences sharedPref = getContext().getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
 
-        Preference account_email_preference = findPreference("account_email_button");
-        EditTextPreference display_name_preference = findPreference("display_name_button");
-        EditTextPreference email_recipient_preference = findPreference("email_recipient");
+        Preference accountEmailPreference = findPreference("account_email_button");
+        EditTextPreference displayNamePreference = findPreference("display_name_button");
+        EditTextPreference adminEmailPreference = findPreference("admin_email_button");
+        EditTextPreference emailRecipientPreference = findPreference("email_recipient");
         EditTextPreference minimum_value = findPreference("minimum_value");
-        Preference sign_out_preference_button = findPreference("sign_out_button");
-        Preference change_password_button = findPreference("change_password_button");
+        Preference signOutPreference = findPreference("sign_out_button");
+        Preference changePasswordPreference = findPreference("change_password_button");
         //Preference delete_account_button = findPreference("delete_account_button");
         Preference terms_and_conditions_button = findPreference("legal_disclaimer");
         //Preference verify_email_preference_button = findPreference("verify_email_button");
@@ -77,12 +78,12 @@ public class MySettingsFragment extends PreferenceFragmentCompat {
             version_number_preference.setSummary(BuildConfig.VERSION_NAME);
         }
 
-        if (account_email_preference != null) {
-            account_email_preference.setSummary(firebaseAuth.getCurrentUser().getEmail());
+        if (accountEmailPreference != null) {
+            accountEmailPreference.setSummary(firebaseAuth.getCurrentUser().getEmail());
         }
 
-        if (display_name_preference != null) {
-            display_name_preference.setSummaryProvider(new SummaryProvider<EditTextPreference>() {
+        if (displayNamePreference != null) {
+            displayNamePreference.setSummaryProvider(new SummaryProvider<EditTextPreference>() {
                 @Override
                 public CharSequence provideSummary(EditTextPreference preference) {
                     if (firebaseUser.getDisplayName() == null)
@@ -91,7 +92,7 @@ public class MySettingsFragment extends PreferenceFragmentCompat {
                         return firebaseUser.getDisplayName();
                 }
             });
-            display_name_preference.setOnPreferenceChangeListener(
+            displayNamePreference.setOnPreferenceChangeListener(
                     new Preference.OnPreferenceChangeListener() {
                         @Override
                         public boolean onPreferenceChange(Preference preference, Object newValue) {
@@ -99,16 +100,28 @@ public class MySettingsFragment extends PreferenceFragmentCompat {
                                     .setDisplayName(newValue.toString().trim())
                                     .build();
                             firebaseUser.updateProfile(profileUpdates);
-                            //display_name_preference.setText(newValue.toString().trim());
+                            //displayNamePreference.setText(newValue.toString().trim());
                             return true;
                         }
                     }
             );
-
         }
 
-        if (email_recipient_preference != null) {
-            email_recipient_preference.setSummaryProvider(new SummaryProvider<EditTextPreference>() {
+        if (adminEmailPreference != null) {
+            adminEmailPreference.setSummaryProvider(new SummaryProvider<EditTextPreference>() {
+                @Override
+                public CharSequence provideSummary(EditTextPreference preference) {
+                    String text = preference.getText().trim();
+                    if (TextUtils.isEmpty(text)){
+                        return "Grant read privileges to an administrator";
+                    }
+                    return text;
+                }
+            });
+        }
+
+        if (emailRecipientPreference != null) {
+            emailRecipientPreference.setSummaryProvider(new SummaryProvider<EditTextPreference>() {
                 @Override
                 public CharSequence provideSummary(EditTextPreference preference) {
                     String text = preference.getText();
@@ -118,7 +131,7 @@ public class MySettingsFragment extends PreferenceFragmentCompat {
                     return text;
                 }
             });
-            email_recipient_preference.setOnPreferenceChangeListener(
+            emailRecipientPreference.setOnPreferenceChangeListener(
                     new Preference.OnPreferenceChangeListener() {
                         @Override
                         public boolean onPreferenceChange(Preference preference, Object newValue) {
@@ -175,8 +188,8 @@ public class MySettingsFragment extends PreferenceFragmentCompat {
             );
         }
 
-        if (sign_out_preference_button != null) {
-            sign_out_preference_button.setOnPreferenceClickListener(
+        if (signOutPreference != null) {
+            signOutPreference.setOnPreferenceClickListener(
                     new Preference.OnPreferenceClickListener() {
                         @Override
                         public boolean onPreferenceClick(Preference preference) {
@@ -200,8 +213,8 @@ public class MySettingsFragment extends PreferenceFragmentCompat {
             );
         }
 
-        if (change_password_button != null) {
-            change_password_button.setOnPreferenceClickListener(
+        if (changePasswordPreference != null) {
+            changePasswordPreference.setOnPreferenceClickListener(
                     new Preference.OnPreferenceClickListener() {
                         @Override
                         public boolean onPreferenceClick(Preference preference) {
