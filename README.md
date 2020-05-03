@@ -33,9 +33,6 @@ users
 formUploads
  * uploadFormData
 
-admins
- * 
-
 Note the current version of cloud firestore used by the application is 21.0.0.  
 
 ### Indexes ###
@@ -129,14 +126,15 @@ The MiC app requires the following permissions to be granted by the user to prop
 The MiC application supports granting admin access to another email address.  This new email will have full read access to all casinos who register it as an admin.  To add an admin account to the platform perform the following:
 
 1. Create the account in the Firebase console under the Authentication tab.  Do not use an email that already belongs to another casino.
-2. Write a new document in the database per the following structure.  This will all take place in the ```admins``` collection.
+2. Write a new document in the database per the following structure.  This will all take place in the 'admins' collection.  Note that the casing of ```adminUID``` and ```casinoName``` has to match exactly.  
+3. For an admin account that has multiple casinos under it's purview, add them to the 'casinos' collection inside the 'admins' collection.  
 ```
 admins (collection)
 	adminexample@email.com (document)
-		adminUID: 'bgsmVEsZV6PLk57lOVW1KIfr0xe2'
+		adminUID: 'bgsmVEsZV6PLk57lOVW1KIfr0xe2' (field)
 		casinos (collection)
-			'1kyN8HCbC6gfZY8nNIYB1HjqRnH3' (document)
-				casinoName: Joe's Casino
+			1kyN8HCbC6gfZY8nNIYB1HjqRnH3 (document)
+				casinoName: 'Joe's Casino' (field)
 ```
 
 
