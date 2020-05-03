@@ -129,7 +129,7 @@ The MiC app requires the following permissions to be granted by the user to prop
 The MiC application supports granting admin access to another email address.  This new email will have full read access to all casinos who register it as an admin.  To add an admin account to the platform perform the following:
 
 1. Create the account in the Firebase console under the Authentication tab.  Do not use an email that already belongs to another casino.
-2. Write a new document in the database.  This will all take place in the 'admins' collection.
+2. Write a new document in the database per the following structure.  This will all take place in the ```admins``` collection.
 ```
 admins (collection)
 	adminexample@email.com (document)
