@@ -41,6 +41,7 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
+import com.firebase.ui.auth.AuthUI;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -52,11 +53,13 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.firestore.SetOptions;
 import com.google.firebase.ml.vision.FirebaseVision;
 import com.google.firebase.ml.vision.common.FirebaseVisionImage;
 import com.google.firebase.ml.vision.document.FirebaseVisionDocumentText;
@@ -203,6 +206,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         database = FirebaseFirestore.getInstance();
         //
         checkPermissions();
+        //
 
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -311,6 +315,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
         // Also check if coming from login activity and send verification email if necessary
         boolean comingFromLogin = intent.getBooleanExtra("comingFromLogin", false);
+        if (comingFromLogin) {
+            //Map<String, Object> data = new HashMap<>();
+            //data.put("email", firebaseAuth.getCurrentUser().getEmail());
+            //database.collection("users").document(firebaseAuth.getCurrentUser().getUid()).set(data, SetOptions.merge());
+            showDialogForAdminAccount();
+        }
         if (comingFromLogin && !firebaseAuth.getCurrentUser().isEmailVerified()) {
                 firebaseAuth.getCurrentUser().reload().addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
@@ -341,6 +351,53 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         if (reject_duplicates) {
             populateDuplicatesSet();
         }
+    }
+
+    private void showDialogForAdminAccount() {
+        // Check if user is an admin account (if email address is a document id in admins collection)
+        // If so, present a dialog box with only the option to sign out and no option to dismiss
+        final AlertDialog alertDialog = new AlertDialog.Builder(MainActivity.this).create();
+        alertDialog.setTitle("Admin Account");
+        //String message = "You are attempting to sign in with an admin account.  To perform scans sign out and back in with a casino level account.  To view casino data as an admin sign into the web portal.";
+        String message = "You are attempting to sign in with an admin account.  Please sign out and back in with a casino level account.";
+        alertDialog.setMessage(message);
+        alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "Sign Out",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int i) {
+                        // Sign out and go to sign in activity
+                        dialog.dismiss();
+                        startActivity(new Intent(getApplicationContext(), LoginActivity.class));
+                    }
+                });
+        alertDialog.setCancelable(false);
+        alertDialog.setCanceledOnTouchOutside(false);
+        //alertDialog.show();
+        DocumentReference docRef = database.collection("admins").document(firebaseAuth.getCurrentUser().getEmail());
+        docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if (task.isSuccessful()) {
+                    DocumentSnapshot document = task.getResult();
+                    if (document.exists()) {
+                        alertDialog.show();
+                        AuthUI.getInstance().signOut(getApplicationContext());
+                                /*.addOnCompleteListener(new OnCompleteListener<Void>() {
+                                    @Override
+                                    public void onComplete(@NonNull Task<Void> task) {
+                                        if (task.isSuccessful()) {
+                                            finish();
+                                            startActivity(new Intent(getApplicationContext(), LoginActivity.class));
+                                        } else {
+                                            if (task.getException() != null)
+                                                Toast.makeText(getApplicationContext(), task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                                        }
+                                    }
+                                });*/
+                    }
+                }
+            }
+        });
+        //
     }
 
     private void labelEditTextsFromToDo(String machine_id, int numberOfProgressives) {

@@ -16,14 +16,27 @@ import androidx.preference.Preference.SummaryProvider;
 import androidx.preference.PreferenceFragmentCompat;
 import com.firebase.ui.auth.AuthUI;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserProfileChangeRequest;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.firestore.SetOptions;
+
+import java.io.Console;
+import java.util.HashMap;
+import java.util.Map;
 
 public class MySettingsFragment extends PreferenceFragmentCompat {
 
     private FirebaseUser firebaseUser;
+    private FirebaseFirestore database;
 
     @Override
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
@@ -36,6 +49,8 @@ public class MySettingsFragment extends PreferenceFragmentCompat {
             return;
         }
 
+        database = FirebaseFirestore.getInstance();
+
         //
         // DONT STORE DISPLAY NAME IN PREFERENCES - FETCH FROM FIREBASE AUTH EACH TIME
         //
@@ -43,8 +58,8 @@ public class MySettingsFragment extends PreferenceFragmentCompat {
         final SharedPreferences sharedPref = getContext().getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
 
         Preference accountEmailPreference = findPreference("account_email_button");
-        EditTextPreference displayNamePreference = findPreference("display_name_button");
-        EditTextPreference adminEmailPreference = findPreference("admin_email_button");
+        final EditTextPreference casinoNamePreference = findPreference("casino_name_button");
+        //final EditTextPreference adminEmailPreference = findPreference("admin_email_button");
         EditTextPreference emailRecipientPreference = findPreference("email_recipient");
         EditTextPreference minimum_value = findPreference("minimum_value");
         Preference signOutPreference = findPreference("sign_out_button");
@@ -82,32 +97,79 @@ public class MySettingsFragment extends PreferenceFragmentCompat {
             accountEmailPreference.setSummary(firebaseAuth.getCurrentUser().getEmail());
         }
 
-        if (displayNamePreference != null) {
-            displayNamePreference.setSummaryProvider(new SummaryProvider<EditTextPreference>() {
+        if (casinoNamePreference != null) {
+
+            DocumentReference docRef = database.collection("users").document(firebaseUser.getUid());
+            docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                 @Override
-                public CharSequence provideSummary(EditTextPreference preference) {
-                    if (firebaseUser.getDisplayName() == null)
-                        return "Not set";
-                    else
-                        return firebaseUser.getDisplayName();
+                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                    if (task.isSuccessful()) {
+                        DocumentSnapshot document = task.getResult();
+                        if (document.exists()) {
+                            Object casinoNameObject = document.get("casinoName");
+                            if (casinoNameObject != null) {
+                                casinoNamePreference.setText(casinoNameObject.toString());
+                            } else {
+                                casinoNamePreference.setText("");
+                            }
+                        }
+                    }
                 }
             });
-            displayNamePreference.setOnPreferenceChangeListener(
+
+            casinoNamePreference.setSummaryProvider(new SummaryProvider<EditTextPreference>() {
+                @Override
+                public CharSequence provideSummary(final EditTextPreference preference) {
+                    String text = preference.getText();
+                    if (text == null || TextUtils.isEmpty(text.trim())) {
+                        return "Not set";
+                    } else {
+                        return text.trim();
+                    }
+                }
+            });
+            casinoNamePreference.setOnPreferenceChangeListener(
                     new Preference.OnPreferenceChangeListener() {
                         @Override
                         public boolean onPreferenceChange(Preference preference, Object newValue) {
-                            UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
-                                    .setDisplayName(newValue.toString().trim())
-                                    .build();
-                            firebaseUser.updateProfile(profileUpdates);
-                            //displayNamePreference.setText(newValue.toString().trim());
+                            //UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
+                            //        .setDisplayName(newValue.toString().trim())
+                            //        .build();
+                            //firebaseUser.updateProfile(profileUpdates);
+                            if (newValue.toString().trim().isEmpty()) {
+                                Toast.makeText(getContext(), "Submit a non-empty casino name", Toast.LENGTH_LONG).show();
+                                return true;
+                            }
+                            String casinoName = newValue.toString().trim();
+                            DocumentReference docRef = database.collection("users").document(firebaseUser.getUid());
+                            docRef.update("casinoName", casinoName);
+                            casinoNamePreference.setText(casinoName);
                             return true;
                         }
                     }
             );
         }
 
-        if (adminEmailPreference != null) {
+        /*if (adminEmailPreference != null) {
+
+            DocumentReference docRef = database.collection("users").document(firebaseUser.getUid());
+            docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                @Override
+                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                    if (task.isSuccessful()) {
+                        DocumentSnapshot document = task.getResult();
+                        if (document.exists()) {
+                            Object adminEmailObject = document.get("adminEmail");
+                            if (adminEmailObject != null) {
+                                adminEmailPreference.setText(adminEmailObject.toString());
+                            } else {
+                                adminEmailPreference.setText("");
+                            }
+                        }
+                    }
+                }
+            });
+
             adminEmailPreference.setSummaryProvider(new SummaryProvider<EditTextPreference>() {
                 @Override
                 public CharSequence provideSummary(EditTextPreference preference) {
@@ -118,7 +180,84 @@ public class MySettingsFragment extends PreferenceFragmentCompat {
                     return text;
                 }
             });
-        }
+            adminEmailPreference.setOnPreferenceChangeListener(
+                    new Preference.OnPreferenceChangeListener() {
+                        @Override
+                        public boolean onPreferenceChange(Preference preference, Object newValue) {
+                            final String adminEmail = newValue.toString().trim();
+                            if (adminEmail.isEmpty()) return true;
+                            // Check if valid email address
+                            // Write to database admin collection
+
+                            String casinoName = "";
+                            if (casinoNamePreference == null || casinoNamePreference.getText().trim().isEmpty()) {
+                                casinoName = firebaseUser.getEmail();
+                            } else {
+                                casinoName = casinoNamePreference.getText().trim();
+                            }
+
+                            Map<String, Object> data = new HashMap<>();
+                            //data.put("casino_name", "Alex's Casino");
+                            //data.put("casino_uid", firebaseUser.getUid());
+                            data.put("adminEmail", adminEmail);
+
+                            String uid = firebaseUser.getUid();
+
+                            // Check if given email exists in users collection.
+                            // If so return message that the admin email cannot belong to a casino
+                            database.collection("users").get()
+                                    .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                                        @Override
+                                        public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                            if (task.isSuccessful()) {
+                                                for (QueryDocumentSnapshot document : task.getResult()) {
+                                                    if (document.getId().equals(adminEmail)) {
+
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    });
+                            //
+
+                            database.collection("users").document(uid)
+                                    .set(data, SetOptions.merge())
+                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                        @Override
+                                        public void onSuccess(Void aVoid) {
+                                            //Toast.makeText(getContext(), "DocumentSnapshot successfully written!", Toast.LENGTH_LONG).show();
+                                        }
+                                    })
+                                    .addOnFailureListener(new OnFailureListener() {
+                                        @Override
+                                        public void onFailure(@NonNull Exception e) {
+                                            //Toast.makeText(getContext(), "Error writing document" + e.getMessage().toString(), Toast.LENGTH_LONG).show();
+                                        }
+                                    });
+
+                            data.clear();
+                            data.put("email", firebaseUser.getEmail());
+                            data.put("casinoName", casinoName);
+                            database.collection("admins").document(adminEmail).collection("casinos").document(uid)
+                                    .set(data, SetOptions.merge())
+                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                        @Override
+                                        public void onSuccess(Void aVoid) {
+                                            //Toast.makeText(getContext(), "DocumentSnapshot successfully written!", Toast.LENGTH_LONG).show();
+                                        }
+                                    })
+                                    .addOnFailureListener(new OnFailureListener() {
+                                        @Override
+                                        public void onFailure(@NonNull Exception e) {
+                                            //Toast.makeText(getContext(), "Error writing document" + e.getMessage().toString(), Toast.LENGTH_LONG).show();
+                                        }
+                                    });
+
+                            return true;
+                        }
+                    }
+            );
+        }*/
 
         if (emailRecipientPreference != null) {
             emailRecipientPreference.setSummaryProvider(new SummaryProvider<EditTextPreference>() {

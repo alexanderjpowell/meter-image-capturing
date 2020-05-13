@@ -195,8 +195,13 @@ public class ManageUsersActivity extends AppCompatActivity implements MyRecycler
 
     @Override
     public void onBackPressed() {
-        startActivity(new Intent(ManageUsersActivity.this, MainActivity.class));
-        finish();
+        if (adminMode) {
+            startActivity(new Intent(ManageUsersActivity.this, SettingsActivity.class));
+            finish();
+        } else {
+            startActivity(new Intent(ManageUsersActivity.this, MainActivity.class));
+            finish();
+        }
     }
 
     @Override

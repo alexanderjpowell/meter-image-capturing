@@ -4,12 +4,13 @@
     <SwitchPreference
         app:key="auto_sort_progressives_preference"
         app:title="Auto sort progressive values"
+        app:summary="Sort progressives in descending order upon submission"
         app:defaultValue="true"/>
 
     <SwitchPreference
         app:key="reject_duplicates"
         app:title="Reject Duplicates"
-        app:summary="Don't process multiple scans from the same machine number in a 24 hour period."
+        app:summary="Don't process multiple scans from the same machine number in a 24 hour period"
         app:defaultValue="false"/>
 
     <EditTextPreference
@@ -50,14 +51,14 @@
             app:selectable="false"/>
 
         <EditTextPreference
-            app:key="display_name_button"
+            app:key="casino_name_button"
             app:title="Casino Name"/>
 
-        <EditTextPreference
+        <!--<EditTextPreference
             app:key="admin_email_button"
             app:title="Admin Email"
             app:summary="Grant read privileges to an administrator"
-            app:useSimpleSummaryProvider="true"/>
+            app:useSimpleSummaryProvider="true"/>-->
 
         <Preference
             app:key="sign_out_button"
