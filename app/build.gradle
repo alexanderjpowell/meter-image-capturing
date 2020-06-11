@@ -6,8 +6,8 @@ android {
         applicationId "com.slotmachine.ocr.mic"
         minSdkVersion 23
         targetSdkVersion 29
-        versionCode 205
-        versionName "2.0.5"
+        versionCode 206
+        versionName "2.0.6"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
@@ -47,7 +47,7 @@ dependencies {
     implementation 'androidx.recyclerview:recyclerview:1.1.0'
     implementation 'androidx.cardview:cardview:1.0.0'
 
-    implementation 'androidx.core:core:1.2.0'
+    implementation 'androidx.core:core:1.3.0'
     implementation 'androidx.preference:preference:1.1.1'
     implementation 'androidx.exifinterface:exifinterface:1.2.0'
 }
