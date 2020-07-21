@@ -14,6 +14,9 @@ import androidx.preference.ListPreference;
 import androidx.preference.Preference;
 import androidx.preference.Preference.SummaryProvider;
 import androidx.preference.PreferenceFragmentCompat;
+import androidx.preference.SeekBarPreference;
+import androidx.preference.SwitchPreference;
+
 import com.firebase.ui.auth.AuthUI;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -69,6 +72,34 @@ public class MySettingsFragment extends PreferenceFragmentCompat {
         //Preference verify_email_preference_button = findPreference("verify_email_button");
         Preference version_number_preference = findPreference("version_number_preference");
         Preference add_remove_users = findPreference("add_remove_users");
+
+        SwitchPreference reject_duplicates = findPreference("reject_duplicates");
+        final SeekBarPreference reject_duplicates_duration = findPreference("reject_duplicates_duration");
+
+        if (reject_duplicates != null) {
+            reject_duplicates_duration.setVisible(reject_duplicates.isChecked());
+            reject_duplicates.setOnPreferenceChangeListener(
+                    new Preference.OnPreferenceChangeListener() {
+                        @Override
+                        public boolean onPreferenceChange(Preference preference, Object newValue) {
+                            reject_duplicates_duration.setVisible((Boolean)newValue);
+                            return true;
+                        }
+                    }
+            );
+        }
+
+        if (reject_duplicates_duration != null) {
+            reject_duplicates_duration.setOnPreferenceChangeListener(
+                    new Preference.OnPreferenceChangeListener() {
+                        @Override
+                        public boolean onPreferenceChange(Preference preference, Object newValue) {
+                            Toast.makeText(getContext(), newValue.toString(), Toast.LENGTH_SHORT).show();
+                            return true;
+                        }
+                    }
+            );
+        }
 
         //
         final ListPreference number_of_progressives_preference = findPreference("number_of_progressives");

@@ -31,6 +31,7 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -497,6 +498,12 @@ public class DataReportActivity extends AppCompatActivity {// implements Adapter
         return stringBuilder.toString();
     }
 
+    private String createReportTitle() {
+        DateFormat dateFormat = new SimpleDateFormat("MMMM_dd,_yyyy", Locale.US);
+        Date date = new Date();
+        return dateFormat.format(date) + "_Report.csv";
+    }
+
     public void generateReport(View view) {
 
         SharedPreferences sharedPreferences = getApplicationContext().getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
@@ -504,7 +511,7 @@ public class DataReportActivity extends AppCompatActivity {// implements Adapter
         NUMBER_OF_PROGRESSIVES = sharedPreferences.getInt("number_of_progressives", 6);
 
         final String[] emails = report_recipient_emails.split(",");
-        final File csvFile = new File(getFilesDir(), "report.csv");
+        final File csvFile = new File(getFilesDir(), createReportTitle());
 
         if (isExternalStorageWritable()) {
             Date time = new Date(System.currentTimeMillis() - offset * 1000);

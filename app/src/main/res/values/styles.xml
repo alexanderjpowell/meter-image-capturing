@@ -17,11 +17,12 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
-    <style name="ToDoListTheme" parent="Theme.MaterialComponents.Light.DarkActionBar">
+    <style name="ToDoListTheme" parent="Theme.MaterialComponents.Light.NoActionBar">
         <!-- Customize your theme here.-->
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
+        <item name="android:textColorSecondary">@color/white</item>
         <!--<item name="android:actionOverflowButtonStyle">@style/MyActionButtonOverflow</item>-->
     </style>
 

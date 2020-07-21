@@ -138,7 +138,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     private Intent intent;
 
-    private boolean DEBUG = false;
+    private boolean DEBUG = true;
 
     private static String TAG = "MainActivity";
 
@@ -358,7 +358,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         // If so, present a dialog box with only the option to sign out and no option to dismiss
         final AlertDialog alertDialog = new AlertDialog.Builder(MainActivity.this).create();
         alertDialog.setTitle("Admin Account");
-        //String message = "You are attempting to sign in with an admin account.  To perform scans sign out and back in with a casino level account.  To view casino data as an admin sign into the web portal.";
         String message = "You are attempting to sign in with an admin account.  Please sign out and back in with a casino level account.";
         alertDialog.setMessage(message);
         alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "Sign Out",

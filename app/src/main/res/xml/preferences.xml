@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto">
+<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
 
     <SwitchPreference
         app:key="auto_sort_progressives_preference"
@@ -12,6 +13,18 @@
         app:title="Reject Duplicates"
         app:summary="Don't process multiple scans from the same machine number in a 24 hour period"
         app:defaultValue="false"/>
+
+    <SeekBarPreference
+        app:key="reject_duplicates_duration"
+        app:title="Reject Duplicates Duration"
+        app:summary="The amount of time (in hours) that duplicates will be rejected from the same machine number"
+        app:defaultValue="24"
+        app:seekBarIncrement="1"
+        app:showSeekBarValue="true"
+        android:selectable="false"
+        app:isPreferenceVisible="false"
+        android:max="24"
+        app:min="1" />
 
     <EditTextPreference
         app:key="email_recipient"
