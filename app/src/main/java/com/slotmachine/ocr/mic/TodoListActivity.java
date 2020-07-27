@@ -28,6 +28,7 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.miguelcatalan.materialsearchview.MaterialSearchView;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -289,11 +290,16 @@ public class TodoListActivity extends AppCompatActivity {
         getMenuInflater().inflate(R.menu.to_do_list_action_bar, menu);
 
         //
-        MenuItem item = menu.findItem(R.id.action_search);
+        MenuItem searchItem = menu.findItem(R.id.action_search);
+        //MenuItem sortMachineIdItem = menu.findItem(R.id.sort_machine_id);
+        //MenuItem sortLocationItem = menu.findItem(R.id.sort_location);
+
+
+
         searchView = findViewById(R.id.search_view);
         //final EditText editText = searchView.findViewById(com.miguelcatalan.materialsearchview.R.id.searchTextView);
         //editText.setInputType(InputType.TYPE_CLASS_NUMBER);
-        searchView.setMenuItem(item);
+        searchView.setMenuItem(searchItem);
         //
         searchView.setOnQueryTextListener(new MaterialSearchView.OnQueryTextListener() {
             @Override
@@ -359,7 +365,22 @@ public class TodoListActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        return super.onOptionsItemSelected(item);
+        switch (item.getItemId()) {
+            case R.id.sort_machine_id:
+                Collections.sort(toDoDataList, ToDoListData.machineIdComparator);
+                toDoDataListAll.clear();
+                toDoDataListAll.addAll(toDoDataList);
+                mAdapter.notifyDataSetChanged();
+                return true;
+            case R.id.sort_location:
+                Collections.sort(toDoDataList, ToDoListData.locationComparator);
+                toDoDataListAll.clear();
+                toDoDataListAll.addAll(toDoDataList);
+                mAdapter.notifyDataSetChanged();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 
     private void showToast(String message) {

@@ -47,6 +47,7 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.textfield.TextInputLayout;
+import com.google.firebase.Timestamp;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.EmailAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
@@ -138,7 +139,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     private Intent intent;
 
-    private boolean DEBUG = true;
+    private int REJECT_DUPLICATES_DURATION;
+    private boolean REJECT_DUPLICATES;
+
+    private boolean DEBUG = false;
 
     private static String TAG = "MainActivity";
 
@@ -165,6 +169,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         setTitle("User: " + username);
         //
 
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        REJECT_DUPLICATES = sharedPreferences.getBoolean("reject_duplicates", false);
+        REJECT_DUPLICATES_DURATION = sharedPreferences.getInt("reject_duplicates_duration", 0) * 3600 * 1000;
 
         //
         relativeLayoutProgressive7 = findViewById(R.id.progressive7_relative_layout);
@@ -339,7 +346,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         //
 
         // Set minimum progressive value
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        //SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         String val = sharedPreferences.getString("minimum_value", "0");
         try {
             minimumProgressiveValue = Double.valueOf(val);
@@ -347,10 +354,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             minimumProgressiveValue = 0.0;
         }
 
-        boolean reject_duplicates = sharedPreferences.getBoolean("reject_duplicates", false);
+        /*boolean reject_duplicates = sharedPreferences.getBoolean("reject_duplicates", false);
+        int reject_duplicates_duration = sharedPreferences.getInt("reject_duplicates_duration", 0);
         if (reject_duplicates) {
-            populateDuplicatesSet();
-        }
+            populateDuplicatesSet(reject_duplicates_duration);
+        }*/
     }
 
     private void showDialogForAdminAccount() {
@@ -446,10 +454,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
     }
 
-    // Get set of machine numbers in past 24 hours
-    private void populateDuplicatesSet() {
+    /*private void populateDuplicatesSet(int duration) {
         set.clear();
-        int offset = 86400;
+        //int offset = 86400; // 24 * 60 * 60
+        int offset = duration * 60 * 60;
+        //showToast(Integer.toString(duration));
         Date time = new Date(System.currentTimeMillis() - offset * 1000);
         CollectionReference collectionReference = database.collection("scans");
         Query query = collectionReference.whereEqualTo("uid", firebaseAuth.getCurrentUser().getUid())
@@ -468,7 +477,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 }
             }
         });
-    }
+    }*/
 
     @Override
     public boolean onTouch(View v, MotionEvent event) {
@@ -1163,13 +1172,115 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
             //
 
+            if (REJECT_DUPLICATES) {
+                // Optimize to only search the last n hours
+                Date time = new Date(System.currentTimeMillis() - REJECT_DUPLICATES_DURATION);
+                Query query = database.collection("users")
+                        .document(firebaseAuth.getUid())
+                        .collection("scans")
+                        .whereEqualTo("machine_id", machineIdText)
+                        .whereGreaterThan("timestamp", time)
+                        .orderBy("timestamp", Query.Direction.DESCENDING)
+                        .limit(1);
+                query.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            List<DocumentSnapshot> documents = task.getResult().getDocuments();
+                            if (documents.size() == 1) {
+                                Timestamp timestamp = (Timestamp)documents.get(0).get("timestamp");
+                                long delta = Math.abs((timestamp.getSeconds() * 1000) - System.currentTimeMillis());
+                                if (delta <= REJECT_DUPLICATES_DURATION) {
+                                    //showToast("DUPLICATE");
+                                    AlertDialog alertDialog = new AlertDialog.Builder(MainActivity.this).create();
+                                    alertDialog.setMessage("This machine has already been scanned in the past 24 hours.");
+                                    alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, "CANCEL",
+                                            new DialogInterface.OnClickListener() {
+                                                public void onClick(DialogInterface dialog, int i) {
+                                                    dialog.dismiss();
+                                                }
+                                            });
+                                    alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "SUBMIT ANYWAY",
+                                            new DialogInterface.OnClickListener() {
+                                                public void onClick(DialogInterface dialog, int i) {
+                                                    insertToDatabase(emailText, userId, progressiveText1, progressiveText2, progressiveText3, progressiveText4, progressiveText5, progressiveText6, progressiveText7, progressiveText8, progressiveText9, progressiveText10, machineIdText, FieldValue.serverTimestamp(), userName, "", locationText);
+                                                    resetMachineId();
+                                                    resetProgressives();
+                                                    showToast("Progressive(s) submitted successfully");
+                                                    hideKeyboard();
+                                                    dialog.dismiss();
+                                                }
+                                            });
+                                    alertDialog.show();
+                                } else {
+                                    //showToast("ORIGINAL - 1");
+                                    insertToDatabase(emailText, userId, progressiveText1, progressiveText2, progressiveText3, progressiveText4, progressiveText5, progressiveText6, progressiveText7, progressiveText8, progressiveText9, progressiveText10, machineIdText, FieldValue.serverTimestamp(), userName, "", locationText);
+                                    resetMachineId();
+                                    resetProgressives();
+                                    showToast("Progressive(s) submitted successfully");
+                                    hideKeyboard();
+                                }
+                            } else {
+                                //showToast("ORIGINAL - 2");
+                                insertToDatabase(emailText, userId, progressiveText1, progressiveText2, progressiveText3, progressiveText4, progressiveText5, progressiveText6, progressiveText7, progressiveText8, progressiveText9, progressiveText10, machineIdText, FieldValue.serverTimestamp(), userName, "", locationText);
+                                resetMachineId();
+                                resetProgressives();
+                                showToast("Progressive(s) submitted successfully");
+                                hideKeyboard();
+                            }
+                        } else {
+                            showToast(task.getException().getMessage());
+                            //Log.d("DEBUG", task.getException().getMessage());
+                        }
+                    }
+                });
+                //
+            } else {
+                insertToDatabase(emailText, userId, progressiveText1, progressiveText2, progressiveText3, progressiveText4, progressiveText5, progressiveText6, progressiveText7, progressiveText8, progressiveText9, progressiveText10, machineIdText, FieldValue.serverTimestamp(), userName, "", locationText);
+                resetMachineId();
+                resetProgressives();
+                showToast("Progressive(s) submitted successfully");
+                hideKeyboard();
+            }
+
+            // Remove element from uploadArray
+            if (intent.hasExtra("hashMap")) {
+                HashMap<String, Object> hashMap = (HashMap<String, Object>)intent.getSerializableExtra("hashMap");
+                DocumentReference documentReference = database.collection("formUploads").document(userId);
+                documentReference.update("uploadArray", FieldValue.arrayRemove(hashMap))
+                        .addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void aVoid) {
+                                Log.d(TAG, "DocumentSnapshot successfully updated!");
+                            }
+                        })
+                        .addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                Log.w(TAG, "Error updating document", e);
+                                showToast("Error updating to do list. " + e.getMessage());
+                            }
+                        });
+            }
+            //
+
+            // if coming from to do activity - go back and
+            if (intent.hasExtra("machine_id")) {
+                //super.onBackPressed();
+                setResult(RESULT_OK, getIntent());
+                this.onBackPressed();
+                finish();
+            }
+            //
+
             // Check if same machine number has been scanned in last 24 hours
             // maybe compile a collection (set) of all unique machine numbers in the oncreate so this only has to be done once
             // then run cross check based on that and display a popup if necessary.
-            SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+            /*SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
             boolean reject_duplicates = sharedPreferences.getBoolean("reject_duplicates", false);
+            int reject_duplicates_duration = sharedPreferences.getInt("reject_duplicates_duration", 0);
             if (reject_duplicates && set.size() == 0) {
-                populateDuplicatesSet();
+                populateDuplicatesSet(reject_duplicates_duration);
             }
             if (reject_duplicates) {
                 if (set.contains(machineIdText)) {
@@ -1199,13 +1310,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     alertDialog.show();
                     return;
                 }
-            }
-
+            }*/
             //
 
-            //
-
-            insertToDatabase(emailText, userId, progressiveText1, progressiveText2, progressiveText3, progressiveText4, progressiveText5, progressiveText6, progressiveText7, progressiveText8, progressiveText9, progressiveText10, machineIdText, FieldValue.serverTimestamp(), userName, "", locationText);
+            /*insertToDatabase(emailText, userId, progressiveText1, progressiveText2, progressiveText3, progressiveText4, progressiveText5, progressiveText6, progressiveText7, progressiveText8, progressiveText9, progressiveText10, machineIdText, FieldValue.serverTimestamp(), userName, "", locationText);
 
             // Remove element from uploadArray
             if (intent.hasExtra("hashMap")) {
@@ -1226,6 +1334,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                             }
                         });
             }
+            //
 
             // if coming from to do activity - go back and
             if (intent.hasExtra("machine_id")) {
@@ -1233,15 +1342,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 setResult(RESULT_OK, getIntent());
                 this.onBackPressed();
                 finish();
-            }
+            }*/
             //
 
-            resetMachineId();
-            resetProgressives();
-            showToast("Progressive(s) submitted successfully");
-            hideKeyboard();
+            //resetMachineId();
+            //resetProgressives();
+            //showToast("Progressive(s) submitted successfully");
+            //hideKeyboard();
         } catch (Exception ex) {
-            showToast("No connection");
+            showToast(ex.getMessage());
         }
     }
 

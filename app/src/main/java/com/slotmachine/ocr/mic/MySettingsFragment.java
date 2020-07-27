@@ -25,21 +25,27 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserProfileChangeRequest;
+import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.firestore.SetOptions;
 
 import java.io.Console;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 public class MySettingsFragment extends PreferenceFragmentCompat {
 
     private FirebaseUser firebaseUser;
     private FirebaseFirestore database;
+    private SharedPreferences sharedPref;
 
     @Override
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
@@ -58,7 +64,8 @@ public class MySettingsFragment extends PreferenceFragmentCompat {
         // DONT STORE DISPLAY NAME IN PREFERENCES - FETCH FROM FIREBASE AUTH EACH TIME
         //
 
-        final SharedPreferences sharedPref = getContext().getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
+        //final SharedPreferences sharedPref = getContext().getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
+        sharedPref = getContext().getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
 
         Preference accountEmailPreference = findPreference("account_email_button");
         final EditTextPreference casinoNamePreference = findPreference("casino_name_button");
@@ -94,7 +101,8 @@ public class MySettingsFragment extends PreferenceFragmentCompat {
                     new Preference.OnPreferenceChangeListener() {
                         @Override
                         public boolean onPreferenceChange(Preference preference, Object newValue) {
-                            Toast.makeText(getContext(), newValue.toString(), Toast.LENGTH_SHORT).show();
+                            //populateDuplicatesSet((Integer)newValue);
+                            //Toast.makeText(getContext(), newValue.toString(), Toast.LENGTH_SHORT).show();
                             return true;
                         }
                     }
@@ -455,9 +463,35 @@ public class MySettingsFragment extends PreferenceFragmentCompat {
         }*/
     }
 
-    /*private void showToast(String message) {
-        Toast.makeText(getContext(), message, Toast.LENGTH_LONG).show();
+    /*private void populateDuplicatesSet(int duration) {
+        final Set<String> set = new HashSet<>();
+        final SharedPreferences.Editor editor = sharedPref.edit();
+        int offset = duration * 60 * 60;
+        Date time = new Date(System.currentTimeMillis() - offset * 1000);
+        CollectionReference collectionReference = database.collection("scans");
+        Query query = collectionReference.whereEqualTo("uid", firebaseUser.getUid())
+                .whereGreaterThan("timestamp", time)
+                .orderBy("timestamp", Query.Direction.DESCENDING)
+                .limit(1000);
+        query.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                if (task.isSuccessful()) {
+                    for (QueryDocumentSnapshot document : task.getResult()) {
+                        set.add(document.get("machine_id").toString().trim());
+                    }
+                    editor.putStringSet("reject_duplicates_set", set);
+                    editor.apply();
+                } else {
+                    showToast("Unable to refresh.  Check your connection.");
+                }
+            }
+        });
     }*/
+
+    private void showToast(String message) {
+        Toast.makeText(getContext(), message, Toast.LENGTH_LONG).show();
+    }
 }
 
 
