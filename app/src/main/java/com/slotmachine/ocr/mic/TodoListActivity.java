@@ -1,7 +1,9 @@
 package com.slotmachine.ocr.mic;
 
 import android.app.SearchManager;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.InputType;
 import android.util.Log;
@@ -43,9 +45,6 @@ public class TodoListActivity extends AppCompatActivity {
     private ToDoListDataAdapter mAdapter;
     private enum EmptyState { NO_FILE_UPLOAD, ALL_COMPLETED, NONE_COMPLETED, NORMAL }
 
-    //private int recyclerViewPosition = 0;
-    //private String previousMachineId = "";
-
     private FirebaseAuth firebaseAuth;
     private FirebaseFirestore database;
 
@@ -58,12 +57,12 @@ public class TodoListActivity extends AppCompatActivity {
     private TextView empty_state_uncompleted_text_view;
     private ProgressBar progressBar;
 
-    private String TAG = "TodoListActivity";
-
-    //private SearchView searchView;
     private MaterialSearchView searchView;
 
-    //private Toolbar mTopToolbar;
+    private SharedPreferences sharedPref;
+    private int SORT_BY_FIELD;
+
+    private String TAG = "TodoListActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,6 +81,9 @@ public class TodoListActivity extends AppCompatActivity {
             finish();
             return;
         }
+
+        sharedPref = getApplicationContext().getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
+        SORT_BY_FIELD = sharedPref.getInt("SORT_BY_FIELD", 0); // 0 is machine id, 1 is location
 
         empty_state_text_view = findViewById(R.id.empty_state_no_file_text_view);
         empty_state_completed_text_view = findViewById(R.id.empty_state_completed_text_view);
@@ -180,7 +182,17 @@ public class TodoListActivity extends AppCompatActivity {
                                     }
                                 }
                             }
+                            //toDoDataListAll.addAll(toDoDataList);
+                            //
+                            if (SORT_BY_FIELD == 0) {
+                                Collections.sort(toDoDataList, ToDoListData.machineIdComparator);
+                            } else { // SORT_BY_FIELD == 1
+                                Collections.sort(toDoDataList, ToDoListData.locationComparator);
+                            }
+                            toDoDataListAll.clear();
                             toDoDataListAll.addAll(toDoDataList);
+                            mAdapter.notifyDataSetChanged();
+                            //
                             toggleEmptyStateDisplays(EmptyState.NORMAL);
                         }
                         mAdapter.notifyDataSetChanged();
@@ -365,14 +377,23 @@ public class TodoListActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        SharedPreferences.Editor editor = sharedPref.edit();
         switch (item.getItemId()) {
             case R.id.sort_machine_id:
+                //
+                editor.putInt("SORT_BY_FIELD", 0);
+                editor.apply();
+                //
                 Collections.sort(toDoDataList, ToDoListData.machineIdComparator);
                 toDoDataListAll.clear();
                 toDoDataListAll.addAll(toDoDataList);
                 mAdapter.notifyDataSetChanged();
                 return true;
             case R.id.sort_location:
+                //
+                editor.putInt("SORT_BY_FIELD", 1);
+                editor.apply();
+                //
                 Collections.sort(toDoDataList, ToDoListData.locationComparator);
                 toDoDataListAll.clear();
                 toDoDataListAll.addAll(toDoDataList);

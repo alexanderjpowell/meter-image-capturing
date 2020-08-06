@@ -52,15 +52,12 @@ import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.EmailAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
-import com.google.firebase.firestore.SetOptions;
 import com.google.firebase.ml.vision.FirebaseVision;
 import com.google.firebase.ml.vision.common.FirebaseVisionImage;
 import com.google.firebase.ml.vision.document.FirebaseVisionDocumentText;
@@ -139,7 +136,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     private Intent intent;
 
-    private int REJECT_DUPLICATES_DURATION;
+    private int REJECT_DUPLICATES_DURATION_MILLIS, REJECT_DUPLICATES_DURATION_HOURS;
     private boolean REJECT_DUPLICATES;
 
     private boolean DEBUG = false;
@@ -171,7 +168,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         REJECT_DUPLICATES = sharedPreferences.getBoolean("reject_duplicates", false);
-        REJECT_DUPLICATES_DURATION = sharedPreferences.getInt("reject_duplicates_duration", 0) * 3600 * 1000;
+        REJECT_DUPLICATES_DURATION_MILLIS = sharedPreferences.getInt("reject_duplicates_duration", 0) * 3600 * 1000;
+        REJECT_DUPLICATES_DURATION_HOURS = sharedPreferences.getInt("reject_duplicates_duration", 0);
 
         //
         relativeLayoutProgressive7 = findViewById(R.id.progressive7_relative_layout);
@@ -1174,7 +1172,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
             if (REJECT_DUPLICATES) {
                 // Optimize to only search the last n hours
-                Date time = new Date(System.currentTimeMillis() - REJECT_DUPLICATES_DURATION);
+                Date time = new Date(System.currentTimeMillis() - REJECT_DUPLICATES_DURATION_MILLIS);
                 Query query = database.collection("users")
                         .document(firebaseAuth.getUid())
                         .collection("scans")
@@ -1190,10 +1188,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                             if (documents.size() == 1) {
                                 Timestamp timestamp = (Timestamp)documents.get(0).get("timestamp");
                                 long delta = Math.abs((timestamp.getSeconds() * 1000) - System.currentTimeMillis());
-                                if (delta <= REJECT_DUPLICATES_DURATION) {
+                                if (delta <= REJECT_DUPLICATES_DURATION_MILLIS) {
                                     //showToast("DUPLICATE");
                                     AlertDialog alertDialog = new AlertDialog.Builder(MainActivity.this).create();
-                                    alertDialog.setMessage("This machine has already been scanned in the past 24 hours.");
+                                    //alertDialog.setMessage("This machine has already been scanned in the past 24 hours.");
+                                    String message = String.format(Locale.US, "This machine has already been scanned in the past %d hour(s).", REJECT_DUPLICATES_DURATION_HOURS);
+                                    alertDialog.setMessage(message);
                                     alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, "CANCEL",
                                             new DialogInterface.OnClickListener() {
                                                 public void onClick(DialogInterface dialog, int i) {
