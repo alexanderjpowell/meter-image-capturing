@@ -78,7 +78,7 @@
             android:label="Completed Scans"
             android:parentActivityName=".MainActivity"
             android:screenOrientation="portrait"
-            android:theme="@style/SettingsTheme">
+            android:theme="@style/DataReportTheme">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".MainActivity" />

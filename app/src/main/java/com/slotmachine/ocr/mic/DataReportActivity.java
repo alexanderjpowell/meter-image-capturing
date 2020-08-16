@@ -7,6 +7,7 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Environment;
 import androidx.annotation.NonNull;
+import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.FileProvider;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import androidx.appcompat.app.AlertDialog;
@@ -29,6 +30,8 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.miguelcatalan.materialsearchview.MaterialSearchView;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.text.DateFormat;
@@ -51,6 +54,8 @@ public class DataReportActivity extends AppCompatActivity {// implements Adapter
 
     private SwipeRefreshLayout swipeRefreshLayout;
 
+    private MaterialSearchView searchView;
+
     private enum DateRange { HOUR, DAY, WEEK }
     private DateRange dateRange;
 
@@ -66,7 +71,11 @@ public class DataReportActivity extends AppCompatActivity {// implements Adapter
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_data_report);
 
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        Toolbar mTopToolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(mTopToolbar);
+
+        if (getSupportActionBar() != null)
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         // Ensure user is signed in
         firebaseAuth = FirebaseAuth.getInstance();
@@ -174,7 +183,52 @@ public class DataReportActivity extends AppCompatActivity {// implements Adapter
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.reports_action_bar, menu);
-        return super.onCreateOptionsMenu(menu);
+
+        MenuItem searchItem = menu.findItem(R.id.action_search);
+        searchView = findViewById(R.id.search_view);
+        searchView.setMenuItem(searchItem);
+
+        searchView.setOnQueryTextListener(new MaterialSearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                //Do some magic
+                //Toast.makeText(getApplicationContext(), "onQueryTextSubmit", Toast.LENGTH_SHORT).show();
+                //doSearch(query);
+                return true;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                if (!newText.trim().isEmpty()) {
+                    //doSearch(newText);
+                } else {
+                    //revertRecyclerViewToNormal();
+                }
+                return false;
+            }
+        });
+
+        searchView.setOnSearchViewListener(new MaterialSearchView.SearchViewListener() {
+            @Override
+            public void onSearchViewShown() {
+            }
+
+            @Override
+            public void onSearchViewClosed() {
+            }
+        });
+
+        //return super.onCreateOptionsMenu(menu);
+        return true;
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (searchView.isSearchOpen()) {
+            searchView.closeSearch();
+        } else {
+            super.onBackPressed();
+        }
     }
 
     @Override
@@ -239,10 +293,20 @@ public class DataReportActivity extends AppCompatActivity {// implements Adapter
     private void executeQuery(DateRange dateRange) {
         Date time = new Date(System.currentTimeMillis() - offset * 1000);
         CollectionReference collectionReference = database.collection("scans");
+        CollectionReference usersCollection = database.collection("users")
+                .document(firebaseAuth.getCurrentUser().getUid())
+                .collection("scans");
         Query query = collectionReference.whereEqualTo("uid", firebaseAuth.getCurrentUser().getUid())
                 .whereGreaterThan("timestamp", time)
                 .orderBy("timestamp", Query.Direction.DESCENDING)
                 .limit(QUERY_LIMIT_SIZE);
+        //
+        /*Query query = usersCollection.whereGreaterThan("timestamp", time)
+                .orderBy("timestamp", Query.Direction.DESCENDING)
+                .orderBy("machine_id")
+                .limit(QUERY_LIMIT_SIZE);*/
+        //Query query = usersCollection.orderBy("machine_id", Query.Direction.DESCENDING).limit(QUERY_LIMIT_SIZE);
+        //
         query.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {

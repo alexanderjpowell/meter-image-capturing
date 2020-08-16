@@ -53,6 +53,7 @@ dependencies {
 
     implementation "androidx.room:room-runtime:2.2.5"
 
+    // 3rd party library for material design search view in action bar
     implementation 'com.miguelcatalan:materialsearchview:1.4.0'
 }
 
