@@ -24,6 +24,14 @@
 
         </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
+        <ProgressBar
+            android:id="@+id/progress_bar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:paddingTop="?attr/actionBarSize"
+            android:visibility="invisible"/>
+
         <FrameLayout
             android:id="@+id/toolbar_container"
             android:layout_width="match_parent"

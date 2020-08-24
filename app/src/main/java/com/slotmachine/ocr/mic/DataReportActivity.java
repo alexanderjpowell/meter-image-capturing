@@ -20,6 +20,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -54,6 +55,7 @@ public class DataReportActivity extends AppCompatActivity {// implements Adapter
 
     private SwipeRefreshLayout swipeRefreshLayout;
 
+    private ProgressBar progressBar;
     private MaterialSearchView searchView;
 
     private enum DateRange { HOUR, DAY, WEEK }
@@ -100,6 +102,8 @@ public class DataReportActivity extends AppCompatActivity {// implements Adapter
                     }
                 }
         );
+
+        progressBar = findViewById(R.id.progress_bar);
 
         rowDataList = new ArrayList<>();
         recyclerView = findViewById(R.id.recycler_view);
@@ -188,22 +192,44 @@ public class DataReportActivity extends AppCompatActivity {// implements Adapter
         searchView = findViewById(R.id.search_view);
         searchView.setMenuItem(searchItem);
 
+        final List<RowData> backupData = new ArrayList<RowData>();
+
         searchView.setOnQueryTextListener(new MaterialSearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
+                //backupData.clear();
+                //backupData.addAll(rowDataList);
                 //Do some magic
                 //Toast.makeText(getApplicationContext(), "onQueryTextSubmit", Toast.LENGTH_SHORT).show();
                 //doSearch(query);
+                progressBar.setVisibility(View.VISIBLE);
+                CollectionReference usersCollection = database.collection("users")
+                        .document(firebaseAuth.getCurrentUser().getUid())
+                        .collection("scans");
+                Query scansQuery = usersCollection.whereEqualTo("machine_id", query)
+                        .orderBy("timestamp", Query.Direction.DESCENDING);
+                        //.limit(QUERY_LIMIT_SIZE);
+                scansQuery.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            prepareData(task.getResult(), false);
+                        } else {
+                            showToast("Unable to refresh.  Check your connection.");
+                        }
+                        progressBar.setVisibility(View.INVISIBLE);
+                    }
+                });
                 return true;
             }
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                if (!newText.trim().isEmpty()) {
+                /*if (!newText.trim().isEmpty()) {
                     //doSearch(newText);
                 } else {
                     //revertRecyclerViewToNormal();
-                }
+                }*/
                 return false;
             }
         });
@@ -211,10 +237,16 @@ public class DataReportActivity extends AppCompatActivity {// implements Adapter
         searchView.setOnSearchViewListener(new MaterialSearchView.SearchViewListener() {
             @Override
             public void onSearchViewShown() {
+                if (backupData.size() == 0) {
+                    backupData.addAll(rowDataList);
+                }
             }
 
             @Override
             public void onSearchViewClosed() {
+                rowDataList.clear();
+                rowDataList.addAll(backupData);
+                mAdapter.notifyDataSetChanged();
             }
         });
 
