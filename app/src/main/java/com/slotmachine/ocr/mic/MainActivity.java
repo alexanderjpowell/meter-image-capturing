@@ -1372,8 +1372,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                   String notes,
                                   String location) {
         Map<String, Object> user = new HashMap<>();
-        user.put("email", email);
-        user.put("uid", uid);
+        //user.put("email", email);
+        //user.put("uid", uid);
         user.put("progressive1", progressive1);
         user.put("progressive2", progressive2);
         user.put("progressive3", progressive3);
@@ -1390,15 +1390,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         user.put("notes", notes);
         user.put("location", location);
 
-        DocumentReference dr = database.collection("scans").document();
-        dr.set(user);
-        String docId = dr.getId();
+        //DocumentReference dr = database.collection("scans").document();
+        //dr.set(user);
+        //String docId = dr.getId();
 
         // New collection
-        user.remove("uid");
-        user.remove("email");
-        DocumentReference dr2 = database.collection("users").document(uid).collection("scans").document(docId);
-        dr2.set(user);
+        //user.remove("uid");
+        //user.remove("email");
+        DocumentReference dr = database.collection("users").document(uid).collection("scans").document();
+        dr.set(user);
     }
 
     public void hideKeyboard() {

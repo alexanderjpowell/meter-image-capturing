@@ -295,12 +295,25 @@ public class DataReportActivity extends AppCompatActivity {// implements Adapter
 
     private void loadMoreRecords() {
         Date time = new Date(System.currentTimeMillis() - offset * 1000);
-        CollectionReference collectionReference = database.collection("scans");
-        Query query = collectionReference.whereEqualTo("uid", firebaseAuth.getCurrentUser().getUid())
+
+        //CollectionReference scansCollection = database.collection("scans");
+
+        CollectionReference usersCollection = database.collection("users")
+                .document(firebaseAuth.getCurrentUser().getUid())
+                .collection("scans");
+
+        /*Query query = scansCollection.whereEqualTo("uid", firebaseAuth.getCurrentUser().getUid())
+                .whereGreaterThan("timestamp", time)
+                .orderBy("timestamp", Query.Direction.DESCENDING)
+                .startAfter(lastDocumentSnapshot)
+                .limit(QUERY_LIMIT_SIZE);*/
+
+        Query query = usersCollection
                 .whereGreaterThan("timestamp", time)
                 .orderBy("timestamp", Query.Direction.DESCENDING)
                 .startAfter(lastDocumentSnapshot)
                 .limit(QUERY_LIMIT_SIZE);
+
         query.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
@@ -316,7 +329,7 @@ public class DataReportActivity extends AppCompatActivity {// implements Adapter
 
     private void deleteScanFromDatabase(String document_id) {
         // Old sub collection
-        database.collection("scans").document(document_id).delete();
+        //database.collection("scans").document(document_id).delete();
 
         // New sub collection
         database.collection("users").document(firebaseAuth.getCurrentUser().getUid()).collection("scans").document(document_id).delete();
@@ -328,15 +341,14 @@ public class DataReportActivity extends AppCompatActivity {// implements Adapter
         CollectionReference usersCollection = database.collection("users")
                 .document(firebaseAuth.getCurrentUser().getUid())
                 .collection("scans");
-        Query query = collectionReference.whereEqualTo("uid", firebaseAuth.getCurrentUser().getUid())
+        /*Query query = collectionReference.whereEqualTo("uid", firebaseAuth.getCurrentUser().getUid())
                 .whereGreaterThan("timestamp", time)
                 .orderBy("timestamp", Query.Direction.DESCENDING)
-                .limit(QUERY_LIMIT_SIZE);
-        //
-        /*Query query = usersCollection.whereGreaterThan("timestamp", time)
-                .orderBy("timestamp", Query.Direction.DESCENDING)
-                .orderBy("machine_id")
                 .limit(QUERY_LIMIT_SIZE);*/
+        //
+        Query query = usersCollection.whereGreaterThan("timestamp", time)
+                .orderBy("timestamp", Query.Direction.DESCENDING)
+                .limit(QUERY_LIMIT_SIZE);
         //Query query = usersCollection.orderBy("machine_id", Query.Direction.DESCENDING).limit(QUERY_LIMIT_SIZE);
         //
         query.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
@@ -611,8 +623,11 @@ public class DataReportActivity extends AppCompatActivity {// implements Adapter
 
         if (isExternalStorageWritable()) {
             Date time = new Date(System.currentTimeMillis() - offset * 1000);
-            CollectionReference collectionReference = database.collection("scans");
-            Query query = collectionReference.whereEqualTo("uid", firebaseAuth.getCurrentUser().getUid())
+            //CollectionReference collectionReference = database.collection("scans");
+            CollectionReference usersCollection = database.collection("users")
+                    .document(firebaseAuth.getCurrentUser().getUid())
+                    .collection("scans");
+            Query query = usersCollection
                     .whereGreaterThan("timestamp", time)
                     .orderBy("timestamp", Query.Direction.DESCENDING)
                     .limit(5000);
