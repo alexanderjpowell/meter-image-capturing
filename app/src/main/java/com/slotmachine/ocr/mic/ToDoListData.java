@@ -10,6 +10,7 @@ public class ToDoListData {
     private String location, machineId, description;
     private String user;
     private ArrayList<String> progressiveDescriptionsList;
+    private ArrayList<String> resetValuesList;
     private Map<String, Object> map;
 
     public ToDoListData(Map<String, Object> mapp) {
@@ -21,6 +22,9 @@ public class ToDoListData {
         if (mapp.containsKey("u")) { this.user = mapp.get("u").toString(); }
         if (mapp.containsKey("da")) {
             this.progressiveDescriptionsList = (ArrayList<String>)mapp.get("da");
+        }
+        if (mapp.containsKey("ra")) {
+            this.resetValuesList = (ArrayList<String>)mapp.get("ra");
         }
     }
 
@@ -53,6 +57,8 @@ public class ToDoListData {
     public void setUser(String user) { this.user = user; }
 
     public ArrayList<String> getProgressiveDescriptionsList() { return this.progressiveDescriptionsList; }
+
+    public ArrayList<String> getResetValuesList() { return this.resetValuesList; }
 
     public Map<String, Object> getMap() { return this.map; }
 

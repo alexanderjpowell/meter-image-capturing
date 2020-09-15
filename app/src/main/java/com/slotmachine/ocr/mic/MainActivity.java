@@ -139,7 +139,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private int REJECT_DUPLICATES_DURATION_MILLIS, REJECT_DUPLICATES_DURATION_HOURS;
     private boolean REJECT_DUPLICATES;
 
-    private boolean DEBUG = false;
+    private boolean DEBUG = false; // When debug is enabled a password isn't necessary to enter settings
 
     private static String TAG = "MainActivity";
 
@@ -1124,7 +1124,22 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             final String locationText = location == null ? "" : location;
             //
 
-            final String emailText = firebaseAuth.getCurrentUser().getEmail().trim();
+            //
+            final ArrayList<String> resetValuesArray = new ArrayList<>();
+            for (int i = 0; i < 10; i++) { // Populate with 10 null entries
+                resetValuesArray.add(null);
+            }
+            if (getIntent().hasExtra("resetValuesArray")) {
+                ArrayList<String> resets = getIntent().getStringArrayListExtra("resetValuesArray");
+                for (int i = 0; i < resets.size(); i++) {
+                    if (resets.get(i) != null && !resets.get(i).isEmpty()) {
+                        resetValuesArray.add(i, resets.get(i));
+                    }
+                }
+            }
+            //
+
+            //final String emailText = firebaseAuth.getCurrentUser().getEmail().trim();
             final String userId = firebaseAuth.getCurrentUser().getUid().trim();
             final String userName = username;
 
@@ -1203,7 +1218,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                     alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "SUBMIT ANYWAY",
                                             new DialogInterface.OnClickListener() {
                                                 public void onClick(DialogInterface dialog, int i) {
-                                                    insertToDatabase(emailText, userId, progressiveText1, progressiveText2, progressiveText3, progressiveText4, progressiveText5, progressiveText6, progressiveText7, progressiveText8, progressiveText9, progressiveText10, machineIdText, FieldValue.serverTimestamp(), userName, "", locationText);
+                                                    insertToDatabase(userId, progressiveText1, progressiveText2, progressiveText3, progressiveText4, progressiveText5, progressiveText6, progressiveText7, progressiveText8, progressiveText9, progressiveText10, resetValuesArray.get(0), resetValuesArray.get(1), resetValuesArray.get(2), resetValuesArray.get(3), resetValuesArray.get(4), resetValuesArray.get(5), resetValuesArray.get(6), resetValuesArray.get(7), resetValuesArray.get(8), resetValuesArray.get(9), machineIdText, FieldValue.serverTimestamp(), userName, "", locationText);
                                                     resetMachineId();
                                                     resetProgressives();
                                                     showToast("Progressive(s) submitted successfully");
@@ -1214,7 +1229,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                     alertDialog.show();
                                 } else {
                                     //showToast("ORIGINAL - 1");
-                                    insertToDatabase(emailText, userId, progressiveText1, progressiveText2, progressiveText3, progressiveText4, progressiveText5, progressiveText6, progressiveText7, progressiveText8, progressiveText9, progressiveText10, machineIdText, FieldValue.serverTimestamp(), userName, "", locationText);
+                                    insertToDatabase(userId, progressiveText1, progressiveText2, progressiveText3, progressiveText4, progressiveText5, progressiveText6, progressiveText7, progressiveText8, progressiveText9, progressiveText10, resetValuesArray.get(0), resetValuesArray.get(1), resetValuesArray.get(2), resetValuesArray.get(3), resetValuesArray.get(4), resetValuesArray.get(5), resetValuesArray.get(6), resetValuesArray.get(7), resetValuesArray.get(8), resetValuesArray.get(9), machineIdText, FieldValue.serverTimestamp(), userName, "", locationText);
                                     resetMachineId();
                                     resetProgressives();
                                     showToast("Progressive(s) submitted successfully");
@@ -1222,7 +1237,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                 }
                             } else {
                                 //showToast("ORIGINAL - 2");
-                                insertToDatabase(emailText, userId, progressiveText1, progressiveText2, progressiveText3, progressiveText4, progressiveText5, progressiveText6, progressiveText7, progressiveText8, progressiveText9, progressiveText10, machineIdText, FieldValue.serverTimestamp(), userName, "", locationText);
+                                insertToDatabase(userId, progressiveText1, progressiveText2, progressiveText3, progressiveText4, progressiveText5, progressiveText6, progressiveText7, progressiveText8, progressiveText9, progressiveText10, resetValuesArray.get(0), resetValuesArray.get(1), resetValuesArray.get(2), resetValuesArray.get(3), resetValuesArray.get(4), resetValuesArray.get(5), resetValuesArray.get(6), resetValuesArray.get(7), resetValuesArray.get(8), resetValuesArray.get(9), machineIdText, FieldValue.serverTimestamp(), userName, "", locationText);
                                 resetMachineId();
                                 resetProgressives();
                                 showToast("Progressive(s) submitted successfully");
@@ -1230,13 +1245,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                             }
                         } else {
                             showToast(task.getException().getMessage());
-                            //Log.d("DEBUG", task.getException().getMessage());
+                            Log.d("DEBUG", task.getException().getMessage());
                         }
                     }
                 });
                 //
             } else {
-                insertToDatabase(emailText, userId, progressiveText1, progressiveText2, progressiveText3, progressiveText4, progressiveText5, progressiveText6, progressiveText7, progressiveText8, progressiveText9, progressiveText10, machineIdText, FieldValue.serverTimestamp(), userName, "", locationText);
+                insertToDatabase(userId, progressiveText1, progressiveText2, progressiveText3, progressiveText4, progressiveText5, progressiveText6, progressiveText7, progressiveText8, progressiveText9, progressiveText10, resetValuesArray.get(0), resetValuesArray.get(1), resetValuesArray.get(2), resetValuesArray.get(3), resetValuesArray.get(4), resetValuesArray.get(5), resetValuesArray.get(6), resetValuesArray.get(7), resetValuesArray.get(8), resetValuesArray.get(9), machineIdText, FieldValue.serverTimestamp(), userName, "", locationText);
                 resetMachineId();
                 resetProgressives();
                 showToast("Progressive(s) submitted successfully");
@@ -1354,8 +1369,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
     }
 
-    private void insertToDatabase(String email,
-                                  String uid,
+    private void insertToDatabase(String uid,
                                   String progressive1,
                                   String progressive2,
                                   String progressive3,
@@ -1366,14 +1380,23 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                   String progressive8,
                                   String progressive9,
                                   String progressive10,
+                                  String reset1,
+                                  String reset2,
+                                  String reset3,
+                                  String reset4,
+                                  String reset5,
+                                  String reset6,
+                                  String reset7,
+                                  String reset8,
+                                  String reset9,
+                                  String reset10,
                                   String machine_id,
                                   FieldValue timestamp,
                                   String userName,
                                   String notes,
                                   String location) {
         Map<String, Object> user = new HashMap<>();
-        //user.put("email", email);
-        //user.put("uid", uid);
+
         user.put("progressive1", progressive1);
         user.put("progressive2", progressive2);
         user.put("progressive3", progressive3);
@@ -1384,19 +1407,22 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         user.put("progressive8", progressive8);
         user.put("progressive9", progressive9);
         user.put("progressive10", progressive10);
+        if (reset1 != null) { user.put("reset1", reset1); }
+        if (reset2 != null) { user.put("reset2", reset2); }
+        if (reset3 != null) { user.put("reset3", reset3); }
+        if (reset4 != null) { user.put("reset4", reset4); }
+        if (reset5 != null) { user.put("reset5", reset5); }
+        if (reset6 != null) { user.put("reset6", reset6); }
+        if (reset7 != null) { user.put("reset7", reset7); }
+        if (reset8 != null) { user.put("reset8", reset8); }
+        if (reset9 != null) { user.put("reset9", reset9); }
+        if (reset10 != null) { user.put("reset10", reset10); }
         user.put("machine_id", machine_id);
         user.put("timestamp", timestamp);
         user.put("userName", userName);
         user.put("notes", notes);
         user.put("location", location);
 
-        //DocumentReference dr = database.collection("scans").document();
-        //dr.set(user);
-        //String docId = dr.getId();
-
-        // New collection
-        //user.remove("uid");
-        //user.remove("email");
         DocumentReference dr = database.collection("users").document(uid).collection("scans").document();
         dr.set(user);
     }
