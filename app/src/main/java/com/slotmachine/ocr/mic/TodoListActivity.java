@@ -5,12 +5,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.text.InputType;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -83,7 +81,7 @@ public class TodoListActivity extends AppCompatActivity {
         }
 
         sharedPref = getApplicationContext().getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
-        SORT_BY_FIELD = sharedPref.getInt("SORT_BY_FIELD", 0); // 0 is machine id, 1 is location
+        SORT_BY_FIELD = sharedPref.getInt("SORT_BY_FIELD", 0); // 0 is original, 1 machine_id, 2 is location
 
         empty_state_text_view = findViewById(R.id.empty_state_no_file_text_view);
         empty_state_completed_text_view = findViewById(R.id.empty_state_completed_text_view);
@@ -135,6 +133,14 @@ public class TodoListActivity extends AppCompatActivity {
                 if (resetValuesList != null) {
                     intent.putStringArrayListExtra("resetValuesArray", toDoDataList.get(position).getResetValuesList());
                 }
+                ArrayList<String> baseValuesList = toDoDataList.get(position).getBaseValuesList();
+                if (baseValuesList != null) {
+                    intent.putStringArrayListExtra("baseValuesArray", toDoDataList.get(position).getBaseValuesList());
+                }
+                ArrayList<String> incrementValuesList = toDoDataList.get(position).getIncrementValuesList();
+                if (incrementValuesList != null) {
+                    intent.putStringArrayListExtra("incrementValuesArray", toDoDataList.get(position).getIncrementValuesList());
+                }
                 intent.putExtra("hashMap", (HashMap)toDoDataList.get(position).getMap());
                 startActivityForResult(intent, SUBMIT_PROGRESSIVE_RECORD);
             }
@@ -146,8 +152,6 @@ public class TodoListActivity extends AppCompatActivity {
         }));
 
         populateRecyclerView("");
-
-        //handleIntent(getIntent());
     }
 
     private int getListPositionFromMachineId(String id) {
@@ -177,7 +181,7 @@ public class TodoListActivity extends AppCompatActivity {
 
                             for (int i = 0; i < mapList.size(); i++) {
                                 Map<String, Object> map = mapList.get(i);
-                                ToDoListData row = new ToDoListData(map);
+                                ToDoListData row = new ToDoListData(i, map);
                                 if (machineIdQuery.isEmpty()) {
                                     toDoDataList.add(row);
                                 } else {
@@ -186,11 +190,12 @@ public class TodoListActivity extends AppCompatActivity {
                                     }
                                 }
                             }
-                            //toDoDataListAll.addAll(toDoDataList);
                             //
                             if (SORT_BY_FIELD == 0) {
+                                Collections.sort(toDoDataList, ToDoListData.indexComparator);
+                            } else if (SORT_BY_FIELD == 1) {
                                 Collections.sort(toDoDataList, ToDoListData.machineIdComparator);
-                            } else { // SORT_BY_FIELD == 1
+                            } else if (SORT_BY_FIELD == 2) {
                                 Collections.sort(toDoDataList, ToDoListData.locationComparator);
                             }
                             toDoDataListAll.clear();
@@ -270,19 +275,6 @@ public class TodoListActivity extends AppCompatActivity {
             }
         }
     }
-
-    /*private String incrementMachineIdString(String machine_id) {
-        if (machine_id == null || machine_id.isEmpty()) {
-            return "";
-        }
-        try {
-            Integer newMachineIdInteger = Integer.valueOf(machine_id) + 1;
-            return Integer.toString(newMachineIdInteger);
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            return "";
-        }
-    }*/
 
     private void removeRowFromRecyclerView(int position) {
         toDoDataList.remove(position);
@@ -383,9 +375,19 @@ public class TodoListActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         SharedPreferences.Editor editor = sharedPref.edit();
         switch (item.getItemId()) {
-            case R.id.sort_machine_id:
+            case R.id.sort_upload_file:
                 //
                 editor.putInt("SORT_BY_FIELD", 0);
+                editor.apply();
+                //
+                Collections.sort(toDoDataList, ToDoListData.indexComparator);
+                toDoDataListAll.clear();
+                toDoDataListAll.addAll(toDoDataList);
+                mAdapter.notifyDataSetChanged();
+                return true;
+            case R.id.sort_machine_id:
+                //
+                editor.putInt("SORT_BY_FIELD", 1);
                 editor.apply();
                 //
                 Collections.sort(toDoDataList, ToDoListData.machineIdComparator);
@@ -395,7 +397,7 @@ public class TodoListActivity extends AppCompatActivity {
                 return true;
             case R.id.sort_location:
                 //
-                editor.putInt("SORT_BY_FIELD", 1);
+                editor.putInt("SORT_BY_FIELD", 2);
                 editor.apply();
                 //
                 Collections.sort(toDoDataList, ToDoListData.locationComparator);

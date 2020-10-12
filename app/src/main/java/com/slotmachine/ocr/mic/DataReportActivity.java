@@ -199,7 +199,6 @@ public class DataReportActivity extends AppCompatActivity {// implements Adapter
             public boolean onQueryTextSubmit(String query) {
                 //backupData.clear();
                 //backupData.addAll(rowDataList);
-                //Do some magic
                 //Toast.makeText(getApplicationContext(), "onQueryTextSubmit", Toast.LENGTH_SHORT).show();
                 //doSearch(query);
                 progressBar.setVisibility(View.VISIBLE);
@@ -329,7 +328,7 @@ public class DataReportActivity extends AppCompatActivity {// implements Adapter
 
     private void deleteScanFromDatabase(String document_id) {
         // Old sub collection
-        //database.collection("scans").document(document_id).delete();
+        database.collection("scans").document(document_id).delete();
 
         // New sub collection
         database.collection("users").document(firebaseAuth.getCurrentUser().getUid()).collection("scans").document(document_id).delete();
@@ -337,7 +336,7 @@ public class DataReportActivity extends AppCompatActivity {// implements Adapter
 
     private void executeQuery(DateRange dateRange) {
         Date time = new Date(System.currentTimeMillis() - offset * 1000);
-        CollectionReference collectionReference = database.collection("scans");
+        //CollectionReference collectionReference = database.collection("scans");
         CollectionReference usersCollection = database.collection("users")
                 .document(firebaseAuth.getCurrentUser().getUid())
                 .collection("scans");

@@ -7,15 +7,19 @@ import java.util.Comparator;
 
 public class ToDoListData {
 
+    private int index;
     private String location, machineId, description;
     private String user;
     private ArrayList<String> progressiveDescriptionsList;
     private ArrayList<String> resetValuesList;
+    private ArrayList<String> baseValuesList;
+    private ArrayList<String> incrementValuesList;
     private Map<String, Object> map;
 
-    public ToDoListData(Map<String, Object> mapp) {
+    public ToDoListData(int index, Map<String, Object> mapp) {
         this.map = mapp;
 
+        this.index = index;
         this.location = mapp.get("l").toString();
         this.machineId = mapp.get("m").toString();
         this.description = mapp.get("d").toString();
@@ -26,7 +30,21 @@ public class ToDoListData {
         if (mapp.containsKey("ra")) {
             this.resetValuesList = (ArrayList<String>)mapp.get("ra");
         }
+        if (mapp.containsKey("ba")) {
+            this.baseValuesList = (ArrayList<String>)mapp.get("ba");
+        }
+        if (mapp.containsKey("ia")) {
+            this.incrementValuesList = (ArrayList<String>)mapp.get("ia");
+        }
     }
+
+    public static Comparator<ToDoListData> indexComparator = new Comparator<ToDoListData>() {
+        public int compare(ToDoListData t1, ToDoListData t2) {
+            int index1 = t1.getIndex();
+            int index2 = t2.getIndex();
+            return index1 - index2; //ascending order
+        }
+    };
 
     public static Comparator<ToDoListData> machineIdComparator = new Comparator<ToDoListData>() {
         public int compare(ToDoListData t1, ToDoListData t2) {
@@ -44,6 +62,9 @@ public class ToDoListData {
         }
     };
 
+    public int getIndex() { return this.index; }
+    public void setIndex(int index) { this.index = index; }
+
     public String getLocation() { return this.location; }
     public void setLocation(String location) { this.location = location; }
 
@@ -59,6 +80,10 @@ public class ToDoListData {
     public ArrayList<String> getProgressiveDescriptionsList() { return this.progressiveDescriptionsList; }
 
     public ArrayList<String> getResetValuesList() { return this.resetValuesList; }
+
+    public ArrayList<String> getBaseValuesList() { return this.baseValuesList; }
+
+    public ArrayList<String> getIncrementValuesList() { return this.incrementValuesList; }
 
     public Map<String, Object> getMap() { return this.map; }
 

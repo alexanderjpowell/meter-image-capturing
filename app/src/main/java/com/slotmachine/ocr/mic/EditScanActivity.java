@@ -136,6 +136,12 @@ public class EditScanActivity extends AppCompatActivity {
         map.put("timestamp", FieldValue.serverTimestamp());
         map.put("notes", notes.getText().toString());
 
+        // Old Reference
+        database.collection("scans")
+                .document(document_id)
+                .update(map);
+
+        // New Reference
         database.collection("users")
                 .document(firebaseAuth.getCurrentUser().getUid())
                 .collection("scans")
