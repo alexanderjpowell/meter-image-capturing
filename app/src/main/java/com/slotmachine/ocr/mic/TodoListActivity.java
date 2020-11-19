@@ -129,10 +129,10 @@ public class TodoListActivity extends AppCompatActivity {
                 intent.putExtra("position", positionAll);
                 ArrayList<String> progressiveDescriptionTitlesList = toDoDataList.get(position).getProgressiveDescriptionsList();
                 intent.putStringArrayListExtra("progressiveDescriptionTitles", progressiveDescriptionTitlesList);
-                ArrayList<String> resetValuesList = toDoDataList.get(position).getResetValuesList();
-                if (resetValuesList != null) {
-                    intent.putStringArrayListExtra("resetValuesArray", toDoDataList.get(position).getResetValuesList());
-                }
+                //ArrayList<String> resetValuesList = toDoDataList.get(position).getResetValuesList();
+                //if (resetValuesList != null) {
+                    //intent.putStringArrayListExtra("resetValuesArray", toDoDataList.get(position).getResetValuesList());
+                //}
                 ArrayList<String> baseValuesList = toDoDataList.get(position).getBaseValuesList();
                 if (baseValuesList != null) {
                     intent.putStringArrayListExtra("baseValuesArray", toDoDataList.get(position).getBaseValuesList());

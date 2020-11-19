@@ -1125,7 +1125,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             //
 
             // Resets
-            final ArrayList<String> resetValuesArray = new ArrayList<>();
+            /*final ArrayList<String> resetValuesArray = new ArrayList<>();
             for (int i = 0; i < 10; i++) { // Populate with 10 null entries
                 resetValuesArray.add(null);
             }
@@ -1136,7 +1136,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         resetValuesArray.add(i, resets.get(i));
                     }
                 }
-            }
+            }*/
             // Bases
             final ArrayList<String> baseValuesArray = new ArrayList<>();
             for (int i = 0; i < 10; i++) { // Populate with 10 null entries
@@ -1244,7 +1244,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                     alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "SUBMIT ANYWAY",
                                             new DialogInterface.OnClickListener() {
                                                 public void onClick(DialogInterface dialog, int i) {
-                                                    insertToDatabase(userId, emailText, progressiveText1, progressiveText2, progressiveText3, progressiveText4, progressiveText5, progressiveText6, progressiveText7, progressiveText8, progressiveText9, progressiveText10, resetValuesArray.get(0), resetValuesArray.get(1), resetValuesArray.get(2), resetValuesArray.get(3), resetValuesArray.get(4), resetValuesArray.get(5), resetValuesArray.get(6), resetValuesArray.get(7), resetValuesArray.get(8), resetValuesArray.get(9), baseValuesArray.get(0), baseValuesArray.get(1), baseValuesArray.get(2), baseValuesArray.get(3), baseValuesArray.get(4), baseValuesArray.get(5), baseValuesArray.get(6), baseValuesArray.get(7), baseValuesArray.get(8), baseValuesArray.get(9), incrementValuesArray.get(0), incrementValuesArray.get(1), incrementValuesArray.get(2), incrementValuesArray.get(3), incrementValuesArray.get(4), incrementValuesArray.get(5), incrementValuesArray.get(6), incrementValuesArray.get(7), incrementValuesArray.get(8), incrementValuesArray.get(9), machineIdText, FieldValue.serverTimestamp(), userName, "", locationText);
+                                                    insertToDatabase(userId, emailText, progressiveText1, progressiveText2, progressiveText3, progressiveText4, progressiveText5, progressiveText6, progressiveText7, progressiveText8, progressiveText9, progressiveText10, baseValuesArray.get(0), baseValuesArray.get(1), baseValuesArray.get(2), baseValuesArray.get(3), baseValuesArray.get(4), baseValuesArray.get(5), baseValuesArray.get(6), baseValuesArray.get(7), baseValuesArray.get(8), baseValuesArray.get(9), incrementValuesArray.get(0), incrementValuesArray.get(1), incrementValuesArray.get(2), incrementValuesArray.get(3), incrementValuesArray.get(4), incrementValuesArray.get(5), incrementValuesArray.get(6), incrementValuesArray.get(7), incrementValuesArray.get(8), incrementValuesArray.get(9), machineIdText, FieldValue.serverTimestamp(), userName, "", locationText);
                                                     resetMachineId();
                                                     resetProgressives();
                                                     showToast("Progressive(s) submitted successfully");
@@ -1255,7 +1255,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                     alertDialog.show();
                                 } else {
                                     //showToast("ORIGINAL - 1");
-                                    insertToDatabase(userId, emailText, progressiveText1, progressiveText2, progressiveText3, progressiveText4, progressiveText5, progressiveText6, progressiveText7, progressiveText8, progressiveText9, progressiveText10, resetValuesArray.get(0), resetValuesArray.get(1), resetValuesArray.get(2), resetValuesArray.get(3), resetValuesArray.get(4), resetValuesArray.get(5), resetValuesArray.get(6), resetValuesArray.get(7), resetValuesArray.get(8), resetValuesArray.get(9), baseValuesArray.get(0), baseValuesArray.get(1), baseValuesArray.get(2), baseValuesArray.get(3), baseValuesArray.get(4), baseValuesArray.get(5), baseValuesArray.get(6), baseValuesArray.get(7), baseValuesArray.get(8), baseValuesArray.get(9), incrementValuesArray.get(0), incrementValuesArray.get(1), incrementValuesArray.get(2), incrementValuesArray.get(3), incrementValuesArray.get(4), incrementValuesArray.get(5), incrementValuesArray.get(6), incrementValuesArray.get(7), incrementValuesArray.get(8), incrementValuesArray.get(9), machineIdText, FieldValue.serverTimestamp(), userName, "", locationText);
+                                    insertToDatabase(userId, emailText, progressiveText1, progressiveText2, progressiveText3, progressiveText4, progressiveText5, progressiveText6, progressiveText7, progressiveText8, progressiveText9, progressiveText10, baseValuesArray.get(0), baseValuesArray.get(1), baseValuesArray.get(2), baseValuesArray.get(3), baseValuesArray.get(4), baseValuesArray.get(5), baseValuesArray.get(6), baseValuesArray.get(7), baseValuesArray.get(8), baseValuesArray.get(9), incrementValuesArray.get(0), incrementValuesArray.get(1), incrementValuesArray.get(2), incrementValuesArray.get(3), incrementValuesArray.get(4), incrementValuesArray.get(5), incrementValuesArray.get(6), incrementValuesArray.get(7), incrementValuesArray.get(8), incrementValuesArray.get(9), machineIdText, FieldValue.serverTimestamp(), userName, "", locationText);
                                     resetMachineId();
                                     resetProgressives();
                                     showToast("Progressive(s) submitted successfully");
@@ -1263,7 +1263,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                 }
                             } else {
                                 //showToast("ORIGINAL - 2");
-                                insertToDatabase(userId, emailText, progressiveText1, progressiveText2, progressiveText3, progressiveText4, progressiveText5, progressiveText6, progressiveText7, progressiveText8, progressiveText9, progressiveText10, resetValuesArray.get(0), resetValuesArray.get(1), resetValuesArray.get(2), resetValuesArray.get(3), resetValuesArray.get(4), resetValuesArray.get(5), resetValuesArray.get(6), resetValuesArray.get(7), resetValuesArray.get(8), resetValuesArray.get(9), baseValuesArray.get(0), baseValuesArray.get(1), baseValuesArray.get(2), baseValuesArray.get(3), baseValuesArray.get(4), baseValuesArray.get(5), baseValuesArray.get(6), baseValuesArray.get(7), baseValuesArray.get(8), baseValuesArray.get(9), incrementValuesArray.get(0), incrementValuesArray.get(1), incrementValuesArray.get(2), incrementValuesArray.get(3), incrementValuesArray.get(4), incrementValuesArray.get(5), incrementValuesArray.get(6), incrementValuesArray.get(7), incrementValuesArray.get(8), incrementValuesArray.get(9),  machineIdText, FieldValue.serverTimestamp(), userName, "", locationText);
+                                insertToDatabase(userId, emailText, progressiveText1, progressiveText2, progressiveText3, progressiveText4, progressiveText5, progressiveText6, progressiveText7, progressiveText8, progressiveText9, progressiveText10, baseValuesArray.get(0), baseValuesArray.get(1), baseValuesArray.get(2), baseValuesArray.get(3), baseValuesArray.get(4), baseValuesArray.get(5), baseValuesArray.get(6), baseValuesArray.get(7), baseValuesArray.get(8), baseValuesArray.get(9), incrementValuesArray.get(0), incrementValuesArray.get(1), incrementValuesArray.get(2), incrementValuesArray.get(3), incrementValuesArray.get(4), incrementValuesArray.get(5), incrementValuesArray.get(6), incrementValuesArray.get(7), incrementValuesArray.get(8), incrementValuesArray.get(9),  machineIdText, FieldValue.serverTimestamp(), userName, "", locationText);
                                 resetMachineId();
                                 resetProgressives();
                                 showToast("Progressive(s) submitted successfully");
@@ -1277,7 +1277,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 });
                 //
             } else {
-                insertToDatabase(userId, emailText, progressiveText1, progressiveText2, progressiveText3, progressiveText4, progressiveText5, progressiveText6, progressiveText7, progressiveText8, progressiveText9, progressiveText10, resetValuesArray.get(0), resetValuesArray.get(1), resetValuesArray.get(2), resetValuesArray.get(3), resetValuesArray.get(4), resetValuesArray.get(5), resetValuesArray.get(6), resetValuesArray.get(7), resetValuesArray.get(8), resetValuesArray.get(9), baseValuesArray.get(0), baseValuesArray.get(1), baseValuesArray.get(2), baseValuesArray.get(3), baseValuesArray.get(4), baseValuesArray.get(5), baseValuesArray.get(6), baseValuesArray.get(7), baseValuesArray.get(8), baseValuesArray.get(9), incrementValuesArray.get(0), incrementValuesArray.get(1), incrementValuesArray.get(2), incrementValuesArray.get(3), incrementValuesArray.get(4), incrementValuesArray.get(5), incrementValuesArray.get(6), incrementValuesArray.get(7), incrementValuesArray.get(8), incrementValuesArray.get(9),  machineIdText, FieldValue.serverTimestamp(), userName, "", locationText);
+                insertToDatabase(userId, emailText, progressiveText1, progressiveText2, progressiveText3, progressiveText4, progressiveText5, progressiveText6, progressiveText7, progressiveText8, progressiveText9, progressiveText10, baseValuesArray.get(0), baseValuesArray.get(1), baseValuesArray.get(2), baseValuesArray.get(3), baseValuesArray.get(4), baseValuesArray.get(5), baseValuesArray.get(6), baseValuesArray.get(7), baseValuesArray.get(8), baseValuesArray.get(9), incrementValuesArray.get(0), incrementValuesArray.get(1), incrementValuesArray.get(2), incrementValuesArray.get(3), incrementValuesArray.get(4), incrementValuesArray.get(5), incrementValuesArray.get(6), incrementValuesArray.get(7), incrementValuesArray.get(8), incrementValuesArray.get(9),  machineIdText, FieldValue.serverTimestamp(), userName, "", locationText);
                 resetMachineId();
                 resetProgressives();
                 showToast("Progressive(s) submitted successfully");
@@ -1407,7 +1407,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                   String progressive8,
                                   String progressive9,
                                   String progressive10,
-                                  String reset1,
+                                  /*String reset1,
                                   String reset2,
                                   String reset3,
                                   String reset4,
@@ -1416,7 +1416,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                   String reset7,
                                   String reset8,
                                   String reset9,
-                                  String reset10,
+                                  String reset10,*/
                                   String base1,
                                   String base2,
                                   String base3,
@@ -1455,7 +1455,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         user.put("progressive8", progressive8);
         user.put("progressive9", progressive9);
         user.put("progressive10", progressive10);
-        if (reset1 != null) { user.put("reset1", reset1); }
+        /*if (reset1 != null) { user.put("reset1", reset1); }
         if (reset2 != null) { user.put("reset2", reset2); }
         if (reset3 != null) { user.put("reset3", reset3); }
         if (reset4 != null) { user.put("reset4", reset4); }
@@ -1464,7 +1464,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         if (reset7 != null) { user.put("reset7", reset7); }
         if (reset8 != null) { user.put("reset8", reset8); }
         if (reset9 != null) { user.put("reset9", reset9); }
-        if (reset10 != null) { user.put("reset10", reset10); }
+        if (reset10 != null) { user.put("reset10", reset10); }*/
         //
         if (base1 != null) { user.put("base1", base1); }
         if (base2 != null) { user.put("base2", base2); }
