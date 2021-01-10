@@ -1424,7 +1424,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         try {
             startActivityForResult(intent, REQ_CODE_SPEECH_INPUT);
         } catch (ActivityNotFoundException a) {
-            showToast("Voice recognition not supported on your device");
+            showToast("Google and Carrier Services required for voice recognition");
         }
     }
 
