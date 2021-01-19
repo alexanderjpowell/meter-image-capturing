@@ -38,13 +38,13 @@ class LoginActivity : AppCompatActivity(), View.OnClickListener {
             finish()
         }
         //
-        val authViewModel = ViewModelProvider(this)[AuthViewModel::class.java]
+        /*val authViewModel = ViewModelProvider(this)[AuthViewModel::class.java]
         authViewModel.userLiveData.observe(this, {
             if (it != null) {
                 startActivity(Intent(this, MainActivity::class.java))
                 finish()
             }
-        })
+        })*/
         //
 
         emailEditText = findViewById(R.id.emailEditText)
