@@ -7,6 +7,7 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Environment;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.FileProvider;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
@@ -35,15 +36,17 @@ import com.miguelcatalan.materialsearchview.MaterialSearchView;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.Serializable;
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.text.SimpleDateFormat;
 
-public class DataReportActivity extends AppCompatActivity {// implements AdapterView.OnItemSelectedListener {
+public class DataReportActivity extends AppCompatActivity {
 
     private List<RowData> rowDataList;
     private RecyclerView recyclerView;
@@ -82,8 +85,8 @@ public class DataReportActivity extends AppCompatActivity {// implements Adapter
         // Ensure user is signed in
         firebaseAuth = FirebaseAuth.getInstance();
         if (firebaseAuth.getCurrentUser() == null) {
-            finish();
             startActivity(new Intent(DataReportActivity.this, LoginActivity.class));
+            finish();
             return;
         }
 
@@ -120,7 +123,7 @@ public class DataReportActivity extends AppCompatActivity {// implements Adapter
             public void onClick(View view, int position) {
                 RowData rowData = rowDataList.get(position);
                 Intent intent = new Intent(DataReportActivity.this, EditScanActivity.class);
-                intent.putExtra("MACHINE_ID", getMachineIdFromString(rowData.getMachineId()));
+                intent.putExtra("MACHINE_ID", rowData.getMachineId());
                 intent.putExtra("PROGRESSIVE_1", removeDollarSignFromString(rowData.getProgressive1()));
                 intent.putExtra("PROGRESSIVE_2", removeDollarSignFromString(rowData.getProgressive2()));
                 intent.putExtra("PROGRESSIVE_3", removeDollarSignFromString(rowData.getProgressive3()));
@@ -133,7 +136,9 @@ public class DataReportActivity extends AppCompatActivity {// implements Adapter
                 intent.putExtra("PROGRESSIVE_10", removeDollarSignFromString(rowData.getProgressive10()));
                 intent.putExtra("NOTES", rowData.getNotes());
                 intent.putExtra("DOCUMENT_ID", rowData.getDocumentId());
-                startActivity(intent);
+                intent.putExtra("position", position);
+                intent.putExtra("data", (Serializable)rowData);
+                startActivityForResult(intent, 666);
             }
 
             @Override
@@ -182,6 +187,16 @@ public class DataReportActivity extends AppCompatActivity {// implements Adapter
         //
 
         executeQuery(dateRange);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == 666 && resultCode == RESULT_OK) {
+            RowData rowData = (RowData)data.getSerializableExtra("updated_scan");
+            int pos = data.getIntExtra("position", 0);
+            mAdapter.setItem(pos, rowData);
+        }
     }
 
     @Override
@@ -336,20 +351,12 @@ public class DataReportActivity extends AppCompatActivity {// implements Adapter
 
     private void executeQuery(DateRange dateRange) {
         Date time = new Date(System.currentTimeMillis() - offset * 1000);
-        //CollectionReference collectionReference = database.collection("scans");
         CollectionReference usersCollection = database.collection("users")
                 .document(firebaseAuth.getCurrentUser().getUid())
                 .collection("scans");
-        /*Query query = collectionReference.whereEqualTo("uid", firebaseAuth.getCurrentUser().getUid())
-                .whereGreaterThan("timestamp", time)
-                .orderBy("timestamp", Query.Direction.DESCENDING)
-                .limit(QUERY_LIMIT_SIZE);*/
-        //
         Query query = usersCollection.whereGreaterThan("timestamp", time)
                 .orderBy("timestamp", Query.Direction.DESCENDING)
                 .limit(QUERY_LIMIT_SIZE);
-        //Query query = usersCollection.orderBy("machine_id", Query.Direction.DESCENDING).limit(QUERY_LIMIT_SIZE);
-        //
         query.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
@@ -381,34 +388,34 @@ public class DataReportActivity extends AppCompatActivity {// implements Adapter
 
             Map<String, Object> map = document.getData();
             if (map.containsKey("progressive1")) {
-                progressive1 = addDollarSign((String)map.get("progressive1"));
+                progressive1 = (String)map.get("progressive1");
             }
             if (map.containsKey("progressive2")) {
-                progressive2 = addDollarSign((String)map.get("progressive2"));
+                progressive2 = (String)map.get("progressive2");
             }
             if (map.containsKey("progressive3")) {
-                progressive3 = addDollarSign((String)map.get("progressive3"));
+                progressive3 = (String)map.get("progressive3");
             }
             if (map.containsKey("progressive4")) {
-                progressive4 = addDollarSign((String)map.get("progressive4"));
+                progressive4 = (String)map.get("progressive4");
             }
             if (map.containsKey("progressive5")) {
-                progressive5 = addDollarSign((String)map.get("progressive5"));
+                progressive5 = (String)map.get("progressive5");
             }
             if (map.containsKey("progressive6")) {
-                progressive6 = addDollarSign((String)map.get("progressive6"));
+                progressive6 = (String)map.get("progressive6");
             }
             if (map.containsKey("progressive7")) {
-                progressive7 = addDollarSign((String)map.get("progressive7"));
+                progressive7 = (String)map.get("progressive7");
             }
             if (map.containsKey("progressive8")) {
-                progressive8 = addDollarSign((String)map.get("progressive8"));
+                progressive8 = (String)map.get("progressive8");
             }
             if (map.containsKey("progressive9")) {
-                progressive9 = addDollarSign((String)map.get("progressive9"));
+                progressive9 = (String)map.get("progressive9");
             }
             if (map.containsKey("progressive10")) {
-                progressive10 = addDollarSign((String)map.get("progressive10"));
+                progressive10 = (String)map.get("progressive10");
             }
 
             if (map.containsKey("location")) {
@@ -427,7 +434,7 @@ public class DataReportActivity extends AppCompatActivity {// implements Adapter
             notes = (document.get("notes") == null) ? "" : document.get("notes").toString().trim();
 
             rowData = new RowData(document.getId(),
-                    "Machine ID: " + machine_id,
+                    machine_id,
                     formattedTimestamp,
                     user,
                     progressive1,
@@ -450,14 +457,6 @@ public class DataReportActivity extends AppCompatActivity {// implements Adapter
         mAdapter.notifyDataSetChanged();
     }
 
-    private String addDollarSign(String progressive) {
-        if (!progressive.trim().isEmpty()) {
-            return "$" + progressive.trim();
-        } else {
-            return "";
-        }
-    }
-
     private void showToast(String message) {
         Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG).show();
     }
@@ -467,15 +466,58 @@ public class DataReportActivity extends AppCompatActivity {// implements Adapter
         return Environment.MEDIA_MOUNTED.equals(state);
     }
 
-    private String getMachineIdFromString(String text) {
-        //Machine ID: 9792// <- Example of what text looks like
-        text = text.replace("Machine ID: ", "");
-        return text;
-    }
-
     private String removeDollarSignFromString(String text) {
         text = text.replace("$", "");
         return text;
+    }
+
+    private String createCsvFile2(QuerySnapshot snapshot) {
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("\"Machine ID\",\"Progressive Index\",\"Progressive Value\",\"Base\",\"Timestamp\",\"User\",\"Notes\",\"Location\"\n");
+
+        for (QueryDocumentSnapshot document : snapshot) {
+            Map<String, Object> data = document.getData();
+
+            String machine_id = data.containsKey("machine_id") ? (String)data.get("machine_id") : "";
+            String timestamp = data.containsKey("timestamp") ? ((Timestamp)data.get("timestamp")).toDate().toString() : "";
+            String user = data.containsKey("userName") ? (String)data.get("userName") : "";
+            String notes = data.containsKey("notes") ? (String)data.get("notes") : "";
+            notes = notes.replaceAll("\"", "");
+            String location = data.containsKey("location") ? (String)data.get("location") : "";
+
+            String[] progressives = {
+                    data.containsKey("progressive1") ? (String)data.get("progressive1") : "",
+                    data.containsKey("progressive2") ? (String)data.get("progressive2") : "",
+                    data.containsKey("progressive3") ? (String)data.get("progressive3") : "",
+                    data.containsKey("progressive4") ? (String)data.get("progressive4") : "",
+                    data.containsKey("progressive5") ? (String)data.get("progressive5") : "",
+                    data.containsKey("progressive6") ? (String)data.get("progressive6") : "",
+                    data.containsKey("progressive7") ? (String)data.get("progressive7") : "",
+                    data.containsKey("progressive8") ? (String)data.get("progressive8") : "",
+                    data.containsKey("progressive9") ? (String)data.get("progressive9") : "",
+                    data.containsKey("progressive10") ? (String)data.get("progressive10") : "",
+            };
+            String[] bases = {
+                    data.containsKey("base1") ? (String)data.get("base1") : "",
+                    data.containsKey("base2") ? (String)data.get("base2") : "",
+                    data.containsKey("base3") ? (String)data.get("base3") : "",
+                    data.containsKey("base4") ? (String)data.get("base4") : "",
+                    data.containsKey("base5") ? (String)data.get("base5") : "",
+                    data.containsKey("base6") ? (String)data.get("base6") : "",
+                    data.containsKey("base7") ? (String)data.get("base7") : "",
+                    data.containsKey("base8") ? (String)data.get("base8") : "",
+                    data.containsKey("base9") ? (String)data.get("base9") : "",
+                    data.containsKey("base10") ? (String)data.get("base10") : "",
+            };
+
+            for (int i = 0; i < 10; i++) {
+                if (!progressives[i].trim().isEmpty()) {
+                    stringBuilder.append("\"").append(machine_id).append("\",").append("\"").append(i+1).append("\",").append("\"").append(progressives[i]).append("\",").append("\"").append(bases[i]).append("\",").append("\"").append(timestamp).append("\",").append("\"").append(user).append("\",").append("\"").append(notes).append("\",").append("\"").append(location).append("\"\n");
+                }
+            }
+        }
+
+        return stringBuilder.toString();
     }
 
     private String createCsvFile(QuerySnapshot snapshot) {
@@ -622,7 +664,6 @@ public class DataReportActivity extends AppCompatActivity {// implements Adapter
 
         if (isExternalStorageWritable()) {
             Date time = new Date(System.currentTimeMillis() - offset * 1000);
-            //CollectionReference collectionReference = database.collection("scans");
             CollectionReference usersCollection = database.collection("users")
                     .document(firebaseAuth.getCurrentUser().getUid())
                     .collection("scans");
@@ -634,7 +675,7 @@ public class DataReportActivity extends AppCompatActivity {// implements Adapter
                 @Override
                 public void onComplete(@NonNull Task<QuerySnapshot> task) {
                     if (task.isSuccessful()) {
-                        String report_contents = createCsvFile(task.getResult());
+                        String report_contents = createCsvFile2(task.getResult());
                         try {
                             FileOutputStream fos = new FileOutputStream(csvFile);
                             fos.write(report_contents.getBytes());

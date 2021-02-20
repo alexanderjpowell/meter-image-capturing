@@ -1,7 +1,9 @@
 package com.slotmachine.ocr.mic;
 
+import java.io.Serializable;
+
 // POJO for scan data displayed to the user
-public class RowData {
+public class RowData implements Serializable {
 
     private String documentId, machineId, date, user, progressive1, progressive2, progressive3, progressive4, progressive5, progressive6, progressive7, progressive8, progressive9, progressive10, location, notes;
     private boolean isSelected;

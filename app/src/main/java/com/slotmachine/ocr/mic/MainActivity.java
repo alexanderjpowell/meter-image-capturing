@@ -752,9 +752,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         } else if (id == R.id.nav_slideshow) {
             intent = new Intent(MainActivity.this, ManageUsersActivity.class);
             startActivity(intent);
-        //} else if (id == R.id.nav_settings) {
-        //    intent = new Intent(MainActivity.this, SettingsActivity.class);
-        //    startActivity(intent);
         } else if (id == R.id.nav_settings) {
 
             if (DEBUG) {
@@ -806,6 +803,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         });
                 alertDialog.show();
             }
+        } else if (id == R.id.nav_sign_out) {
+            AuthUI.getInstance().signOut(this)
+                    .addOnCompleteListener(new OnCompleteListener<Void>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Void> task) {
+                            startActivity(new Intent(MainActivity.this, LoginActivity.class));
+                            finish();
+                        }
+                    });
         }
 
         DrawerLayout drawer = findViewById(R.id.drawer_layout);

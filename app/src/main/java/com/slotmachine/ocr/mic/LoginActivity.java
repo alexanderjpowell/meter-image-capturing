@@ -3,7 +3,6 @@ package com.slotmachine.ocr.mic;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.SpannableString;
 import android.text.Spanned;
@@ -19,10 +18,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 
-public class LoginActivity extends AppCompatActivity implements View.OnClickListener {
+public class LoginActivity extends BaseActivity implements View.OnClickListener {
 
     private FirebaseAuth firebaseAuth;
     private EditText emailEditText;
@@ -86,6 +86,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         progressDialog.dismiss();
                         if (task.isSuccessful()) {
+                            onEvent(FirebaseAnalytics.Event.LOGIN, task.getResult().getUser().getUid());
                             finish();
                             Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                             intent.putExtra("comingFromLogin", true);
