@@ -40,7 +40,6 @@ import java.io.Serializable;
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -110,7 +109,7 @@ public class DataReportActivity extends AppCompatActivity {
 
         rowDataList = new ArrayList<>();
         recyclerView = findViewById(R.id.recycler_view);
-        mAdapter = new ReportDataAdapter(DataReportActivity.this, rowDataList);
+        mAdapter = new ReportDataAdapter(rowDataList);
 
         final LinearLayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
         recyclerView.setLayoutManager(mLayoutManager);
@@ -207,7 +206,7 @@ public class DataReportActivity extends AppCompatActivity {
         searchView = findViewById(R.id.search_view);
         searchView.setMenuItem(searchItem);
 
-        final List<RowData> backupData = new ArrayList<RowData>();
+        final List<RowData> backupData = new ArrayList<>();
 
         searchView.setOnQueryTextListener(new MaterialSearchView.OnQueryTextListener() {
             @Override

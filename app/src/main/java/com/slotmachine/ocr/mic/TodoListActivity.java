@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -59,8 +58,6 @@ public class TodoListActivity extends AppCompatActivity {
 
     private SharedPreferences sharedPref;
     private int SORT_BY_FIELD;
-
-    private String TAG = "TodoListActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -129,10 +126,6 @@ public class TodoListActivity extends AppCompatActivity {
                 intent.putExtra("position", positionAll);
                 ArrayList<String> progressiveDescriptionTitlesList = toDoDataList.get(position).getProgressiveDescriptionsList();
                 intent.putStringArrayListExtra("progressiveDescriptionTitles", progressiveDescriptionTitlesList);
-                //ArrayList<String> resetValuesList = toDoDataList.get(position).getResetValuesList();
-                //if (resetValuesList != null) {
-                    //intent.putStringArrayListExtra("resetValuesArray", toDoDataList.get(position).getResetValuesList());
-                //}
                 ArrayList<String> baseValuesList = toDoDataList.get(position).getBaseValuesList();
                 if (baseValuesList != null) {
                     intent.putStringArrayListExtra("baseValuesArray", toDoDataList.get(position).getBaseValuesList());
@@ -147,7 +140,6 @@ public class TodoListActivity extends AppCompatActivity {
 
             @Override
             public void onLongClick(View view, final int position) {
-                // TODO
             }
         }));
 
@@ -207,11 +199,9 @@ public class TodoListActivity extends AppCompatActivity {
                         mAdapter.notifyDataSetChanged();
                     } else {
                         toggleEmptyStateDisplays(EmptyState.NO_FILE_UPLOAD);
-                        Log.d(TAG, "No such document");
                     }
                 } else {
                     showToast(task.getException().getMessage());
-                    Log.d(TAG, "get failed with ", task.getException());
                 }
 
                 // Finish things up
@@ -257,19 +247,13 @@ public class TodoListActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
         super.onActivityResult(requestCode, resultCode, intent);
-
         if (resultCode == RESULT_OK) {
             if (requestCode == SUBMIT_PROGRESSIVE_RECORD) {
-                //showToast(Integer.toString(toDoDataListAll.size()));
                 int recyclerViewPosition = intent.getIntExtra("position", 0);
-                //previousMachineId = intent.getStringExtra("machine_id");
-
                 if (searchView.hasFocus()) {
                     searchView.clearFocus();
                     searchView.closeSearch();
                 }
-
-                //showToast(Integer.toString(recyclerViewPosition));
                 recyclerView.scrollToPosition(recyclerViewPosition);
                 removeRowFromRecyclerView(recyclerViewPosition);
             }
@@ -286,12 +270,6 @@ public class TodoListActivity extends AppCompatActivity {
         toDoDataListAll.clear();
         toDoDataListAll.addAll(toDoDataList);
     }
-
-    /*private void removeMachineIdFromRecyclerView(String machineId) {
-        int pos = getDataListPositionFromMachineId(machineId);
-        toDoDataList.remove(pos);
-        mAdapter.notifyDataSetChanged();
-    }*/
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

@@ -1,6 +1,5 @@
 package com.slotmachine.ocr.mic;
 
-import android.content.Context;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -12,25 +11,18 @@ import java.util.List;
 
 public class ReportDataAdapter extends RecyclerView.Adapter<ReportDataAdapter.ReportDataHolder> {
 
-    private Context context;
     private List<RowData> rowDataList;
 
-    public ReportDataAdapter(Context context, List<RowData> rowDataList) {
-        this.context = context;
+    public ReportDataAdapter(List<RowData> rowDataList) {
         this.rowDataList = rowDataList;
     }
 
     @Override
     @NonNull
     public ReportDataHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view  = LayoutInflater.from(context).inflate(R.layout.report_list_row, parent,false);
+        View view  = LayoutInflater.from(parent.getContext()).inflate(R.layout.report_list_row, parent,false);
         return new ReportDataHolder(view);
     }
-
-    /*@Override
-    public int getItemViewType(int position) {
-        return 5;
-    }*/
 
     @Override
     public void onBindViewHolder(@NonNull final ReportDataHolder holder, final int position) {
@@ -56,85 +48,61 @@ public class ReportDataAdapter extends RecyclerView.Adapter<ReportDataAdapter.Re
             holder.progressiveTextView1.setText("$" + rowData.getProgressive1());
         } else {
             holder.progressiveTextView1.setText("");
-            //holder.progressiveTextView1.setVisibility(View.INVISIBLE);
         }
 
         if (!progressive2.trim().isEmpty()) {
             holder.progressiveTextView2.setText("$" + rowData.getProgressive2());
         } else {
             holder.progressiveTextView2.setText("");
-            //holder.progressiveTextView2.setVisibility(View.INVISIBLE);
         }
 
         if (!progressive3.trim().isEmpty()) {
             holder.progressiveTextView3.setText("$" + rowData.getProgressive3());
         } else {
             holder.progressiveTextView3.setText("");
-            //holder.progressiveTextView3.setVisibility(View.INVISIBLE);
         }
 
         if (!progressive4.trim().isEmpty()) {
             holder.progressiveTextView4.setText("$" + rowData.getProgressive4());
         } else {
             holder.progressiveTextView4.setText("");
-            //holder.progressiveTextView4.setVisibility(View.INVISIBLE);
         }
 
         if (!progressive5.trim().isEmpty()) {
             holder.progressiveTextView5.setText("$" + rowData.getProgressive5());
         } else {
             holder.progressiveTextView5.setText("");
-            //holder.progressiveTextView5.setVisibility(View.INVISIBLE);
         }
 
         if (!progressive6.trim().isEmpty()) {
             holder.progressiveTextView6.setText("$" + rowData.getProgressive6());
         } else {
             holder.progressiveTextView6.setText("");
-            //holder.progressiveTextView6.setVisibility(View.INVISIBLE);
         }
 
         if (!progressive7.trim().isEmpty()) {
             holder.progressiveTextView7.setText("$" + rowData.getProgressive7());
         } else {
             holder.progressiveTextView7.setText("");
-            //holder.progressiveTextView7.setVisibility(View.INVISIBLE);
         }
 
         if (!progressive8.trim().isEmpty()) {
             holder.progressiveTextView8.setText("$" + rowData.getProgressive8());
         } else {
             holder.progressiveTextView8.setText("");
-            //holder.progressiveTextView8.setVisibility(View.INVISIBLE);
         }
 
         if (!progressive9.trim().isEmpty()) {
             holder.progressiveTextView9.setText("$" + rowData.getProgressive9());
         } else {
             holder.progressiveTextView9.setText("");
-            //holder.progressiveTextView9.setVisibility(View.INVISIBLE);
         }
 
         if (!progressive10.trim().isEmpty()) {
             holder.progressiveTextView10.setText("$" + rowData.getProgressive10());
         } else {
             holder.progressiveTextView10.setText("");
-            //holder.progressiveTextView10.setVisibility(View.INVISIBLE);
         }
-
-        /*holder.notesTextView.setText(rowData.getNotes());
-
-        holder.checkBox.setChecked(rowData.isSelected());
-        holder.checkBox.setTag(rowDataList.get(position));
-
-        holder.checkBox.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                RowData rowData1 = (RowData)holder.checkBox.getTag();
-                rowData1.setSelected(holder.checkBox.isChecked());
-                rowDataList.get(position).setSelected(holder.checkBox.isChecked());
-            }
-        });*/
     }
 
     @Override
@@ -146,11 +114,6 @@ public class ReportDataAdapter extends RecyclerView.Adapter<ReportDataAdapter.Re
         rowDataList.set(position, item);
         notifyItemChanged(position);
     }
-
-    /*public void removeItem(int position) {
-        rowDataList.remove(position);
-        notifyItemRemoved(position);
-    }*/
 
     public static class ReportDataHolder extends RecyclerView.ViewHolder{
 
@@ -181,8 +144,4 @@ public class ReportDataAdapter extends RecyclerView.Adapter<ReportDataAdapter.Re
             checkBox = itemView.findViewById(R.id.checkBox);
         }
     }
-
-    /*public List<RowData> getRowDataList(){
-        return rowDataList;
-    }*/
 }

@@ -78,6 +78,8 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
+import timber.log.Timber;
+
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, View.OnTouchListener {
 
     public static final int REQUEST_TAKE_PHOTO_PROGRESSIVES = 0;
@@ -103,6 +105,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public TextInputEditText progressive9;
     public TextInputEditText progressive10;
     public TextInputEditText machineId;
+    public TextInputEditText notesEditText;
 
     public TextInputLayout inputLayout0;
     public TextInputLayout inputLayout1;
@@ -121,10 +124,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private RelativeLayout relativeLayoutProgressive9;
     private RelativeLayout relativeLayoutProgressive10;
 
-    //public Spinner spinner;
     private String username;
-
-    //private DrawerLayout mDrawerLayout;
 
     private FirebaseAuth firebaseAuth;
     private FirebaseFirestore database;
@@ -132,7 +132,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private Double minimumProgressiveValue;
     private int NUMBER_OF_PROGRESSIVES;
 
-    private Set<String> set = new HashSet<>();
+    private List<String> progressiveDescriptions = null;
 
     private Intent intent;
 
@@ -141,14 +141,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     private boolean DEBUG = false; // When debug is enabled a password isn't necessary to enter settings
 
-    private static String TAG = "MainActivity";
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // Ensure user is signed in
         firebaseAuth = FirebaseAuth.getInstance();
         if (firebaseAuth.getCurrentUser() == null) {
             startActivity(new Intent(MainActivity.this, LoginActivity.class));
@@ -178,7 +175,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         relativeLayoutProgressive10 = findViewById(R.id.progressive10_relative_layout);
 
         NUMBER_OF_PROGRESSIVES = sharedPref.getInt("number_of_progressives", 6);
-        //showToast(Integer.toString(NUMBER_OF_PROGRESSIVES));
         if (NUMBER_OF_PROGRESSIVES == 6) {
             relativeLayoutProgressive7.setVisibility(View.GONE);
             relativeLayoutProgressive8.setVisibility(View.GONE);
@@ -207,11 +203,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
         //
 
-        //
         database = FirebaseFirestore.getInstance();
-        //
         checkPermissions();
-        //
 
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -235,6 +228,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         progressive9 = findViewById(R.id.progressive9);
         progressive10 = findViewById(R.id.progressive10);
         machineId = findViewById(R.id.machineId);
+        notesEditText = findViewById(R.id.notes_edit_text);
         submitButton = findViewById(R.id.submit_button);
 
         inputLayout0 = findViewById(R.id.inputLayout0);
@@ -281,65 +275,16 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         intent = getIntent();
         String machine_id = intent.getStringExtra("machine_id");
         int numberOfProgressives = intent.getIntExtra("numberOfProgressives",0);
-        //int numberOfProgressives = 10;
         labelEditTextsFromToDo(machine_id, numberOfProgressives);
 
-        //String[] progressiveDescriptionTitles = intent.getStringArrayExtra("progressiveDescriptionTitles");
-        List<String> progressiveDescriptionTitles = intent.getStringArrayListExtra("progressiveDescriptionTitles");
-        if (progressiveDescriptionTitles != null) {
-            labelEditTextsFromToDo2(progressiveDescriptionTitles);
-
-            // Set additional progressive text boxes if needed
-            if (progressiveDescriptionTitles.size() <= 6) {
-                relativeLayoutProgressive7.setVisibility(View.GONE);
-                relativeLayoutProgressive8.setVisibility(View.GONE);
-                relativeLayoutProgressive9.setVisibility(View.GONE);
-                relativeLayoutProgressive10.setVisibility(View.GONE);
-            } else if (progressiveDescriptionTitles.size() == 7) {
-                relativeLayoutProgressive7.setVisibility(View.VISIBLE);
-                relativeLayoutProgressive8.setVisibility(View.GONE);
-                relativeLayoutProgressive9.setVisibility(View.GONE);
-                relativeLayoutProgressive10.setVisibility(View.GONE);
-            } else if (progressiveDescriptionTitles.size() == 8) {
-                relativeLayoutProgressive7.setVisibility(View.VISIBLE);
-                relativeLayoutProgressive8.setVisibility(View.VISIBLE);
-                relativeLayoutProgressive9.setVisibility(View.GONE);
-                relativeLayoutProgressive10.setVisibility(View.GONE);
-            } else if (progressiveDescriptionTitles.size() == 9) {
-                relativeLayoutProgressive7.setVisibility(View.VISIBLE);
-                relativeLayoutProgressive8.setVisibility(View.VISIBLE);
-                relativeLayoutProgressive9.setVisibility(View.VISIBLE);
-                relativeLayoutProgressive10.setVisibility(View.GONE);
-            } else if (progressiveDescriptionTitles.size() == 10) {
-                relativeLayoutProgressive7.setVisibility(View.VISIBLE);
-                relativeLayoutProgressive8.setVisibility(View.VISIBLE);
-                relativeLayoutProgressive9.setVisibility(View.VISIBLE);
-                relativeLayoutProgressive10.setVisibility(View.VISIBLE);
-            }
-            //
+        progressiveDescriptions = intent.getStringArrayListExtra("progressiveDescriptionTitles");
+        if (progressiveDescriptions != null) {
+            labelEditTextsFromToDo2(progressiveDescriptions);
         }
         // Also check if coming from login activity and send verification email if necessary
         boolean comingFromLogin = intent.getBooleanExtra("comingFromLogin", false);
         if (comingFromLogin) {
-            //Map<String, Object> data = new HashMap<>();
-            //data.put("email", firebaseAuth.getCurrentUser().getEmail());
-            //database.collection("users").document(firebaseAuth.getCurrentUser().getUid()).set(data, SetOptions.merge());
             showDialogForAdminAccount();
-        }
-        if (comingFromLogin && !firebaseAuth.getCurrentUser().isEmailVerified()) {
-                firebaseAuth.getCurrentUser().reload().addOnCompleteListener(new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        if (task.isSuccessful()) {
-                            if (!firebaseAuth.getCurrentUser().isEmailVerified()) {
-                                //showToast("Verified: " + Boolean.toString(firebaseAuth.getCurrentUser().isEmailVerified()));
-                                firebaseAuth.getCurrentUser().sendEmailVerification();
-                            }
-                        } else {
-                            showToast("Unable to reload user");
-                        }
-                    }
-                });
         }
         //
 
@@ -351,12 +296,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         } catch (Exception ex) {
             minimumProgressiveValue = 0.0;
         }
-
-        /*boolean reject_duplicates = sharedPreferences.getBoolean("reject_duplicates", false);
-        int reject_duplicates_duration = sharedPreferences.getInt("reject_duplicates_duration", 0);
-        if (reject_duplicates) {
-            populateDuplicatesSet(reject_duplicates_duration);
-        }*/
     }
 
     private void showDialogForAdminAccount() {
@@ -376,7 +315,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 });
         alertDialog.setCancelable(false);
         alertDialog.setCanceledOnTouchOutside(false);
-        //alertDialog.show();
         DocumentReference docRef = database.collection("admins").document(firebaseAuth.getCurrentUser().getEmail());
         docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
@@ -406,8 +344,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     private void labelEditTextsFromToDo(String machine_id, int numberOfProgressives) {
-        //numberOfProgressives = (numberOfProgressives > 6) ? 6 : numberOfProgressives;
-        numberOfProgressives = (numberOfProgressives > 10) ? 10 : numberOfProgressives;
+        numberOfProgressives = Math.min(numberOfProgressives, 10);
         int[][] states = new int[][] {
                 new int[] { android.R.attr.state_enabled }, // enabled
                 new int[] { -android.R.attr.state_enabled }, // disabled
@@ -428,7 +365,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
     }
 
-    //private void labelEditTextsFromToDo2(String[] progressiveDescriptionTitles) {
     private void labelEditTextsFromToDo2(List<String> progressiveDescriptionTitles) {
         int[][] states = new int[][] {
                 new int[] { android.R.attr.state_enabled }, // enabled
@@ -451,31 +387,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
         }
     }
-
-    /*private void populateDuplicatesSet(int duration) {
-        set.clear();
-        //int offset = 86400; // 24 * 60 * 60
-        int offset = duration * 60 * 60;
-        //showToast(Integer.toString(duration));
-        Date time = new Date(System.currentTimeMillis() - offset * 1000);
-        CollectionReference collectionReference = database.collection("scans");
-        Query query = collectionReference.whereEqualTo("uid", firebaseAuth.getCurrentUser().getUid())
-                .whereGreaterThan("timestamp", time)
-                .orderBy("timestamp", Query.Direction.DESCENDING)
-                .limit(1000);
-        query.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                if (task.isSuccessful()) {
-                    for (QueryDocumentSnapshot document : task.getResult()) {
-                        set.add(document.get("machine_id").toString().trim());
-                    }
-                } else {
-                    showToast("Unable to refresh.  Check your connection.");
-                }
-            }
-        });
-    }*/
 
     @Override
     public boolean onTouch(View v, MotionEvent event) {
@@ -673,15 +584,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 MY_PERMISSIONS_REQUEST_CODE);
     }
 
-    /*@Override
-    public void onBackPressed() {
-        Intent intent = new Intent(Intent.ACTION_MAIN);
-        intent.addCategory(Intent.CATEGORY_HOME);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        startActivity(intent);
-        finish();
-    }*/
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -719,21 +621,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 startActivityForResult(takePictureIntent, request);
             }
         }
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        /*if (id == R.id.action_bar_spinner) {
-            showToast(spinner.getSelectedItem().toString());
-            return true;
-        }*/
-
-        return super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -881,7 +768,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
         } catch (Exception error) {
             error.printStackTrace();
-            Log.d("ERROR", error.getMessage());
             showToast("Error");
         }
     }
@@ -889,6 +775,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private void resetMachineId() {
         machineId.setText("");
         machineId.clearFocus();
+    }
+
+    private void resetNotes() {
+        notesEditText.setText("");
+        notesEditText.clearFocus();
     }
 
     private void resetProgressives() {
@@ -925,7 +816,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                             @Override
                             public void onSuccess(FirebaseVisionDocumentText firebaseVisionDocumentText) {
                                 if (firebaseVisionDocumentText == null) {
-                                    Log.d("ERROR", "firebaseVisionDocumentText is null");
                                     showToast("No text detected.  Try again.  ");
                                     return;
                                 }
@@ -942,14 +832,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                     List<FirebaseVisionDocumentText.Paragraph> paragraphs = block.getParagraphs();
                                     for (FirebaseVisionDocumentText.Paragraph paragraph : paragraphs) {
                                         List<FirebaseVisionDocumentText.Word> words = paragraph.getWords();
-                                        Log.d("PARAGRAPH", paragraph.getText());
                                         if (getNumberOfOccurrences(paragraph.getText()) == 2) {
                                             int firstIndex = paragraph.getText().indexOf('#');
                                             int secondIndex = paragraph.getText().indexOf('#', firstIndex + 1);
                                             machineCode = paragraph.getText().substring(firstIndex+1, secondIndex).trim();
                                         }
                                         for (FirebaseVisionDocumentText.Word word : words) {
-                                            //Log.d("WORDS", word.getText());
                                             if (!isAlpha(word.getText())) {
                                                 sb.append(word.getText().trim());
                                                 filteredWords.add(word);
@@ -959,8 +847,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                         }
                                     }
                                 }
-
-                                Log.d("StringBuilder: ", sb.toString());
 
                                 List<String> dollarValues = TextParser.parse(filteredWords);
                                 if (minimumProgressiveValue != null) {
@@ -1032,10 +918,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public void scanProgressives(View view) {
         dispatchTakePictureIntent(REQUEST_TAKE_PHOTO_PROGRESSIVES);
     }
-
-    /*public void scanMachineId(View view) {
-        dispatchTakePictureIntent(REQUEST_TAKE_PHOTO_MACHINE_ID);
-    }*/
 
     private void printRect(Rect rect) {
         String left = Integer.toString(rect.left);
@@ -1124,25 +1006,26 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             final String progressiveText8 = progressive8.getText().toString().trim();
             final String progressiveText9 = progressive9.getText().toString().trim();
             final String progressiveText10 = progressive10.getText().toString().trim();
+            final String notesText = notesEditText.getText().toString().trim();
 
             //
             String location = getIntent().getStringExtra("location");
             final String locationText = location == null ? "" : location;
             //
 
-            // Resets
-            /*final ArrayList<String> resetValuesArray = new ArrayList<>();
+            // Descriptions
+            final ArrayList<String> descriptionValuesArray = new ArrayList<>();
             for (int i = 0; i < 10; i++) { // Populate with 10 null entries
-                resetValuesArray.add(null);
+                descriptionValuesArray.add(null);
             }
-            if (getIntent().hasExtra("resetValuesArray")) {
-                ArrayList<String> resets = getIntent().getStringArrayListExtra("resetValuesArray");
-                for (int i = 0; i < resets.size(); i++) {
-                    if (resets.get(i) != null && !resets.get(i).isEmpty()) {
-                        resetValuesArray.add(i, resets.get(i));
+            if (getIntent().hasExtra("progressiveDescriptionTitles")) {
+                ArrayList<String> descriptions = getIntent().getStringArrayListExtra("progressiveDescriptionTitles");
+                for (int i = 0; i < descriptions.size(); i++) {
+                    if (descriptions.get(i) != null && !descriptions.get(i).isEmpty()) {
+                        descriptionValuesArray.add(i, descriptions.get(i));
                     }
                 }
-            }*/
+            }
             // Bases
             final ArrayList<String> baseValuesArray = new ArrayList<>();
             for (int i = 0; i < 10; i++) { // Populate with 10 null entries
@@ -1171,7 +1054,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
             //
 
-            final String emailText = firebaseAuth.getCurrentUser().getEmail().trim();
             final String userId = firebaseAuth.getCurrentUser().getUid().trim();
             final String userName = username;
 
@@ -1236,9 +1118,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                 Timestamp timestamp = (Timestamp)documents.get(0).get("timestamp");
                                 long delta = Math.abs((timestamp.getSeconds() * 1000) - System.currentTimeMillis());
                                 if (delta <= REJECT_DUPLICATES_DURATION_MILLIS) {
-                                    //showToast("DUPLICATE");
                                     AlertDialog alertDialog = new AlertDialog.Builder(MainActivity.this).create();
-                                    //alertDialog.setMessage("This machine has already been scanned in the past 24 hours.");
                                     String message = String.format(Locale.US, "This machine has already been scanned in the past %d hour(s).", REJECT_DUPLICATES_DURATION_HOURS);
                                     alertDialog.setMessage(message);
                                     alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, "CANCEL",
@@ -1250,9 +1130,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                     alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "SUBMIT ANYWAY",
                                             new DialogInterface.OnClickListener() {
                                                 public void onClick(DialogInterface dialog, int i) {
-                                                    insertToDatabase(userId, emailText, progressiveText1, progressiveText2, progressiveText3, progressiveText4, progressiveText5, progressiveText6, progressiveText7, progressiveText8, progressiveText9, progressiveText10, baseValuesArray.get(0), baseValuesArray.get(1), baseValuesArray.get(2), baseValuesArray.get(3), baseValuesArray.get(4), baseValuesArray.get(5), baseValuesArray.get(6), baseValuesArray.get(7), baseValuesArray.get(8), baseValuesArray.get(9), incrementValuesArray.get(0), incrementValuesArray.get(1), incrementValuesArray.get(2), incrementValuesArray.get(3), incrementValuesArray.get(4), incrementValuesArray.get(5), incrementValuesArray.get(6), incrementValuesArray.get(7), incrementValuesArray.get(8), incrementValuesArray.get(9), machineIdText, FieldValue.serverTimestamp(), userName, "", locationText);
+                                                    insertToDatabase(userId, progressiveText1, progressiveText2, progressiveText3, progressiveText4, progressiveText5, progressiveText6, progressiveText7, progressiveText8, progressiveText9, progressiveText10, descriptionValuesArray.get(0), descriptionValuesArray.get(1), descriptionValuesArray.get(2), descriptionValuesArray.get(3), descriptionValuesArray.get(4), descriptionValuesArray.get(5), descriptionValuesArray.get(6), descriptionValuesArray.get(7), descriptionValuesArray.get(8), descriptionValuesArray.get(9), baseValuesArray.get(0), baseValuesArray.get(1), baseValuesArray.get(2), baseValuesArray.get(3), baseValuesArray.get(4), baseValuesArray.get(5), baseValuesArray.get(6), baseValuesArray.get(7), baseValuesArray.get(8), baseValuesArray.get(9), incrementValuesArray.get(0), incrementValuesArray.get(1), incrementValuesArray.get(2), incrementValuesArray.get(3), incrementValuesArray.get(4), incrementValuesArray.get(5), incrementValuesArray.get(6), incrementValuesArray.get(7), incrementValuesArray.get(8), incrementValuesArray.get(9), machineIdText, FieldValue.serverTimestamp(), userName, notesText, locationText);
                                                     resetMachineId();
                                                     resetProgressives();
+                                                    resetNotes();
                                                     showToast("Progressive(s) submitted successfully");
                                                     hideKeyboard();
                                                     dialog.dismiss();
@@ -1260,32 +1141,32 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                             });
                                     alertDialog.show();
                                 } else {
-                                    //showToast("ORIGINAL - 1");
-                                    insertToDatabase(userId, emailText, progressiveText1, progressiveText2, progressiveText3, progressiveText4, progressiveText5, progressiveText6, progressiveText7, progressiveText8, progressiveText9, progressiveText10, baseValuesArray.get(0), baseValuesArray.get(1), baseValuesArray.get(2), baseValuesArray.get(3), baseValuesArray.get(4), baseValuesArray.get(5), baseValuesArray.get(6), baseValuesArray.get(7), baseValuesArray.get(8), baseValuesArray.get(9), incrementValuesArray.get(0), incrementValuesArray.get(1), incrementValuesArray.get(2), incrementValuesArray.get(3), incrementValuesArray.get(4), incrementValuesArray.get(5), incrementValuesArray.get(6), incrementValuesArray.get(7), incrementValuesArray.get(8), incrementValuesArray.get(9), machineIdText, FieldValue.serverTimestamp(), userName, "", locationText);
+                                    insertToDatabase(userId, progressiveText1, progressiveText2, progressiveText3, progressiveText4, progressiveText5, progressiveText6, progressiveText7, progressiveText8, progressiveText9, progressiveText10, descriptionValuesArray.get(0), descriptionValuesArray.get(1), descriptionValuesArray.get(2), descriptionValuesArray.get(3), descriptionValuesArray.get(4), descriptionValuesArray.get(5), descriptionValuesArray.get(6), descriptionValuesArray.get(7), descriptionValuesArray.get(8), descriptionValuesArray.get(9), baseValuesArray.get(0), baseValuesArray.get(1), baseValuesArray.get(2), baseValuesArray.get(3), baseValuesArray.get(4), baseValuesArray.get(5), baseValuesArray.get(6), baseValuesArray.get(7), baseValuesArray.get(8), baseValuesArray.get(9), incrementValuesArray.get(0), incrementValuesArray.get(1), incrementValuesArray.get(2), incrementValuesArray.get(3), incrementValuesArray.get(4), incrementValuesArray.get(5), incrementValuesArray.get(6), incrementValuesArray.get(7), incrementValuesArray.get(8), incrementValuesArray.get(9), machineIdText, FieldValue.serverTimestamp(), userName, notesText, locationText);
                                     resetMachineId();
                                     resetProgressives();
+                                    resetNotes();
                                     showToast("Progressive(s) submitted successfully");
                                     hideKeyboard();
                                 }
                             } else {
-                                //showToast("ORIGINAL - 2");
-                                insertToDatabase(userId, emailText, progressiveText1, progressiveText2, progressiveText3, progressiveText4, progressiveText5, progressiveText6, progressiveText7, progressiveText8, progressiveText9, progressiveText10, baseValuesArray.get(0), baseValuesArray.get(1), baseValuesArray.get(2), baseValuesArray.get(3), baseValuesArray.get(4), baseValuesArray.get(5), baseValuesArray.get(6), baseValuesArray.get(7), baseValuesArray.get(8), baseValuesArray.get(9), incrementValuesArray.get(0), incrementValuesArray.get(1), incrementValuesArray.get(2), incrementValuesArray.get(3), incrementValuesArray.get(4), incrementValuesArray.get(5), incrementValuesArray.get(6), incrementValuesArray.get(7), incrementValuesArray.get(8), incrementValuesArray.get(9),  machineIdText, FieldValue.serverTimestamp(), userName, "", locationText);
+                                insertToDatabase(userId, progressiveText1, progressiveText2, progressiveText3, progressiveText4, progressiveText5, progressiveText6, progressiveText7, progressiveText8, progressiveText9, progressiveText10, descriptionValuesArray.get(0), descriptionValuesArray.get(1), descriptionValuesArray.get(2), descriptionValuesArray.get(3), descriptionValuesArray.get(4), descriptionValuesArray.get(5), descriptionValuesArray.get(6), descriptionValuesArray.get(7), descriptionValuesArray.get(8), descriptionValuesArray.get(9), baseValuesArray.get(0), baseValuesArray.get(1), baseValuesArray.get(2), baseValuesArray.get(3), baseValuesArray.get(4), baseValuesArray.get(5), baseValuesArray.get(6), baseValuesArray.get(7), baseValuesArray.get(8), baseValuesArray.get(9), incrementValuesArray.get(0), incrementValuesArray.get(1), incrementValuesArray.get(2), incrementValuesArray.get(3), incrementValuesArray.get(4), incrementValuesArray.get(5), incrementValuesArray.get(6), incrementValuesArray.get(7), incrementValuesArray.get(8), incrementValuesArray.get(9),  machineIdText, FieldValue.serverTimestamp(), userName, notesText, locationText);
                                 resetMachineId();
                                 resetProgressives();
+                                resetNotes();
                                 showToast("Progressive(s) submitted successfully");
                                 hideKeyboard();
                             }
                         } else {
                             showToast(task.getException().getMessage());
-                            Log.d("DEBUG", task.getException().getMessage());
                         }
                     }
                 });
                 //
             } else {
-                insertToDatabase(userId, emailText, progressiveText1, progressiveText2, progressiveText3, progressiveText4, progressiveText5, progressiveText6, progressiveText7, progressiveText8, progressiveText9, progressiveText10, baseValuesArray.get(0), baseValuesArray.get(1), baseValuesArray.get(2), baseValuesArray.get(3), baseValuesArray.get(4), baseValuesArray.get(5), baseValuesArray.get(6), baseValuesArray.get(7), baseValuesArray.get(8), baseValuesArray.get(9), incrementValuesArray.get(0), incrementValuesArray.get(1), incrementValuesArray.get(2), incrementValuesArray.get(3), incrementValuesArray.get(4), incrementValuesArray.get(5), incrementValuesArray.get(6), incrementValuesArray.get(7), incrementValuesArray.get(8), incrementValuesArray.get(9),  machineIdText, FieldValue.serverTimestamp(), userName, "", locationText);
+                insertToDatabase(userId, progressiveText1, progressiveText2, progressiveText3, progressiveText4, progressiveText5, progressiveText6, progressiveText7, progressiveText8, progressiveText9, progressiveText10, descriptionValuesArray.get(0), descriptionValuesArray.get(1), descriptionValuesArray.get(2), descriptionValuesArray.get(3), descriptionValuesArray.get(4), descriptionValuesArray.get(5), descriptionValuesArray.get(6), descriptionValuesArray.get(7), descriptionValuesArray.get(8), descriptionValuesArray.get(9), baseValuesArray.get(0), baseValuesArray.get(1), baseValuesArray.get(2), baseValuesArray.get(3), baseValuesArray.get(4), baseValuesArray.get(5), baseValuesArray.get(6), baseValuesArray.get(7), baseValuesArray.get(8), baseValuesArray.get(9), incrementValuesArray.get(0), incrementValuesArray.get(1), incrementValuesArray.get(2), incrementValuesArray.get(3), incrementValuesArray.get(4), incrementValuesArray.get(5), incrementValuesArray.get(6), incrementValuesArray.get(7), incrementValuesArray.get(8), incrementValuesArray.get(9),  machineIdText, FieldValue.serverTimestamp(), userName, notesText, locationText);
                 resetMachineId();
                 resetProgressives();
+                resetNotes();
                 showToast("Progressive(s) submitted successfully");
                 hideKeyboard();
             }
@@ -1298,13 +1179,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         .addOnSuccessListener(new OnSuccessListener<Void>() {
                             @Override
                             public void onSuccess(Void aVoid) {
-                                Log.d(TAG, "DocumentSnapshot successfully updated!");
+                                Timber.d("DocumentSnapshot successfully updated!");
                             }
                         })
                         .addOnFailureListener(new OnFailureListener() {
                             @Override
                             public void onFailure(@NonNull Exception e) {
-                                Log.w(TAG, "Error updating document", e);
                                 showToast("Error updating to do list. " + e.getMessage());
                             }
                         });
@@ -1313,96 +1193,17 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
             // if coming from to do activity - go back and
             if (intent.hasExtra("machine_id")) {
-                //super.onBackPressed();
                 setResult(RESULT_OK, getIntent());
                 this.onBackPressed();
                 finish();
             }
             //
-
-            // Check if same machine number has been scanned in last 24 hours
-            // maybe compile a collection (set) of all unique machine numbers in the oncreate so this only has to be done once
-            // then run cross check based on that and display a popup if necessary.
-            /*SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-            boolean reject_duplicates = sharedPreferences.getBoolean("reject_duplicates", false);
-            int reject_duplicates_duration = sharedPreferences.getInt("reject_duplicates_duration", 0);
-            if (reject_duplicates && set.size() == 0) {
-                populateDuplicatesSet(reject_duplicates_duration);
-            }
-            if (reject_duplicates) {
-                if (set.contains(machineIdText)) {
-                    AlertDialog alertDialog = new AlertDialog.Builder(MainActivity.this).create();
-                    alertDialog.setMessage("This machine has already been scanned in the past 24 hours.");
-                    alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, "CANCEL",
-                            new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int i) {
-                                    dialog.dismiss();
-                                }
-                            });
-                    alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "SUBMIT ANYWAY",
-                            new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int i) {
-
-                                    //
-                                    insertToDatabase(emailText, userId, progressiveText1, progressiveText2, progressiveText3, progressiveText4, progressiveText5, progressiveText6, progressiveText7, progressiveText8, progressiveText9, progressiveText10, machineIdText, FieldValue.serverTimestamp(), userName, "", locationText);
-                                    //
-
-                                    resetMachineId();
-                                    resetProgressives();
-                                    showToast("Progressive(s) submitted successfully");
-                                    hideKeyboard();
-                                    dialog.dismiss();
-                                }
-                            });
-                    alertDialog.show();
-                    return;
-                }
-            }*/
-            //
-
-            /*insertToDatabase(emailText, userId, progressiveText1, progressiveText2, progressiveText3, progressiveText4, progressiveText5, progressiveText6, progressiveText7, progressiveText8, progressiveText9, progressiveText10, machineIdText, FieldValue.serverTimestamp(), userName, "", locationText);
-
-            // Remove element from uploadArray
-            if (intent.hasExtra("hashMap")) {
-                HashMap<String, Object> hashMap = (HashMap<String, Object>)intent.getSerializableExtra("hashMap");
-                DocumentReference documentReference = database.collection("formUploads").document(userId);
-                documentReference.update("uploadArray", FieldValue.arrayRemove(hashMap))
-                        .addOnSuccessListener(new OnSuccessListener<Void>() {
-                            @Override
-                            public void onSuccess(Void aVoid) {
-                                Log.d(TAG, "DocumentSnapshot successfully updated!");
-                            }
-                        })
-                        .addOnFailureListener(new OnFailureListener() {
-                            @Override
-                            public void onFailure(@NonNull Exception e) {
-                                Log.w(TAG, "Error updating document", e);
-                                showToast("Error updating to do list. " + e.getMessage());
-                            }
-                        });
-            }
-            //
-
-            // if coming from to do activity - go back and
-            if (intent.hasExtra("machine_id")) {
-                //super.onBackPressed();
-                setResult(RESULT_OK, getIntent());
-                this.onBackPressed();
-                finish();
-            }*/
-            //
-
-            //resetMachineId();
-            //resetProgressives();
-            //showToast("Progressive(s) submitted successfully");
-            //hideKeyboard();
         } catch (Exception ex) {
             showToast(ex.getMessage());
         }
     }
 
     private void insertToDatabase(String uid,
-                                  String email,
                                   String progressive1,
                                   String progressive2,
                                   String progressive3,
@@ -1413,16 +1214,16 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                   String progressive8,
                                   String progressive9,
                                   String progressive10,
-                                  /*String reset1,
-                                  String reset2,
-                                  String reset3,
-                                  String reset4,
-                                  String reset5,
-                                  String reset6,
-                                  String reset7,
-                                  String reset8,
-                                  String reset9,
-                                  String reset10,*/
+                                  String description1,
+                                  String description2,
+                                  String description3,
+                                  String description4,
+                                  String description5,
+                                  String description6,
+                                  String description7,
+                                  String description8,
+                                  String description9,
+                                  String description10,
                                   String base1,
                                   String base2,
                                   String base3,
@@ -1449,8 +1250,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                   String notes,
                                   String location) {
         Map<String, Object> user = new HashMap<>();
-        user.put("email", email);
-        user.put("uid", uid);
         user.put("progressive1", progressive1);
         user.put("progressive2", progressive2);
         user.put("progressive3", progressive3);
@@ -1461,16 +1260,19 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         user.put("progressive8", progressive8);
         user.put("progressive9", progressive9);
         user.put("progressive10", progressive10);
-        /*if (reset1 != null) { user.put("reset1", reset1); }
-        if (reset2 != null) { user.put("reset2", reset2); }
-        if (reset3 != null) { user.put("reset3", reset3); }
-        if (reset4 != null) { user.put("reset4", reset4); }
-        if (reset5 != null) { user.put("reset5", reset5); }
-        if (reset6 != null) { user.put("reset6", reset6); }
-        if (reset7 != null) { user.put("reset7", reset7); }
-        if (reset8 != null) { user.put("reset8", reset8); }
-        if (reset9 != null) { user.put("reset9", reset9); }
-        if (reset10 != null) { user.put("reset10", reset10); }*/
+        //
+        List<String> descriptions = new ArrayList<>();
+        descriptions.add(description1);
+        descriptions.add(description2);
+        descriptions.add(description3);
+        descriptions.add(description4);
+        descriptions.add(description5);
+        descriptions.add(description6);
+        descriptions.add(description7);
+        descriptions.add(description8);
+        descriptions.add(description9);
+        descriptions.add(description10);
+        user.put("descriptions", descriptions);
         //
         if (base1 != null) { user.put("base1", base1); }
         if (base2 != null) { user.put("base2", base2); }
@@ -1499,22 +1301,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         user.put("notes", notes);
         user.put("location", location);
 
-        // Old Reference
-        DocumentReference dr = database.collection("scans").document();
-        dr.set(user);
-        String docId = dr.getId();
-        //
-
-        user.remove("uid");
-        user.remove("email");
-
-        // New
-        dr = database.collection("users").document(uid).collection("scans").document(docId);
-        dr.set(user);
-
-        // Once the old reference is removed, we don't need to include a doc id
-        //DocumentReference dr = database.collection("users").document(uid).collection("scans").document();
-        //dr.set(user);
+        database.collection("users").document(uid).collection("scans").document().set(user);
     }
 
     public void hideKeyboard() {
@@ -1618,7 +1405,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     public void sortProgressives() {
 
-        final List<Double> values = new ArrayList<Double>();
+        final List<Double> values = new ArrayList<>();
 
         if (isDouble(progressive1.getText().toString())) {
             values.add(Double.parseDouble(progressive1.getText().toString()));
@@ -1685,21 +1472,5 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 progressive10.setText(df.format(values.get(i)));
             }
         }
-
-        /*if (NUMBER_OF_PROGRESSIVES == 6) {
-            progressive7.setText("");
-            progressive8.setText("");
-            progressive9.setText("");
-            progressive10.setText("");
-        } else if (NUMBER_OF_PROGRESSIVES == 7) {
-            progressive8.setText("");
-            progressive9.setText("");
-            progressive10.setText("");
-        } else if (NUMBER_OF_PROGRESSIVES == 8) {
-            progressive9.setText("");
-            progressive10.setText("");
-        } else if (NUMBER_OF_PROGRESSIVES == 9) {
-            progressive10.setText("");
-        }*/
     }
 }

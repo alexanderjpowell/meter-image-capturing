@@ -30,6 +30,10 @@ android {
     packagingOptions {
         exclude 'META-INF/proguard/androidx-annotations.pro'
     }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
 }
 
 dependencies {
@@ -37,7 +41,7 @@ dependencies {
     implementation 'androidx.appcompat:appcompat:1.2.0'
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
-    testImplementation 'junit:junit:4.13.1'
+    testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test:runner:1.3.0'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
 
@@ -64,10 +68,12 @@ dependencies {
     implementation 'androidx.preference:preference-ktx:1.1.1'
     implementation 'androidx.exifinterface:exifinterface:1.3.2'
 
-    // 3rd party library for material design search view in action bar
-    implementation 'com.miguelcatalan:materialsearchview:1.4.0'
-    implementation "androidx.core:core-ktx:1.3.2"
+    implementation 'androidx.core:core-ktx:1.3.2'
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+
+    // 3rd party libraries
+    implementation 'com.miguelcatalan:materialsearchview:1.4.0'
+    implementation 'com.jakewharton.timber:timber:4.7.1'
 }
 repositories {
     mavenCentral()

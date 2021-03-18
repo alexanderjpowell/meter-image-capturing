@@ -19,27 +19,12 @@ import androidx.preference.SwitchPreference;
 
 import com.firebase.ui.auth.AuthUI;
 import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.auth.UserProfileChangeRequest;
-import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.Query;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
-import com.google.firebase.firestore.SetOptions;
-
-import java.io.Console;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
 
 public class MySettingsFragment extends PreferenceFragmentCompat {
 
@@ -64,19 +49,15 @@ public class MySettingsFragment extends PreferenceFragmentCompat {
         // DONT STORE DISPLAY NAME IN PREFERENCES - FETCH FROM FIREBASE AUTH EACH TIME
         //
 
-        //final SharedPreferences sharedPref = getContext().getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
         sharedPref = getContext().getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
 
         Preference accountEmailPreference = findPreference("account_email_button");
         final EditTextPreference casinoNamePreference = findPreference("casino_name_button");
-        //final EditTextPreference adminEmailPreference = findPreference("admin_email_button");
         EditTextPreference emailRecipientPreference = findPreference("email_recipient");
         EditTextPreference minimum_value = findPreference("minimum_value");
         Preference signOutPreference = findPreference("sign_out_button");
         Preference changePasswordPreference = findPreference("change_password_button");
-        //Preference delete_account_button = findPreference("delete_account_button");
         Preference terms_and_conditions_button = findPreference("legal_disclaimer");
-        //Preference verify_email_preference_button = findPreference("verify_email_button");
         Preference version_number_preference = findPreference("version_number_preference");
         Preference add_remove_users = findPreference("add_remove_users");
 
@@ -119,7 +100,7 @@ public class MySettingsFragment extends PreferenceFragmentCompat {
                         public boolean onPreferenceChange(Preference preference, Object newValue) {
                             preference.setSummary(newValue.toString() + " progressive options");
                             SharedPreferences.Editor editor = sharedPref.edit();
-                            editor.putInt("number_of_progressives", Integer.valueOf(newValue.toString()));
+                            editor.putInt("number_of_progressives", Integer.parseInt(newValue.toString()));
                             editor.apply();
                             return true;
                         }
@@ -188,115 +169,6 @@ public class MySettingsFragment extends PreferenceFragmentCompat {
                     }
             );
         }
-
-        /*if (adminEmailPreference != null) {
-
-            DocumentReference docRef = database.collection("users").document(firebaseUser.getUid());
-            docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                @Override
-                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                    if (task.isSuccessful()) {
-                        DocumentSnapshot document = task.getResult();
-                        if (document.exists()) {
-                            Object adminEmailObject = document.get("adminEmail");
-                            if (adminEmailObject != null) {
-                                adminEmailPreference.setText(adminEmailObject.toString());
-                            } else {
-                                adminEmailPreference.setText("");
-                            }
-                        }
-                    }
-                }
-            });
-
-            adminEmailPreference.setSummaryProvider(new SummaryProvider<EditTextPreference>() {
-                @Override
-                public CharSequence provideSummary(EditTextPreference preference) {
-                    String text = preference.getText().trim();
-                    if (TextUtils.isEmpty(text)){
-                        return "Grant read privileges to an administrator";
-                    }
-                    return text;
-                }
-            });
-            adminEmailPreference.setOnPreferenceChangeListener(
-                    new Preference.OnPreferenceChangeListener() {
-                        @Override
-                        public boolean onPreferenceChange(Preference preference, Object newValue) {
-                            final String adminEmail = newValue.toString().trim();
-                            if (adminEmail.isEmpty()) return true;
-                            // Check if valid email address
-                            // Write to database admin collection
-
-                            String casinoName = "";
-                            if (casinoNamePreference == null || casinoNamePreference.getText().trim().isEmpty()) {
-                                casinoName = firebaseUser.getEmail();
-                            } else {
-                                casinoName = casinoNamePreference.getText().trim();
-                            }
-
-                            Map<String, Object> data = new HashMap<>();
-                            //data.put("casino_name", "Alex's Casino");
-                            //data.put("casino_uid", firebaseUser.getUid());
-                            data.put("adminEmail", adminEmail);
-
-                            String uid = firebaseUser.getUid();
-
-                            // Check if given email exists in users collection.
-                            // If so return message that the admin email cannot belong to a casino
-                            database.collection("users").get()
-                                    .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                                        @Override
-                                        public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                                            if (task.isSuccessful()) {
-                                                for (QueryDocumentSnapshot document : task.getResult()) {
-                                                    if (document.getId().equals(adminEmail)) {
-
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    });
-                            //
-
-                            database.collection("users").document(uid)
-                                    .set(data, SetOptions.merge())
-                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                        @Override
-                                        public void onSuccess(Void aVoid) {
-                                            //Toast.makeText(getContext(), "DocumentSnapshot successfully written!", Toast.LENGTH_LONG).show();
-                                        }
-                                    })
-                                    .addOnFailureListener(new OnFailureListener() {
-                                        @Override
-                                        public void onFailure(@NonNull Exception e) {
-                                            //Toast.makeText(getContext(), "Error writing document" + e.getMessage().toString(), Toast.LENGTH_LONG).show();
-                                        }
-                                    });
-
-                            data.clear();
-                            data.put("email", firebaseUser.getEmail());
-                            data.put("casinoName", casinoName);
-                            database.collection("admins").document(adminEmail).collection("casinos").document(uid)
-                                    .set(data, SetOptions.merge())
-                                    .addOnSuccessListener(new OnSuccessListener<Void>() {
-                                        @Override
-                                        public void onSuccess(Void aVoid) {
-                                            //Toast.makeText(getContext(), "DocumentSnapshot successfully written!", Toast.LENGTH_LONG).show();
-                                        }
-                                    })
-                                    .addOnFailureListener(new OnFailureListener() {
-                                        @Override
-                                        public void onFailure(@NonNull Exception e) {
-                                            //Toast.makeText(getContext(), "Error writing document" + e.getMessage().toString(), Toast.LENGTH_LONG).show();
-                                        }
-                                    });
-
-                            return true;
-                        }
-                    }
-            );
-        }*/
 
         if (emailRecipientPreference != null) {
             emailRecipientPreference.setSummaryProvider(new SummaryProvider<EditTextPreference>() {
@@ -403,40 +275,6 @@ public class MySettingsFragment extends PreferenceFragmentCompat {
             );
         }
 
-        /*if (delete_account_button != null) {
-            delete_account_button.setOnPreferenceClickListener(
-                    new Preference.OnPreferenceClickListener() {
-                        @Override
-                        public boolean onPreferenceClick(Preference preference) {
-                            new AlertDialog.Builder(requireActivity())
-                                    .setTitle("Delete Account")
-                                    .setMessage("Are you sure you want to delete your account? This operation cannot be undone.")
-                                    .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                                        @Override
-                                        public void onClick(DialogInterface dialog, int which) {
-                                            FirebaseUser user = firebaseAuth.getCurrentUser();
-                                            user.delete().addOnCompleteListener(new OnCompleteListener<Void>() {
-                                                @Override
-                                                public void onComplete(@NonNull Task<Void> task) {
-                                                    if (task.isSuccessful()) {
-                                                        requireActivity().finish();
-                                                        startActivity(new Intent(requireActivity(), LoginActivity.class));
-                                                    } else {
-                                                        if (task.getException() != null)
-                                                            Toast.makeText(getContext(), task.getException().getMessage(), Toast.LENGTH_SHORT).show();
-                                                    }
-                                                }
-                                            });
-                                        }
-                                    })
-                                    .setNegativeButton("No", null)
-                                    .show();
-                            return true;
-                        }
-                    }
-            );
-        }*/
-
         if (terms_and_conditions_button != null) {
             terms_and_conditions_button.setOnPreferenceClickListener(
                     new Preference.OnPreferenceClickListener() {
@@ -448,49 +286,6 @@ public class MySettingsFragment extends PreferenceFragmentCompat {
                     }
             );
         }
-
-        /*if (verify_email_preference_button != null) {
-
-            verify_email_preference_button.setOnPreferenceClickListener(
-                    new Preference.OnPreferenceClickListener() {
-                        @Override
-                        public boolean onPreferenceClick(Preference preference) {
-                            firebaseUser.sendEmailVerification();
-                            return true;
-                        }
-                    }
-            );
-        }*/
-    }
-
-    /*private void populateDuplicatesSet(int duration) {
-        final Set<String> set = new HashSet<>();
-        final SharedPreferences.Editor editor = sharedPref.edit();
-        int offset = duration * 60 * 60;
-        Date time = new Date(System.currentTimeMillis() - offset * 1000);
-        CollectionReference collectionReference = database.collection("scans");
-        Query query = collectionReference.whereEqualTo("uid", firebaseUser.getUid())
-                .whereGreaterThan("timestamp", time)
-                .orderBy("timestamp", Query.Direction.DESCENDING)
-                .limit(1000);
-        query.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                if (task.isSuccessful()) {
-                    for (QueryDocumentSnapshot document : task.getResult()) {
-                        set.add(document.get("machine_id").toString().trim());
-                    }
-                    editor.putStringSet("reject_duplicates_set", set);
-                    editor.apply();
-                } else {
-                    showToast("Unable to refresh.  Check your connection.");
-                }
-            }
-        });
-    }*/
-
-    private void showToast(String message) {
-        Toast.makeText(getContext(), message, Toast.LENGTH_LONG).show();
     }
 }
 
