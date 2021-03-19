@@ -22,6 +22,10 @@ import androidx.exifinterface.media.ExifInterface;
 import android.net.Uri;
 import android.provider.MediaStore;
 import androidx.annotation.NonNull;
+
+import com.google.android.material.badge.BadgeDrawable;
+import com.google.android.material.badge.BadgeUtils;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.textfield.TextInputEditText;
 import androidx.core.content.FileProvider;
@@ -30,6 +34,10 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import androidx.appcompat.widget.Toolbar;
+import androidx.recyclerview.widget.ItemTouchHelper;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -135,6 +143,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private List<String> progressiveDescriptions = null;
 
     private Intent intent;
+    private Toolbar toolbar;
 
     private int REJECT_DUPLICATES_DURATION_MILLIS, REJECT_DUPLICATES_DURATION_HOURS;
     private boolean REJECT_DUPLICATES;
@@ -153,7 +162,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             return;
         }
 
-        Toolbar toolbar = findViewById(R.id.toolbar);
+        toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         //
@@ -289,13 +298,39 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         //
 
         // Set minimum progressive value
-        //SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         String val = sharedPreferences.getString("minimum_value", "0");
         try {
             minimumProgressiveValue = Double.valueOf(val);
         } catch (Exception ex) {
             minimumProgressiveValue = 0.0;
         }
+
+        RecyclerView recyclerView = findViewById(R.id.drag_recycler);
+        ArrayList<String> test = new ArrayList<>();
+        test.add("");
+        test.add("");
+        test.add("");
+        test.add("");
+        test.add("");
+        test.add("");
+        test.add("");
+        test.add("");
+        test.add("");
+        test.add("");
+        test.add("");
+        test.add("");
+        test.add("");
+        test.add("");
+        test.add("");
+        test.add("");
+        test.add("");
+        test.add("");
+        DraggableRecyclerAdapter adapter = new DraggableRecyclerAdapter(test);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        ItemTouchHelper.Callback callback = new ItemMoveCallback(adapter);
+        ItemTouchHelper touchHelper = new ItemTouchHelper(callback);
+        touchHelper.attachToRecyclerView(recyclerView);
+        recyclerView.setAdapter(adapter);
     }
 
     private void showDialogForAdminAccount() {
@@ -324,18 +359,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     if (document.exists()) {
                         alertDialog.show();
                         AuthUI.getInstance().signOut(getApplicationContext());
-                                /*.addOnCompleteListener(new OnCompleteListener<Void>() {
-                                    @Override
-                                    public void onComplete(@NonNull Task<Void> task) {
-                                        if (task.isSuccessful()) {
-                                            finish();
-                                            startActivity(new Intent(getApplicationContext(), LoginActivity.class));
-                                        } else {
-                                            if (task.getException() != null)
-                                                Toast.makeText(getApplicationContext(), task.getException().getMessage(), Toast.LENGTH_SHORT).show();
-                                        }
-                                    }
-                                });*/
                     }
                 }
             }
@@ -586,17 +609,32 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.main, menu);
 
-        if (firebaseAuth.getCurrentUser() == null) {
-            startActivity(new Intent(MainActivity.this, LoginActivity.class));
-            finish();
-            return false;
-        }
-        String uid = firebaseAuth.getCurrentUser().getUid();
+        BadgeDrawable badge = BadgeDrawable.create(this);
+        badge.setVisible(true);
+        BadgeUtils.attachBadgeDrawable(badge, toolbar, R.id.item_add_notes);
 
         return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if (item.getItemId() == R.id.item_add_notes) {
+            //TODO: open dialog to add notes
+            MaterialAlertDialogBuilder a = new MaterialAlertDialogBuilder(this);
+            a.setTitle("Notes")
+                    .setView(R.layout.dialog_edittext_layout)
+                    .setPositiveButton("Save", (dialogInterface, i) -> {
+
+                    })
+                    .setNegativeButton("Cancel", (dialogInterface, i) -> {
+
+                    })
+                    .show();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     private void dispatchTakePictureIntent(Integer request) {
@@ -1073,8 +1111,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             // Make sure at least one progressive has been entered
             if (allProgressivesEmpty()) {
                 AlertDialog alertDialog = new AlertDialog.Builder(MainActivity.this).create();
-                alertDialog.setMessage("Please enter at lease one progressive value");
-                alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "OK",
+                alertDialog.setMessage("Are you sure you want to enter all blanks for this machine?");
+                alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "Submit",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int i) {
+                                dialog.dismiss();
+                            }
+                        });
+                alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, "Cancel",
                         new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int i) {
                                 dialog.dismiss();
