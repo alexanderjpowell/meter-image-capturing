@@ -11,30 +11,19 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/drag_icon"
-        android:hint="@string/progressive_1_text"
-        app:startIconDrawable="@drawable/baseline_attach_money_24"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:hint="Machine ID"
         app:endIconDrawable="@drawable/ic_mic"
         app:endIconMode="custom"
         style="@style/TextInputLayoutStyle">
 
         <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/progressive_edit_text"
+            android:id="@+id/machineId"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textSize="30sp"
             android:inputType="numberDecimal"
             android:maxLines="1"/>
     </com.google.android.material.textfield.TextInputLayout>
-
-    <ImageView
-        android:id="@+id/drag_icon"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="4dp"
-        android:src="@drawable/baseline_drag_handle_24"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
