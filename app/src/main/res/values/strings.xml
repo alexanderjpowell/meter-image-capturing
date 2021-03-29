@@ -141,4 +141,6 @@
     <string name="upload_file_sort_original">Original order</string>
     <string name="upload_file_sort_machine_id">Sort by machine id</string>
     <string name="upload_file_sort_location">Sort by location</string>
+    <string name="notes_dialog_hint">Add machine notes here</string>
+    <string name="machine_id_hint">Machine ID</string>
 </resources>

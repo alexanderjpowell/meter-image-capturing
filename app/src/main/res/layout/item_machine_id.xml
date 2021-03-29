@@ -5,20 +5,20 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/inputLayout1"
+        android:id="@+id/input_layout"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:hint="Machine ID"
+        android:hint="@string/machine_id_hint"
         app:endIconDrawable="@drawable/ic_mic"
         app:endIconMode="custom"
         style="@style/TextInputLayoutStyle">
 
         <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/machineId"
+            android:id="@+id/edit_text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textSize="30sp"

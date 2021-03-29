@@ -3,15 +3,11 @@ package com.slotmachine.ocr.mic;
 import android.annotation.SuppressLint;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.SharedPreferences;
-import android.content.res.ColorStateList;
 import android.graphics.Color;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AlertDialog;
 import android.preference.PreferenceManager;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.text.method.PasswordTransformationMethod;
 import android.view.Menu;
 import android.Manifest;
@@ -41,21 +37,14 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.util.Log;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.Toast;
 import com.firebase.ui.auth.AuthUI;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
-import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.Timestamp;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.EmailAuthProvider;
@@ -66,7 +55,6 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
-import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.ml.vision.FirebaseVision;
 import com.google.firebase.ml.vision.common.FirebaseVisionImage;
 import com.google.firebase.ml.vision.document.FirebaseVisionDocumentText;
@@ -98,48 +86,16 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public static final int REQUEST_DATA_REPORT_ACTIVITY = 4;
     private static final int REQ_CODE_SPEECH_INPUT = 100;
 
-    private static final String EMPTY_PROGRESSIVE_VALUE = "";
-
     public String mCurrentPhotoPath;
-    //public Button submitButton;
     public int progressive = 1;
-//    public TextInputEditText progressive1;
-//    public TextInputEditText progressive2;
-//    public TextInputEditText progressive3;
-//    public TextInputEditText progressive4;
-//    public TextInputEditText progressive5;
-//    public TextInputEditText progressive6;
-//    public TextInputEditText progressive7;
-//    public TextInputEditText progressive8;
-//    public TextInputEditText progressive9;
-//    public TextInputEditText progressive10;
-//    public TextInputEditText machineId;
-//    public TextInputEditText notesEditText;
-//
-//    public TextInputLayout inputLayout0;
-//    public TextInputLayout inputLayout1;
-//    public TextInputLayout inputLayout2;
-//    public TextInputLayout inputLayout3;
-//    public TextInputLayout inputLayout4;
-//    public TextInputLayout inputLayout5;
-//    public TextInputLayout inputLayout6;
-//    public TextInputLayout inputLayout7;
-//    public TextInputLayout inputLayout8;
-//    public TextInputLayout inputLayout9;
-//    public TextInputLayout inputLayout10;
-//
-//    private RelativeLayout relativeLayoutProgressive7;
-//    private RelativeLayout relativeLayoutProgressive8;
-//    private RelativeLayout relativeLayoutProgressive9;
-//    private RelativeLayout relativeLayoutProgressive10;
 
     private String username;
+    private String notes;
 
     private FirebaseAuth firebaseAuth;
     private FirebaseFirestore database;
 
     private Double minimumProgressiveValue;
-    private int NUMBER_OF_PROGRESSIVES;
 
     private List<String> progressiveDescriptions = null;
 
@@ -153,6 +109,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     ItemTouchHelper touchHelper;
     DraggableRecyclerAdapter adapter;
+    BadgeDrawable badge;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -174,47 +131,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         username = sharedPref.getString("username", "No user selected");
 
         setTitle("User: " + username);
-        //
 
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         REJECT_DUPLICATES = sharedPreferences.getBoolean("reject_duplicates", false);
         REJECT_DUPLICATES_DURATION_MILLIS = sharedPreferences.getInt("reject_duplicates_duration", 0) * 3600 * 1000;
         REJECT_DUPLICATES_DURATION_HOURS = sharedPreferences.getInt("reject_duplicates_duration", 0);
-
-        //
-//        relativeLayoutProgressive7 = findViewById(R.id.progressive7_relative_layout);
-//        relativeLayoutProgressive8 = findViewById(R.id.progressive8_relative_layout);
-//        relativeLayoutProgressive9 = findViewById(R.id.progressive9_relative_layout);
-//        relativeLayoutProgressive10 = findViewById(R.id.progressive10_relative_layout);
-//
-//        NUMBER_OF_PROGRESSIVES = sharedPref.getInt("number_of_progressives", 6);
-//        if (NUMBER_OF_PROGRESSIVES == 6) {
-//            relativeLayoutProgressive7.setVisibility(View.GONE);
-//            relativeLayoutProgressive8.setVisibility(View.GONE);
-//            relativeLayoutProgressive9.setVisibility(View.GONE);
-//            relativeLayoutProgressive10.setVisibility(View.GONE);
-//        } else if (NUMBER_OF_PROGRESSIVES == 7) {
-//            relativeLayoutProgressive7.setVisibility(View.VISIBLE);
-//            relativeLayoutProgressive8.setVisibility(View.GONE);
-//            relativeLayoutProgressive9.setVisibility(View.GONE);
-//            relativeLayoutProgressive10.setVisibility(View.GONE);
-//        } else if (NUMBER_OF_PROGRESSIVES == 8) {
-//            relativeLayoutProgressive7.setVisibility(View.VISIBLE);
-//            relativeLayoutProgressive8.setVisibility(View.VISIBLE);
-//            relativeLayoutProgressive9.setVisibility(View.GONE);
-//            relativeLayoutProgressive10.setVisibility(View.GONE);
-//        } else if (NUMBER_OF_PROGRESSIVES == 9) {
-//            relativeLayoutProgressive7.setVisibility(View.VISIBLE);
-//            relativeLayoutProgressive8.setVisibility(View.VISIBLE);
-//            relativeLayoutProgressive9.setVisibility(View.VISIBLE);
-//            relativeLayoutProgressive10.setVisibility(View.GONE);
-//        } else if (NUMBER_OF_PROGRESSIVES == 10) {
-//            relativeLayoutProgressive7.setVisibility(View.VISIBLE);
-//            relativeLayoutProgressive8.setVisibility(View.VISIBLE);
-//            relativeLayoutProgressive9.setVisibility(View.VISIBLE);
-//            relativeLayoutProgressive10.setVisibility(View.VISIBLE);
-//        }
-        //
 
         database = FirebaseFirestore.getInstance();
         checkPermissions();
@@ -230,70 +151,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         View headerView = navigationView.getHeaderView(0);
         headerView.setBackgroundColor(Color.parseColor("#2196F3"));
 
-//        progressive1 = findViewById(R.id.progressive1);
-//        progressive2 = findViewById(R.id.progressive2);
-//        progressive3 = findViewById(R.id.progressive3);
-//        progressive4 = findViewById(R.id.progressive4);
-//        progressive5 = findViewById(R.id.progressive5);
-//        progressive6 = findViewById(R.id.progressive6);
-//        progressive7 = findViewById(R.id.progressive7);
-//        progressive8 = findViewById(R.id.progressive8);
-//        progressive9 = findViewById(R.id.progressive9);
-//        progressive10 = findViewById(R.id.progressive10);
-//        machineId = findViewById(R.id.machineId);
-//        notesEditText = findViewById(R.id.notes_edit_text);
-//        submitButton = findViewById(R.id.submit_button);
-//
-//        inputLayout0 = findViewById(R.id.inputLayout0);
-//        inputLayout1 = findViewById(R.id.inputLayout1);
-//        inputLayout2 = findViewById(R.id.inputLayout2);
-//        inputLayout3 = findViewById(R.id.inputLayout3);
-//        inputLayout4 = findViewById(R.id.inputLayout4);
-//        inputLayout5 = findViewById(R.id.inputLayout5);
-//        inputLayout6 = findViewById(R.id.inputLayout6);
-//        inputLayout7 = findViewById(R.id.inputLayout7);
-//        inputLayout8 = findViewById(R.id.inputLayout8);
-//        inputLayout9 = findViewById(R.id.inputLayout9);
-//        inputLayout10 = findViewById(R.id.inputLayout10);
-
         resetProgressives();
 
-//        progressive1.setOnTouchListener(this);
-//        progressive2.setOnTouchListener(this);
-//        progressive3.setOnTouchListener(this);
-//        progressive4.setOnTouchListener(this);
-//        progressive5.setOnTouchListener(this);
-//        progressive6.setOnTouchListener(this);
-//        progressive7.setOnTouchListener(this);
-//        progressive8.setOnTouchListener(this);
-//        progressive9.setOnTouchListener(this);
-//        progressive10.setOnTouchListener(this);
-//        machineId.setOnTouchListener(this);
-//
-//        progressive1.addTextChangedListener(new GenericTextWatcher(progressive1));
-//        progressive2.addTextChangedListener(new GenericTextWatcher(progressive2));
-//        progressive3.addTextChangedListener(new GenericTextWatcher(progressive3));
-//        progressive4.addTextChangedListener(new GenericTextWatcher(progressive4));
-//        progressive5.addTextChangedListener(new GenericTextWatcher(progressive5));
-//        progressive6.addTextChangedListener(new GenericTextWatcher(progressive6));
-//        //
-//        progressive7.addTextChangedListener(new GenericTextWatcher(progressive7));
-//        progressive8.addTextChangedListener(new GenericTextWatcher(progressive8));
-//        progressive9.addTextChangedListener(new GenericTextWatcher(progressive9));
-//        progressive10.addTextChangedListener(new GenericTextWatcher(progressive10));
-//        //
-//        machineId.addTextChangedListener(new GenericTextWatcher(machineId));
-
-        // Populate machine id if coming from to do list activity
         intent = getIntent();
-        String machine_id = intent.getStringExtra("machine_id");
-        int numberOfProgressives = intent.getIntExtra("numberOfProgressives",0);
-        //labelEditTextsFromToDo(machine_id, numberOfProgressives);
-
-        progressiveDescriptions = intent.getStringArrayListExtra("progressiveDescriptionTitles");
-        if (progressiveDescriptions != null) {
-            //labelEditTextsFromToDo2(progressiveDescriptions);
-        }
         // Also check if coming from login activity and send verification email if necessary
         boolean comingFromLogin = intent.getBooleanExtra("comingFromLogin", false);
         if (comingFromLogin) {
@@ -309,34 +169,24 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             minimumProgressiveValue = 0.0;
         }
 
+        progressiveDescriptions = intent.getStringArrayListExtra("progressiveDescriptionTitles");
         RecyclerView recyclerView = findViewById(R.id.drag_recycler);
-        ArrayList<String> test = new ArrayList<>();
-        test.add("");
-        test.add("");
-        test.add("");
-        test.add("");
-        test.add("");
-        test.add("");
-        test.add("");
-        test.add("");
-//        test.add("");
-//        test.add("");
-//        test.add("");
-//        test.add("");
-//        test.add("");
-//        test.add("");
-//        test.add("");
-//        test.add("");
-//        test.add("");
-//        test.add("");
-//        test.add("");
-//        test.add("");
-        adapter = new DraggableRecyclerAdapter(test, this);
+        adapter = new DraggableRecyclerAdapter(6, progressiveDescriptions,this);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         ItemTouchHelper.Callback callback = new ItemMoveCallback(adapter);
         touchHelper = new ItemTouchHelper(callback);
         touchHelper.attachToRecyclerView(recyclerView);
         recyclerView.setAdapter(adapter);
+
+        String machine_id = intent.getStringExtra("machine_id");
+        if (machine_id != null) {
+            adapter.setMachineId(machine_id);
+        }
+    }
+
+    @Override
+    public void onVoiceRequest(int code) {
+        startVoiceInput(code);
     }
 
     @Override
@@ -346,8 +196,20 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     @Override
     public void onSubmitScan() {
-        //String id = adapter.getMachineId();
-        showToast("Progressive(s) submitted successfully");
+        if (allProgressivesEmpty()) {
+            AlertDialog alertDialog = new AlertDialog.Builder(MainActivity.this).create();
+            alertDialog.setMessage("Are you sure you want to enter all blanks for this machine?");
+            alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "Submit",
+                    (dialog, i) -> {
+                        dialog.dismiss();
+                        submitOnClick();
+                    });
+            alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, "Cancel",
+                    (dialog, i) -> dialog.dismiss());
+            alertDialog.show();
+        } else {
+            submitOnClick();
+        }
     }
 
     @Override
@@ -365,7 +227,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         alertDialog.setMessage(message);
         alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "Sign Out",
                 (dialog, i) -> {
-                    // Sign out and go to sign in activity
                     dialog.dismiss();
                     startActivity(new Intent(getApplicationContext(), LoginActivity.class));
                 });
@@ -381,240 +242,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 }
             }
         });
-        //
     }
-
-//    private void labelEditTextsFromToDo(String machine_id, int numberOfProgressives) {
-//        numberOfProgressives = Math.min(numberOfProgressives, 10);
-//        int[][] states = new int[][] {
-//                new int[] { android.R.attr.state_enabled }, // enabled
-//                new int[] { -android.R.attr.state_enabled }, // disabled
-//                new int[] { -android.R.attr.state_checked }, // unchecked
-//                new int[] { android.R.attr.state_pressed }  // pressed
-//        };
-//        int[] colors = new int[] {
-//                Color.GREEN,
-//                Color.GREEN,
-//                Color.GREEN,
-//                Color.GREEN
-//        };
-//        ColorStateList colorStateList = new ColorStateList(states, colors);
-//        machineId.setText(machine_id);
-//        TextInputLayout[] array = { inputLayout1, inputLayout2, inputLayout3, inputLayout4, inputLayout5, inputLayout6, inputLayout7, inputLayout8, inputLayout9, inputLayout10 };
-//        for (int i = 0; i < numberOfProgressives; i++) {
-//            array[i].setDefaultHintTextColor(colorStateList);
-//        }
-//    }
-//
-//    private void labelEditTextsFromToDo2(List<String> progressiveDescriptionTitles) {
-//        int[][] states = new int[][] {
-//                new int[] { android.R.attr.state_enabled }, // enabled
-//                new int[] { -android.R.attr.state_enabled }, // disabled
-//                new int[] { -android.R.attr.state_checked }, // unchecked
-//                new int[] { android.R.attr.state_pressed }  // pressed
-//        };
-//        int[] colors = new int[] {
-//                Color.GREEN,
-//                Color.GREEN,
-//                Color.GREEN,
-//                Color.GREEN
-//        };
-//        ColorStateList colorStateList = new ColorStateList(states, colors);
-//        TextInputLayout[] array = { inputLayout1, inputLayout2, inputLayout3, inputLayout4, inputLayout5, inputLayout6, inputLayout7, inputLayout8, inputLayout9, inputLayout10 };
-//        for (int i = 0; i < progressiveDescriptionTitles.size(); i++) {
-//            if (progressiveDescriptionTitles.get(i) != null) {
-//                array[i].setHint(progressiveDescriptionTitles.get(i));
-//                array[i].setDefaultHintTextColor(colorStateList);
-//            }
-//        }
-//    }
-
-//    @Override
-//    public boolean onTouch(View v, MotionEvent event) {
-//
-//        final int DRAWABLE_RIGHT = 2;
-//        switch (v.getId()) {
-//            case R.id.progressive1:
-//                if (event.getAction() == MotionEvent.ACTION_UP) {
-//                    if (event.getRawX() >= (progressive1.getRight() - progressive1.getCompoundDrawables()[DRAWABLE_RIGHT].getBounds().width() - 15)) {
-//                        if (progressive1.getError() == null) {
-//                            if (progressive1.getText().toString().equals("")) {
-//                                progressive = 1;
-//                                startVoiceInput(1);
-//                                return true;
-//                            } else {
-//                                event.setAction(MotionEvent.ACTION_CANCEL);
-//                                progressive1.setText("");
-//                            }
-//                        }
-//                    }
-//                }
-//                break;
-//            case R.id.progressive2:
-//                if (event.getAction() == MotionEvent.ACTION_UP) {
-//                    if (event.getRawX() >= (progressive2.getRight() - progressive2.getCompoundDrawables()[DRAWABLE_RIGHT].getBounds().width() - 15)) {
-//                        if (progressive2.getError() == null) {
-//                            if (progressive2.getText().toString().equals("")) {
-//                                progressive = 2;
-//                                startVoiceInput(2);
-//                                return true;
-//                            } else {
-//                                event.setAction(MotionEvent.ACTION_CANCEL);
-//                                progressive2.setText("");
-//                            }
-//                        }
-//                    }
-//                }
-//                break;
-//            case R.id.progressive3:
-//                if (event.getAction() == MotionEvent.ACTION_UP) {
-//                    if (event.getRawX() >= (progressive3.getRight() - progressive3.getCompoundDrawables()[DRAWABLE_RIGHT].getBounds().width() - 15)) {
-//                        if (progressive3.getError() == null) {
-//                            if (progressive3.getText().toString().equals("")) {
-//                                progressive = 3;
-//                                startVoiceInput(3);
-//                                return true;
-//                            } else {
-//                                event.setAction(MotionEvent.ACTION_CANCEL);
-//                                progressive3.setText("");
-//                            }
-//                        }
-//                    }
-//                }
-//                break;
-//            case R.id.progressive4:
-//                if (event.getAction() == MotionEvent.ACTION_UP) {
-//                    if (event.getRawX() >= (progressive4.getRight() - progressive4.getCompoundDrawables()[DRAWABLE_RIGHT].getBounds().width() - 15)) {
-//                        if (progressive4.getError() == null) {
-//                            if (progressive4.getText().toString().equals("")) {
-//                                progressive = 4;
-//                                startVoiceInput(4);
-//                                return true;
-//                            } else {
-//                                event.setAction(MotionEvent.ACTION_CANCEL);
-//                                progressive4.setText("");
-//                            }
-//                        }
-//                    }
-//                }
-//                break;
-//            case R.id.progressive5:
-//                if (event.getAction() == MotionEvent.ACTION_UP) {
-//                    if (event.getRawX() >= (progressive5.getRight() - progressive5.getCompoundDrawables()[DRAWABLE_RIGHT].getBounds().width() - 15)) {
-//                        if (progressive5.getError() == null) {
-//                            if (progressive5.getText().toString().equals("")) {
-//                                progressive = 5;
-//                                startVoiceInput(5);
-//                                return true;
-//                            } else {
-//                                event.setAction(MotionEvent.ACTION_CANCEL);
-//                                progressive5.setText("");
-//                            }
-//                        }
-//                    }
-//                }
-//                break;
-//            case R.id.progressive6:
-//                if (event.getAction() == MotionEvent.ACTION_UP) {
-//                    if (event.getRawX() >= (progressive6.getRight() - progressive6.getCompoundDrawables()[DRAWABLE_RIGHT].getBounds().width() - 15)) {
-//                        if (progressive6.getError() == null) {
-//                            if (progressive6.getText().toString().equals("")) {
-//                                progressive = 6;
-//                                startVoiceInput(6);
-//                                return true;
-//                            } else {
-//                                event.setAction(MotionEvent.ACTION_CANCEL);
-//                                progressive6.setText("");
-//                            }
-//                        }
-//                    }
-//                }
-//                break;
-//            //
-//            case R.id.progressive7:
-//                if (event.getAction() == MotionEvent.ACTION_UP) {
-//                    if (event.getRawX() >= (progressive7.getRight() - progressive7.getCompoundDrawables()[DRAWABLE_RIGHT].getBounds().width() - 15)) {
-//                        if (progressive7.getError() == null) {
-//                            if (progressive7.getText().toString().equals("")) {
-//                                progressive = 7;
-//                                startVoiceInput(7);
-//                                return true;
-//                            } else {
-//                                event.setAction(MotionEvent.ACTION_CANCEL);
-//                                progressive7.setText("");
-//                            }
-//                        }
-//                    }
-//                }
-//                break;
-//            case R.id.progressive8:
-//                if (event.getAction() == MotionEvent.ACTION_UP) {
-//                    if (event.getRawX() >= (progressive8.getRight() - progressive8.getCompoundDrawables()[DRAWABLE_RIGHT].getBounds().width() - 15)) {
-//                        if (progressive8.getError() == null) {
-//                            if (progressive8.getText().toString().equals("")) {
-//                                progressive = 8;
-//                                startVoiceInput(8);
-//                                return true;
-//                            } else {
-//                                event.setAction(MotionEvent.ACTION_CANCEL);
-//                                progressive8.setText("");
-//                            }
-//                        }
-//                    }
-//                }
-//                break;
-//            case R.id.progressive9:
-//                if (event.getAction() == MotionEvent.ACTION_UP) {
-//                    if (event.getRawX() >= (progressive9.getRight() - progressive9.getCompoundDrawables()[DRAWABLE_RIGHT].getBounds().width() - 15)) {
-//                        if (progressive9.getError() == null) {
-//                            if (progressive9.getText().toString().equals("")) {
-//                                progressive = 9;
-//                                startVoiceInput(9);
-//                                return true;
-//                            } else {
-//                                event.setAction(MotionEvent.ACTION_CANCEL);
-//                                progressive9.setText("");
-//                            }
-//                        }
-//                    }
-//                }
-//                break;
-//            case R.id.progressive10:
-//                if (event.getAction() == MotionEvent.ACTION_UP) {
-//                    if (event.getRawX() >= (progressive10.getRight() - progressive10.getCompoundDrawables()[DRAWABLE_RIGHT].getBounds().width() - 15)) {
-//                        if (progressive10.getError() == null) {
-//                            if (progressive10.getText().toString().equals("")) {
-//                                progressive = 10;
-//                                startVoiceInput(10);
-//                                return true;
-//                            } else {
-//                                event.setAction(MotionEvent.ACTION_CANCEL);
-//                                progressive10.setText("");
-//                            }
-//                        }
-//                    }
-//                }
-//                break;
-//            //
-//            case R.id.machineId:
-//                if (event.getAction() == MotionEvent.ACTION_UP) {
-//                    if (event.getRawX() >= (machineId.getRight() - machineId.getCompoundDrawables()[DRAWABLE_RIGHT].getBounds().width() - 15)) {
-//                        if (machineId.getError() == null) {
-//                            if (machineId.getText().toString().equals("")) {
-//                                progressive = 0;
-//                                startVoiceInput(0);
-//                                return true;
-//                            } else {
-//                                event.setAction(MotionEvent.ACTION_CANCEL);
-//                                machineId.setText("");
-//                            }
-//                        }
-//                    }
-//                }
-//                break;
-//        }
-//        return false;
-//    }
 
     private void checkPermissions() {
         this.requestPermissions(new String[] {Manifest.permission.CAMERA,
@@ -629,28 +257,29 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main, menu);
-
-        BadgeDrawable badge = BadgeDrawable.create(this);
-        badge.setVisible(true);
+        badge = BadgeDrawable.create(this);
+        badge.setVisible(false);
         BadgeUtils.attachBadgeDrawable(badge, toolbar, R.id.item_add_notes);
-
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if (item.getItemId() == R.id.item_add_notes) {
-            //TODO: open dialog to add notes
-            MaterialAlertDialogBuilder a = new MaterialAlertDialogBuilder(this);
-            a.setTitle("Notes")
-                    .setView(R.layout.dialog_edittext_layout)
-                    .setPositiveButton("Save", (dialogInterface, i) -> {
-
-                    })
-                    .setNegativeButton("Cancel", (dialogInterface, i) -> {
-
-                    })
-                    .show();
+            MaterialAlertDialogBuilder dialog = new MaterialAlertDialogBuilder(this);
+            View mView = getLayoutInflater().inflate(R.layout.dialog_edittext_layout, null);
+            TextInputEditText notesEditText = mView.findViewById(R.id.notes_edit_text);
+            notesEditText.setText(notes);
+            dialog.setTitle("Notes")
+                .setView(mView)
+                .setPositiveButton("Save", (dialogInterface, i) -> {
+                    notes = notesEditText.getText().toString();
+                    badge.setVisible(!notes.trim().isEmpty());
+                })
+                .setNegativeButton("Cancel", (dialogInterface, i) -> {
+                    dialogInterface.dismiss();
+                })
+                .show();
             return true;
         }
         return super.onOptionsItemSelected(item);
@@ -714,47 +343,34 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 alertDialog.setTitle("Re-authenticate");
                 alertDialog.setMessage("To use MiC in admin mode please provide the password for your account");
                 alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "SUBMIT",
-                        new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int i) {
-                                String password = passwordEditText.getText().toString().trim();
-                                if (password.equals("")) {
-                                    return;
-                                }
-                                FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-                                AuthCredential credential = EmailAuthProvider.getCredential(user.getEmail(), password);
-                                user.reauthenticate(credential)
-                                        .addOnCompleteListener(new OnCompleteListener<Void>() {
-                                            @Override
-                                            public void onComplete(@NonNull Task<Void> task) {
-                                                if (task.isSuccessful()) {
-                                                    final Intent intent1;
-                                                    intent1 = new Intent(MainActivity.this, SettingsActivity.class);
-                                                    startActivity(intent1);
-                                                } else {
-                                                    showToast("Incorrect password");
-                                                }
-                                                //Log.d(TAG, "User re-authenticated.");
-                                            }
-                                        });
-                                dialog.dismiss();
+                        (dialog, i) -> {
+                            String password = passwordEditText.getText().toString().trim();
+                            if (password.equals("")) {
+                                return;
                             }
+                            FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                            AuthCredential credential = EmailAuthProvider.getCredential(user.getEmail(), password);
+                            user.reauthenticate(credential)
+                                    .addOnCompleteListener(task -> {
+                                        if (task.isSuccessful()) {
+                                            final Intent intent1;
+                                            intent1 = new Intent(MainActivity.this, SettingsActivity.class);
+                                            startActivity(intent1);
+                                        } else {
+                                            showToast("Incorrect password");
+                                        }
+                                    });
+                            dialog.dismiss();
                         });
                 alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, "CANCEL",
-                        new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int i) {
-                                dialog.dismiss();
-                            }
-                        });
+                        (dialog, i) -> dialog.dismiss());
                 alertDialog.show();
             }
         } else if (id == R.id.nav_sign_out) {
             AuthUI.getInstance().signOut(this)
-                    .addOnCompleteListener(new OnCompleteListener<Void>() {
-                        @Override
-                        public void onComplete(@NonNull Task<Void> task) {
-                            startActivity(new Intent(MainActivity.this, LoginActivity.class));
-                            finish();
-                        }
+                    .addOnCompleteListener(task -> {
+                        startActivity(new Intent(MainActivity.this, LoginActivity.class));
+                        finish();
                     });
         }
 
@@ -782,7 +398,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                             Bitmap newBitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
                             processProgressivesOCR(newBitmap);
                             if (file.exists()) {
-                                boolean deleted = file.delete();
+                                file.delete();
                             }
                         } else {
                             showToast("Bitmap is null");
@@ -898,7 +514,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                             sb.append(word.getText().trim());
                                             filteredWords.add(word);
                                             wordDimensions.add(word.getBoundingBox());
-                                            printRect(word.getBoundingBox());
+                                            //printRect(word.getBoundingBox());
                                         }
                                     }
                                 }
@@ -955,7 +571,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         })
                         .addOnFailureListener(e -> showToast("Error with cloud OCR"));
 
-        //progressDialog.dismiss();
     }
 
     private static int exifToDegrees(int exifOrientation) {
@@ -965,23 +580,22 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         return 0;
     }
 
-    public void scanProgressives(View view) {
-        dispatchTakePictureIntent(REQUEST_TAKE_PHOTO_PROGRESSIVES);
-    }
+//    public void scanProgressives(View view) {
+//        dispatchTakePictureIntent(REQUEST_TAKE_PHOTO_PROGRESSIVES);
+//    }
 
-    private void printRect(Rect rect) {
-        String left = Integer.toString(rect.left);
-        String right = Integer.toString(rect.left);
-        String top = Integer.toString(rect.top);
-        String bottom = Integer.toString(rect.bottom);
-        Log.d("Bounding Box","Left: " + left + ", Right: " + right + ", Top: " + top + ", Bottom: " + bottom);
-    }
+//    private void printRect(Rect rect) {
+//        String left = Integer.toString(rect.left);
+//        String right = Integer.toString(rect.left);
+//        String top = Integer.toString(rect.top);
+//        String bottom = Integer.toString(rect.bottom);
+//        Log.d("Bounding Box","Left: " + left + ", Right: " + right + ", Top: " + top + ", Bottom: " + bottom);
+//    }
 
     private File createImageFile() throws IOException {
         // Create an image file name
         String imageFileName = "tempMICImage";
         File storageDir = getFilesDir();
-        //File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
         File image = File.createTempFile(
                 imageFileName,   /* prefix    */
                 ".jpg",   /* suffix    */
@@ -991,11 +605,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         // Add .nomedia file to storageDir - this prevents photos being automatically saved to image gallery
         File nomedia = new File(storageDir, ".nomedia");
         if (!nomedia.exists()) {
-            boolean created = nomedia.createNewFile();
-            /*if (created)
-                showToast(".nomedia successfully created");
-            else
-                showToast("failed to create .nomedia");*/
+            nomedia.createNewFile();
         }
         //
 
@@ -1027,238 +637,198 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     private boolean allProgressivesEmpty() {
-//        return (progressive1.getText().toString().trim().isEmpty()
-//                && progressive2.getText().toString().trim().isEmpty()
-//                && progressive3.getText().toString().trim().isEmpty()
-//                && progressive4.getText().toString().trim().isEmpty()
-//                && progressive5.getText().toString().trim().isEmpty()
-//                && progressive6.getText().toString().trim().isEmpty()
-//                && progressive7.getText().toString().trim().isEmpty()
-//                && progressive8.getText().toString().trim().isEmpty()
-//                && progressive9.getText().toString().trim().isEmpty()
-//                && progressive10.getText().toString().trim().isEmpty());
-        return false;
+        for (int i = 1; i < adapter.getData().size(); i++) {
+            if (!adapter.getData().get(i).trim().isEmpty()) {
+                return false;
+            }
+        }
+        return true;
     }
 
-//    public void submitOnClick(View view) {
-//
-//        try {
-//            sortProgressives();
-//
-//            // Get data points
-//            final String machineIdText = machineId.getText().toString().trim();
-//            final String progressiveText1 = progressive1.getText().toString().trim();
-//            final String progressiveText2 = progressive2.getText().toString().trim();
-//            final String progressiveText3 = progressive3.getText().toString().trim();
-//            final String progressiveText4 = progressive4.getText().toString().trim();
-//            final String progressiveText5 = progressive5.getText().toString().trim();
-//            final String progressiveText6 = progressive6.getText().toString().trim();
-//            final String progressiveText7 = progressive7.getText().toString().trim();
-//            final String progressiveText8 = progressive8.getText().toString().trim();
-//            final String progressiveText9 = progressive9.getText().toString().trim();
-//            final String progressiveText10 = progressive10.getText().toString().trim();
-//            final String notesText = notesEditText.getText().toString().trim();
-//
-//            //
-//            String location = getIntent().getStringExtra("location");
-//            final String locationText = location == null ? "" : location;
-//            //
-//
-//            // Descriptions
-//            final ArrayList<String> descriptionValuesArray = new ArrayList<>();
-//            for (int i = 0; i < 10; i++) { // Populate with 10 null entries
-//                descriptionValuesArray.add(null);
-//            }
-//            if (getIntent().hasExtra("progressiveDescriptionTitles")) {
-//                ArrayList<String> descriptions = getIntent().getStringArrayListExtra("progressiveDescriptionTitles");
-//                for (int i = 0; i < descriptions.size(); i++) {
-//                    if (descriptions.get(i) != null && !descriptions.get(i).isEmpty()) {
-//                        descriptionValuesArray.add(i, descriptions.get(i));
-//                    }
-//                }
-//            }
-//            // Bases
-//            final ArrayList<String> baseValuesArray = new ArrayList<>();
-//            for (int i = 0; i < 10; i++) { // Populate with 10 null entries
-//                baseValuesArray.add(null);
-//            }
-//            if (getIntent().hasExtra("baseValuesArray")) {
-//                ArrayList<String> bases = getIntent().getStringArrayListExtra("baseValuesArray");
-//                for (int i = 0; i < bases.size(); i++) {
-//                    if (bases.get(i) != null && !bases.get(i).isEmpty()) {
-//                        baseValuesArray.add(i, bases.get(i));
-//                    }
-//                }
-//            }
-//            // Increments
-//            final ArrayList<String> incrementValuesArray = new ArrayList<>();
-//            for (int i = 0; i < 10; i++) { // Populate with 10 null entries
-//                incrementValuesArray.add(null);
-//            }
-//            if (getIntent().hasExtra("incrementValuesArray")) {
-//                ArrayList<String> increments = getIntent().getStringArrayListExtra("incrementValuesArray");
-//                for (int i = 0; i < increments.size(); i++) {
-//                    if (increments.get(i) != null && !increments.get(i).isEmpty()) {
-//                        incrementValuesArray.add(i, increments.get(i));
-//                    }
-//                }
-//            }
-//            //
-//
-//            final String userId = firebaseAuth.getCurrentUser().getUid().trim();
-//            final String userName = username;
-//
-//            // First, make sure machine id isn't blank
-//            if (machineIdText.isEmpty()) {
-//                AlertDialog alertDialog = new AlertDialog.Builder(MainActivity.this).create();
-//                alertDialog.setMessage("Please add machine ID");
-//                alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "OK",
-//                        new DialogInterface.OnClickListener() {
-//                            public void onClick(DialogInterface dialog, int i) {
-//                                dialog.dismiss();
-//                            }
-//                        });
-//                alertDialog.show();
-//                return;
-//            }
-//            // Make sure at least one progressive has been entered
-//            if (allProgressivesEmpty()) {
-//                AlertDialog alertDialog = new AlertDialog.Builder(MainActivity.this).create();
-//                alertDialog.setMessage("Are you sure you want to enter all blanks for this machine?");
-//                alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "Submit",
-//                        new DialogInterface.OnClickListener() {
-//                            public void onClick(DialogInterface dialog, int i) {
-//                                dialog.dismiss();
-//                            }
-//                        });
-//                alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, "Cancel",
-//                        new DialogInterface.OnClickListener() {
-//                            public void onClick(DialogInterface dialog, int i) {
-//                                dialog.dismiss();
-//                            }
-//                        });
-//                alertDialog.show();
-//                return;
-//            }
-//
-//            // Make sure a user has been selected
-//            if (username.equals("No user selected")) {
-//                AlertDialog alertDialog = new AlertDialog.Builder(MainActivity.this).create();
-//                alertDialog.setMessage("Please select a user from the manage users tab");
-//                alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "OK",
-//                        new DialogInterface.OnClickListener() {
-//                            public void onClick(DialogInterface dialog, int i) {
-//                                dialog.dismiss();
-//                            }
-//                        });
-//                alertDialog.show();
-//                return;
-//            }
-//            //
-//
-//            if (REJECT_DUPLICATES) {
-//                // Optimize to only search the last n hours
-//                Date time = new Date(System.currentTimeMillis() - REJECT_DUPLICATES_DURATION_MILLIS);
-//                Query query = database.collection("users")
-//                        .document(firebaseAuth.getUid())
-//                        .collection("scans")
-//                        .whereEqualTo("machine_id", machineIdText)
-//                        .whereGreaterThan("timestamp", time)
-//                        .orderBy("timestamp", Query.Direction.DESCENDING)
-//                        .limit(1);
-//                query.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-//                    @Override
-//                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-//                        if (task.isSuccessful()) {
-//                            List<DocumentSnapshot> documents = task.getResult().getDocuments();
-//                            if (documents.size() == 1) {
-//                                Timestamp timestamp = (Timestamp)documents.get(0).get("timestamp");
-//                                long delta = Math.abs((timestamp.getSeconds() * 1000) - System.currentTimeMillis());
-//                                if (delta <= REJECT_DUPLICATES_DURATION_MILLIS) {
-//                                    AlertDialog alertDialog = new AlertDialog.Builder(MainActivity.this).create();
-//                                    String message = String.format(Locale.US, "This machine has already been scanned in the past %d hour(s).", REJECT_DUPLICATES_DURATION_HOURS);
-//                                    alertDialog.setMessage(message);
-//                                    alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, "CANCEL",
-//                                            new DialogInterface.OnClickListener() {
-//                                                public void onClick(DialogInterface dialog, int i) {
-//                                                    dialog.dismiss();
-//                                                }
-//                                            });
-//                                    alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "SUBMIT ANYWAY",
-//                                            new DialogInterface.OnClickListener() {
-//                                                public void onClick(DialogInterface dialog, int i) {
-//                                                    insertToDatabase(userId, progressiveText1, progressiveText2, progressiveText3, progressiveText4, progressiveText5, progressiveText6, progressiveText7, progressiveText8, progressiveText9, progressiveText10, descriptionValuesArray.get(0), descriptionValuesArray.get(1), descriptionValuesArray.get(2), descriptionValuesArray.get(3), descriptionValuesArray.get(4), descriptionValuesArray.get(5), descriptionValuesArray.get(6), descriptionValuesArray.get(7), descriptionValuesArray.get(8), descriptionValuesArray.get(9), baseValuesArray.get(0), baseValuesArray.get(1), baseValuesArray.get(2), baseValuesArray.get(3), baseValuesArray.get(4), baseValuesArray.get(5), baseValuesArray.get(6), baseValuesArray.get(7), baseValuesArray.get(8), baseValuesArray.get(9), incrementValuesArray.get(0), incrementValuesArray.get(1), incrementValuesArray.get(2), incrementValuesArray.get(3), incrementValuesArray.get(4), incrementValuesArray.get(5), incrementValuesArray.get(6), incrementValuesArray.get(7), incrementValuesArray.get(8), incrementValuesArray.get(9), machineIdText, FieldValue.serverTimestamp(), userName, notesText, locationText);
-//                                                    resetMachineId();
-//                                                    resetProgressives();
-//                                                    resetNotes();
-//                                                    showToast("Progressive(s) submitted successfully");
-//                                                    hideKeyboard();
-//                                                    dialog.dismiss();
-//                                                }
-//                                            });
-//                                    alertDialog.show();
-//                                } else {
-//                                    insertToDatabase(userId, progressiveText1, progressiveText2, progressiveText3, progressiveText4, progressiveText5, progressiveText6, progressiveText7, progressiveText8, progressiveText9, progressiveText10, descriptionValuesArray.get(0), descriptionValuesArray.get(1), descriptionValuesArray.get(2), descriptionValuesArray.get(3), descriptionValuesArray.get(4), descriptionValuesArray.get(5), descriptionValuesArray.get(6), descriptionValuesArray.get(7), descriptionValuesArray.get(8), descriptionValuesArray.get(9), baseValuesArray.get(0), baseValuesArray.get(1), baseValuesArray.get(2), baseValuesArray.get(3), baseValuesArray.get(4), baseValuesArray.get(5), baseValuesArray.get(6), baseValuesArray.get(7), baseValuesArray.get(8), baseValuesArray.get(9), incrementValuesArray.get(0), incrementValuesArray.get(1), incrementValuesArray.get(2), incrementValuesArray.get(3), incrementValuesArray.get(4), incrementValuesArray.get(5), incrementValuesArray.get(6), incrementValuesArray.get(7), incrementValuesArray.get(8), incrementValuesArray.get(9), machineIdText, FieldValue.serverTimestamp(), userName, notesText, locationText);
-//                                    resetMachineId();
-//                                    resetProgressives();
-//                                    resetNotes();
-//                                    showToast("Progressive(s) submitted successfully");
-//                                    hideKeyboard();
-//                                }
-//                            } else {
-//                                insertToDatabase(userId, progressiveText1, progressiveText2, progressiveText3, progressiveText4, progressiveText5, progressiveText6, progressiveText7, progressiveText8, progressiveText9, progressiveText10, descriptionValuesArray.get(0), descriptionValuesArray.get(1), descriptionValuesArray.get(2), descriptionValuesArray.get(3), descriptionValuesArray.get(4), descriptionValuesArray.get(5), descriptionValuesArray.get(6), descriptionValuesArray.get(7), descriptionValuesArray.get(8), descriptionValuesArray.get(9), baseValuesArray.get(0), baseValuesArray.get(1), baseValuesArray.get(2), baseValuesArray.get(3), baseValuesArray.get(4), baseValuesArray.get(5), baseValuesArray.get(6), baseValuesArray.get(7), baseValuesArray.get(8), baseValuesArray.get(9), incrementValuesArray.get(0), incrementValuesArray.get(1), incrementValuesArray.get(2), incrementValuesArray.get(3), incrementValuesArray.get(4), incrementValuesArray.get(5), incrementValuesArray.get(6), incrementValuesArray.get(7), incrementValuesArray.get(8), incrementValuesArray.get(9),  machineIdText, FieldValue.serverTimestamp(), userName, notesText, locationText);
-//                                resetMachineId();
-//                                resetProgressives();
-//                                resetNotes();
-//                                showToast("Progressive(s) submitted successfully");
-//                                hideKeyboard();
-//                            }
-//                        } else {
-//                            showToast(task.getException().getMessage());
-//                        }
-//                    }
-//                });
-//                //
-//            } else {
-//                insertToDatabase(userId, progressiveText1, progressiveText2, progressiveText3, progressiveText4, progressiveText5, progressiveText6, progressiveText7, progressiveText8, progressiveText9, progressiveText10, descriptionValuesArray.get(0), descriptionValuesArray.get(1), descriptionValuesArray.get(2), descriptionValuesArray.get(3), descriptionValuesArray.get(4), descriptionValuesArray.get(5), descriptionValuesArray.get(6), descriptionValuesArray.get(7), descriptionValuesArray.get(8), descriptionValuesArray.get(9), baseValuesArray.get(0), baseValuesArray.get(1), baseValuesArray.get(2), baseValuesArray.get(3), baseValuesArray.get(4), baseValuesArray.get(5), baseValuesArray.get(6), baseValuesArray.get(7), baseValuesArray.get(8), baseValuesArray.get(9), incrementValuesArray.get(0), incrementValuesArray.get(1), incrementValuesArray.get(2), incrementValuesArray.get(3), incrementValuesArray.get(4), incrementValuesArray.get(5), incrementValuesArray.get(6), incrementValuesArray.get(7), incrementValuesArray.get(8), incrementValuesArray.get(9),  machineIdText, FieldValue.serverTimestamp(), userName, notesText, locationText);
-//                resetMachineId();
-//                resetProgressives();
-//                resetNotes();
-//                showToast("Progressive(s) submitted successfully");
-//                hideKeyboard();
-//            }
-//
-//            // Remove element from uploadArray
-//            if (intent.hasExtra("hashMap")) {
-//                HashMap<String, Object> hashMap = (HashMap<String, Object>)intent.getSerializableExtra("hashMap");
-//                DocumentReference documentReference = database.collection("formUploads").document(userId);
-//                documentReference.update("uploadArray", FieldValue.arrayRemove(hashMap))
-//                        .addOnSuccessListener(new OnSuccessListener<Void>() {
-//                            @Override
-//                            public void onSuccess(Void aVoid) {
-//                                Timber.d("DocumentSnapshot successfully updated!");
-//                            }
-//                        })
-//                        .addOnFailureListener(new OnFailureListener() {
-//                            @Override
-//                            public void onFailure(@NonNull Exception e) {
-//                                showToast("Error updating to do list. " + e.getMessage());
-//                            }
-//                        });
-//            }
-//            //
-//
-//            // if coming from to do activity - go back and
-//            if (intent.hasExtra("machine_id")) {
-//                setResult(RESULT_OK, getIntent());
-//                this.onBackPressed();
-//                finish();
-//            }
-//            //
-//        } catch (Exception ex) {
-//            showToast(ex.getMessage());
-//        }
-//    }
+    public void submitOnClick() {
+
+        try {
+            //sortProgressives();
+
+            List<String> data = adapter.getData();
+            int len = data.size();
+            if (len < 11) {
+                for (int i = 0; i < 11 - len; i++) {
+                    data.add("");
+                }
+            }
+
+            final String machineIdText = data.get(0);
+            final String progressiveText1 = data.get(1);
+            final String progressiveText2 = data.get(2);
+            final String progressiveText3 = data.get(3);
+            final String progressiveText4 = data.get(4);
+            final String progressiveText5 = data.get(5);
+            final String progressiveText6 = data.get(6);
+            final String progressiveText7 = data.get(7);
+            final String progressiveText8 = data.get(8);
+            final String progressiveText9 = data.get(9);
+            final String progressiveText10 = data.get(10);
+            final String notesText = notes;
+
+            //
+            String location = getIntent().getStringExtra("location");
+            final String locationText = location == null ? "" : location;
+            //
+
+            // Descriptions
+            final ArrayList<String> descriptionValuesArray = new ArrayList<>();
+            for (int i = 0; i < 10; i++) { // Populate with 10 null entries
+                descriptionValuesArray.add(null);
+            }
+            if (getIntent().hasExtra("progressiveDescriptionTitles")) {
+                ArrayList<String> descriptions = getIntent().getStringArrayListExtra("progressiveDescriptionTitles");
+                for (int i = 0; i < descriptions.size(); i++) {
+                    if (descriptions.get(i) != null && !descriptions.get(i).isEmpty()) {
+                        descriptionValuesArray.add(i, descriptions.get(i));
+                    }
+                }
+            }
+            // Bases
+            final ArrayList<String> baseValuesArray = new ArrayList<>();
+            for (int i = 0; i < 10; i++) { // Populate with 10 null entries
+                baseValuesArray.add(null);
+            }
+            if (getIntent().hasExtra("baseValuesArray")) {
+                ArrayList<String> bases = getIntent().getStringArrayListExtra("baseValuesArray");
+                for (int i = 0; i < bases.size(); i++) {
+                    if (bases.get(i) != null && !bases.get(i).isEmpty()) {
+                        baseValuesArray.add(i, bases.get(i));
+                    }
+                }
+            }
+            // Increments
+            final ArrayList<String> incrementValuesArray = new ArrayList<>();
+            for (int i = 0; i < 10; i++) { // Populate with 10 null entries
+                incrementValuesArray.add(null);
+            }
+            if (getIntent().hasExtra("incrementValuesArray")) {
+                ArrayList<String> increments = getIntent().getStringArrayListExtra("incrementValuesArray");
+                for (int i = 0; i < increments.size(); i++) {
+                    if (increments.get(i) != null && !increments.get(i).isEmpty()) {
+                        incrementValuesArray.add(i, increments.get(i));
+                    }
+                }
+            }
+            //
+
+            final String userId = firebaseAuth.getCurrentUser().getUid().trim();
+            final String userName = username;
+
+            // First, make sure machine id isn't blank
+            if (machineIdText.isEmpty()) {
+                AlertDialog alertDialog = new AlertDialog.Builder(MainActivity.this).create();
+                alertDialog.setMessage("Please add machine ID");
+                alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "OK",
+                        (dialog, i) -> dialog.dismiss());
+                alertDialog.show();
+                return;
+            }
+
+            // Make sure a user has been selected
+            if (username.equals("No user selected")) {
+                AlertDialog alertDialog = new AlertDialog.Builder(MainActivity.this).create();
+                alertDialog.setMessage("Please select a user from the manage users tab");
+                alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "OK",
+                        (dialog, i) -> dialog.dismiss());
+                alertDialog.show();
+                return;
+            }
+            //
+
+            if (REJECT_DUPLICATES) {
+                // Optimize to only search the last n hours
+                Date time = new Date(System.currentTimeMillis() - REJECT_DUPLICATES_DURATION_MILLIS);
+                Query query = database.collection("users")
+                        .document(firebaseAuth.getUid())
+                        .collection("scans")
+                        .whereEqualTo("machine_id", machineIdText)
+                        .whereGreaterThan("timestamp", time)
+                        .orderBy("timestamp", Query.Direction.DESCENDING)
+                        .limit(1);
+                query.get().addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        List<DocumentSnapshot> documents = task.getResult().getDocuments();
+                        if (documents.size() == 1) {
+                            Timestamp timestamp = (Timestamp)documents.get(0).get("timestamp");
+                            long delta = Math.abs((timestamp.getSeconds() * 1000) - System.currentTimeMillis());
+                            if (delta <= REJECT_DUPLICATES_DURATION_MILLIS) {
+                                AlertDialog alertDialog = new AlertDialog.Builder(MainActivity.this).create();
+                                String message = String.format(Locale.US, "This machine has already been scanned in the past %d hour(s).", REJECT_DUPLICATES_DURATION_HOURS);
+                                alertDialog.setMessage(message);
+                                alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, "CANCEL",
+                                        (dialog, i) -> dialog.dismiss());
+                                alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "SUBMIT ANYWAY",
+                                        (dialog, i) -> {
+                                            insertToDatabase(userId, progressiveText1, progressiveText2, progressiveText3, progressiveText4, progressiveText5, progressiveText6, progressiveText7, progressiveText8, progressiveText9, progressiveText10, descriptionValuesArray.get(0), descriptionValuesArray.get(1), descriptionValuesArray.get(2), descriptionValuesArray.get(3), descriptionValuesArray.get(4), descriptionValuesArray.get(5), descriptionValuesArray.get(6), descriptionValuesArray.get(7), descriptionValuesArray.get(8), descriptionValuesArray.get(9), baseValuesArray.get(0), baseValuesArray.get(1), baseValuesArray.get(2), baseValuesArray.get(3), baseValuesArray.get(4), baseValuesArray.get(5), baseValuesArray.get(6), baseValuesArray.get(7), baseValuesArray.get(8), baseValuesArray.get(9), incrementValuesArray.get(0), incrementValuesArray.get(1), incrementValuesArray.get(2), incrementValuesArray.get(3), incrementValuesArray.get(4), incrementValuesArray.get(5), incrementValuesArray.get(6), incrementValuesArray.get(7), incrementValuesArray.get(8), incrementValuesArray.get(9), machineIdText, FieldValue.serverTimestamp(), userName, notesText, locationText);
+                                            resetMachineId();
+                                            resetProgressives();
+                                            resetNotes();
+                                            showToast("Progressive(s) submitted successfully");
+                                            hideKeyboard();
+                                            dialog.dismiss();
+                                        });
+                                alertDialog.show();
+                            } else {
+                                insertToDatabase(userId, progressiveText1, progressiveText2, progressiveText3, progressiveText4, progressiveText5, progressiveText6, progressiveText7, progressiveText8, progressiveText9, progressiveText10, descriptionValuesArray.get(0), descriptionValuesArray.get(1), descriptionValuesArray.get(2), descriptionValuesArray.get(3), descriptionValuesArray.get(4), descriptionValuesArray.get(5), descriptionValuesArray.get(6), descriptionValuesArray.get(7), descriptionValuesArray.get(8), descriptionValuesArray.get(9), baseValuesArray.get(0), baseValuesArray.get(1), baseValuesArray.get(2), baseValuesArray.get(3), baseValuesArray.get(4), baseValuesArray.get(5), baseValuesArray.get(6), baseValuesArray.get(7), baseValuesArray.get(8), baseValuesArray.get(9), incrementValuesArray.get(0), incrementValuesArray.get(1), incrementValuesArray.get(2), incrementValuesArray.get(3), incrementValuesArray.get(4), incrementValuesArray.get(5), incrementValuesArray.get(6), incrementValuesArray.get(7), incrementValuesArray.get(8), incrementValuesArray.get(9), machineIdText, FieldValue.serverTimestamp(), userName, notesText, locationText);
+                                resetMachineId();
+                                resetProgressives();
+                                resetNotes();
+                                showToast("Progressive(s) submitted successfully");
+                                hideKeyboard();
+                            }
+                        } else {
+                            insertToDatabase(userId, progressiveText1, progressiveText2, progressiveText3, progressiveText4, progressiveText5, progressiveText6, progressiveText7, progressiveText8, progressiveText9, progressiveText10, descriptionValuesArray.get(0), descriptionValuesArray.get(1), descriptionValuesArray.get(2), descriptionValuesArray.get(3), descriptionValuesArray.get(4), descriptionValuesArray.get(5), descriptionValuesArray.get(6), descriptionValuesArray.get(7), descriptionValuesArray.get(8), descriptionValuesArray.get(9), baseValuesArray.get(0), baseValuesArray.get(1), baseValuesArray.get(2), baseValuesArray.get(3), baseValuesArray.get(4), baseValuesArray.get(5), baseValuesArray.get(6), baseValuesArray.get(7), baseValuesArray.get(8), baseValuesArray.get(9), incrementValuesArray.get(0), incrementValuesArray.get(1), incrementValuesArray.get(2), incrementValuesArray.get(3), incrementValuesArray.get(4), incrementValuesArray.get(5), incrementValuesArray.get(6), incrementValuesArray.get(7), incrementValuesArray.get(8), incrementValuesArray.get(9),  machineIdText, FieldValue.serverTimestamp(), userName, notesText, locationText);
+                            resetMachineId();
+                            resetProgressives();
+                            resetNotes();
+                            showToast("Progressive(s) submitted successfully");
+                            hideKeyboard();
+                        }
+                    } else {
+                        showToast(task.getException().getMessage());
+                    }
+                });
+                //
+            } else {
+                insertToDatabase(userId, progressiveText1, progressiveText2, progressiveText3, progressiveText4, progressiveText5, progressiveText6, progressiveText7, progressiveText8, progressiveText9, progressiveText10, descriptionValuesArray.get(0), descriptionValuesArray.get(1), descriptionValuesArray.get(2), descriptionValuesArray.get(3), descriptionValuesArray.get(4), descriptionValuesArray.get(5), descriptionValuesArray.get(6), descriptionValuesArray.get(7), descriptionValuesArray.get(8), descriptionValuesArray.get(9), baseValuesArray.get(0), baseValuesArray.get(1), baseValuesArray.get(2), baseValuesArray.get(3), baseValuesArray.get(4), baseValuesArray.get(5), baseValuesArray.get(6), baseValuesArray.get(7), baseValuesArray.get(8), baseValuesArray.get(9), incrementValuesArray.get(0), incrementValuesArray.get(1), incrementValuesArray.get(2), incrementValuesArray.get(3), incrementValuesArray.get(4), incrementValuesArray.get(5), incrementValuesArray.get(6), incrementValuesArray.get(7), incrementValuesArray.get(8), incrementValuesArray.get(9),  machineIdText, FieldValue.serverTimestamp(), userName, notesText, locationText);
+                resetMachineId();
+                resetProgressives();
+                resetNotes();
+                showToast("Progressive(s) submitted successfully");
+                hideKeyboard();
+            }
+
+            // Reset Notes
+            notes = "";
+
+            // Remove element from uploadArray
+            if (intent.hasExtra("hashMap")) {
+                HashMap<String, Object> hashMap = (HashMap<String, Object>)intent.getSerializableExtra("hashMap");
+                DocumentReference documentReference = database.collection("formUploads").document(userId);
+                documentReference.update("uploadArray", FieldValue.arrayRemove(hashMap))
+                        .addOnSuccessListener(aVoid -> Timber.d("DocumentSnapshot successfully updated!"))
+                        .addOnFailureListener(e -> showToast("Error updating to do list. " + e.getMessage()));
+            }
+            //
+
+            // if coming from to do activity - go back and
+            if (intent.hasExtra("machine_id")) {
+                setResult(RESULT_OK, getIntent());
+                this.onBackPressed();
+                finish();
+            }
+            //
+        } catch (Exception ex) {
+            Timber.e(ex);
+            showToast(ex.getMessage());
+        }
+    }
 
     private void insertToDatabase(String uid,
                                   String progressive1,
@@ -1361,15 +931,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         database.collection("users").document(uid).collection("scans").document().set(user);
     }
 
-//    public void hideKeyboard() {
-//        try {
-//            LinearLayout layout = findViewById(R.id.mainLinearLayout);
-//            InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-//            imm.hideSoftInputFromWindow(layout.getWindowToken(), 0);
-//        } catch (Exception ex) {
-//            ex.printStackTrace();
-//        }
-//    }
+    public void hideKeyboard() {
+        try {
+            LinearLayout layout = findViewById(R.id.coordinator_layout);
+            InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+            imm.hideSoftInputFromWindow(layout.getWindowToken(), 0);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
 
     private void startVoiceInput(int progressive) {
         Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
@@ -1431,24 +1001,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             return "9";
         }
         return number.trim(); // return original string if no match
-    }
-
-    private class GenericTextWatcher implements TextWatcher {
-        private TextInputEditText textInputEditText;
-        private GenericTextWatcher(TextInputEditText textInputEditText) {
-            this.textInputEditText = textInputEditText;
-        }
-
-        public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
-        public void afterTextChanged(Editable editable) {}
-
-        public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-            if (textInputEditText.getText().toString().equals("")) {
-                textInputEditText.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_mic, 0);
-            } else {
-                textInputEditText.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_cancel_black_24dp, 0);
-            }
-        }
     }
 
     private boolean isDouble(String value) {

@@ -1,6 +1,7 @@
 package com.slotmachine.ocr.mic;
 
 import android.annotation.SuppressLint;
+import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -8,14 +9,11 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.ImageView;
-import android.widget.TextView;
-
 import androidx.recyclerview.widget.RecyclerView;
-
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
+import com.google.android.material.textfield.TextInputLayout;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -23,48 +21,34 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import timber.log.Timber;
-
 public class DraggableRecyclerAdapter extends RecyclerView.Adapter<DraggableRecyclerAdapter.ParentViewHolder> implements ItemMoveCallback.ItemTouchHelperContract {
 
     private static final int ITEM_MACHINE_ID = 1;
     private static final int ITEM_PROGRESSIVE = 2;
     private static final int ITEM_BUTTONS = 3;
 
-    private ArrayList data;
     StartDragListener startDragListener;
 
-    private List<EditModel> progs = new ArrayList<>();
+    private final List<EditTextModel> editTextData = new ArrayList<>();
+    private final List<String> descriptions;
 
-    public DraggableRecyclerAdapter(ArrayList data, StartDragListener startDragListener) {
-        this.data = data;
+    public DraggableRecyclerAdapter(int progressiveCount, StartDragListener startDragListener) {
+        this(progressiveCount, null, startDragListener);
+    }
+
+    public DraggableRecyclerAdapter(int progressiveCount, List<String> descriptions, StartDragListener startDragListener) {
+        this.descriptions = descriptions;
         this.startDragListener = startDragListener;
-        progs.add(new EditModel());
-        progs.add(new EditModel());
-        progs.add(new EditModel());
-        progs.add(new EditModel());
-        progs.add(new EditModel());
-        progs.add(new EditModel());
-        progs.add(new EditModel());
-        progs.add(new EditModel());
-//        progs.add(new EditModel());
-//        progs.add(new EditModel());
-//        progs.add(new EditModel());
-//        progs.add(new EditModel());
-//        progs.add(new EditModel());
-//        progs.add(new EditModel());
-//        progs.add(new EditModel());
-//        progs.add(new EditModel());
-//        progs.add(new EditModel());
-//        progs.add(new EditModel());
-//        progs.add(new EditModel());
+        for (int i = 0; i < progressiveCount + 1; i++) { // Add 1 for machine id
+            editTextData.add(new EditTextModel(""));
+        }
     }
 
     @Override
     public int getItemViewType(int position) {
         if (position == 0) {
             return ITEM_MACHINE_ID;
-        } else if (position == data.size() - 1) {
+        } else if (position == editTextData.size()) {
             return ITEM_BUTTONS;
         } else {
             return ITEM_PROGRESSIVE;
@@ -74,7 +58,7 @@ public class DraggableRecyclerAdapter extends RecyclerView.Adapter<DraggableRecy
     @Override
     public @NotNull ParentViewHolder onCreateViewHolder(@NotNull ViewGroup parent, int viewType) {
         if (viewType == ITEM_PROGRESSIVE) {
-            return new MyViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.item_draggable_progressive, parent, false));
+            return new ProgressiveHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.item_draggable_progressive, parent, false));
         } else if (viewType == ITEM_MACHINE_ID) {
             return new MachineIdViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.item_machine_id, parent, false));
         } else {
@@ -84,47 +68,54 @@ public class DraggableRecyclerAdapter extends RecyclerView.Adapter<DraggableRecy
 
     @Override
     public void onBindViewHolder(@NotNull ParentViewHolder holder, int position) {
-        if (holder instanceof MyViewHolder) {
-            ((MyViewHolder)holder).bind();
-            ((MyViewHolder) holder).progressiveEditText.setText(progs.get(position).getEditTextValue());
+        if (holder instanceof ProgressiveHolder) {
+            ((ProgressiveHolder)holder).bind();
+            ((ProgressiveHolder) holder).progressiveEditText.setText(editTextData.get(position).getEditTextValue());
         } else if (holder instanceof ButtonsViewHolder) {
             ((ButtonsViewHolder) holder).button.setOnClickListener(view -> startDragListener.onSubmitButtonClick());
             ((ButtonsViewHolder) holder).button2.setOnClickListener(view -> startDragListener.onSubmitScan());
+        } else if (holder instanceof MachineIdViewHolder) {
+            ((MachineIdViewHolder) holder).bind();
+            ((MachineIdViewHolder) holder).machineIdEditText.setText(editTextData.get(position).getEditTextValue());
         }
     }
 
     @Override
     public int getItemCount() {
-        return data.size();
+        return editTextData.size() + 1;
     }
 
     @Override
     public void onRowMoved(int fromPosition, int toPosition) {
         if (fromPosition < toPosition) {
             for (int i = fromPosition; i < toPosition; i++) {
-                Collections.swap(data, i, i + 1);
+                Collections.swap(editTextData, i, i + 1);
             }
         } else {
             for (int i = fromPosition; i > toPosition; i--) {
-                Collections.swap(data, i, i - 1);
+                Collections.swap(editTextData, i, i - 1);
             }
         }
         notifyItemMoved(fromPosition, toPosition);
     }
 
+    public void setMachineId(String id) {
+        editTextData.get(0).setEditTextValue(id);
+        notifyDataSetChanged();
+    }
+
     public void setItems(List<String> progressives) {
         for (int i = 0; i < Math.min(6, progressives.size()); i++) {
             if (!progressives.get(i).isEmpty()) {
-                Timber.e(progressives.get(i));
-                progs.get(i + 1).setEditTextValue(progressives.get(i));
+                editTextData.get(i + 1).setEditTextValue(progressives.get(i));
             }
         }
         notifyDataSetChanged();
     }
 
-    public String getMachineId() {
-        return progs.get(0).getEditTextValue();
-    }
+//    public String getMachineId() {
+//        return progs.get(0).getEditTextValue();
+//    }
 
 //    @Override
 //    public void onRowSelected(MyViewHolder myViewHolder) {
@@ -144,34 +135,19 @@ public class DraggableRecyclerAdapter extends RecyclerView.Adapter<DraggableRecy
         }
     }
 
-    public class MyViewHolder extends ParentViewHolder {
+    public class ProgressiveHolder extends ParentViewHolder {
 
         View rowView;
         ImageView dragIcon;
         TextInputEditText progressiveEditText;
+        TextInputLayout progressiveLayout;
 
-        public MyViewHolder(View itemView) {
+        public ProgressiveHolder(View itemView) {
             super(itemView);
             rowView = itemView;
             dragIcon = itemView.findViewById(R.id.drag_icon);
             progressiveEditText = itemView.findViewById(R.id.progressive_edit_text);
-
-            progressiveEditText.addTextChangedListener(new TextWatcher() {
-                @Override
-                public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                }
-
-                @Override
-                public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                    //progs.get(getAdapterPosition()).setEditTextValue(charSequence.toString());
-                    progs.get(getAdapterPosition()).setEditTextValue(progressiveEditText.getText().toString());
-                }
-
-                @Override
-                public void afterTextChanged(Editable editable) {
-                }
-            });
-
+            progressiveLayout = itemView.findViewById(R.id.progressive_layout);
         }
 
         @SuppressLint("ClickableViewAccessibility")
@@ -183,26 +159,103 @@ public class DraggableRecyclerAdapter extends RecyclerView.Adapter<DraggableRecy
                 return false;
             });
 
-//            progressiveEditText.addTextChangedListener(new TextWatcher() {
-//                @Override
-//                public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-//                }
-//
-//                @Override
-//                public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-//                    progs.get(getAdapterPosition()).setEditTextValue(charSequence.toString());
-//                }
-//
-//                @Override
-//                public void afterTextChanged(Editable editable) {
-//                }
-//            });
+            progressiveLayout.setHint("Progressive " + getAdapterPosition());
+
+            progressiveLayout.setEndIconOnClickListener(view -> {
+                if (progressiveEditText.getText() != null) {
+                    if (progressiveEditText.getText().toString().isEmpty()) {
+                        startDragListener.onVoiceRequest(getAdapterPosition());
+                    } else {
+                        progressiveEditText.setText("");
+                    }
+                }
+            });
+
+            progressiveEditText.addTextChangedListener(new TextWatcher() {
+                @Override
+                public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                }
+
+                @Override
+                public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                    if (progressiveEditText.getText() != null) {
+                        String value = progressiveEditText.getText().toString();
+                        editTextData.get(getAdapterPosition()).setEditTextValue(value);
+                        if (value.isEmpty()) {
+                            progressiveLayout.setEndIconDrawable(R.drawable.outline_mic_24);
+                        } else {
+                            progressiveLayout.setEndIconDrawable(R.drawable.ic_cancel_black_24dp);
+                        }
+                    }
+                }
+
+                @Override
+                public void afterTextChanged(Editable editable) {
+                }
+            });
+
+            if (descriptions != null && descriptions.size() >= getAdapterPosition()) {
+                int[][] states = new int[][] {
+                        new int[] { android.R.attr.state_enabled }, // enabled
+                        new int[] { -android.R.attr.state_enabled }, // disabled
+                        new int[] { -android.R.attr.state_checked }, // unchecked
+                        new int[] { android.R.attr.state_pressed }  // pressed
+                };
+                int[] colors = new int[] {
+                        Color.GREEN,
+                        Color.GREEN,
+                        Color.GREEN,
+                        Color.GREEN
+                };
+                progressiveLayout.setHint(descriptions.get(getAdapterPosition() - 1)); // Subtract 1 for machine id
+                ColorStateList colorStateList = new ColorStateList(states, colors);
+                progressiveLayout.setDefaultHintTextColor(colorStateList);
+            }
         }
     }
 
-    public static class MachineIdViewHolder extends ParentViewHolder {
+    public class MachineIdViewHolder extends ParentViewHolder {
+        TextInputEditText machineIdEditText;
+        TextInputLayout machineIdLayout;
         public MachineIdViewHolder(View itemView) {
             super(itemView);
+            machineIdLayout = itemView.findViewById(R.id.input_layout);
+            machineIdEditText = itemView.findViewById(R.id.edit_text);
+        }
+
+        private void bind() {
+            machineIdLayout.setEndIconOnClickListener(view -> {
+                if (machineIdEditText.getText() != null) {
+                    if (machineIdEditText.getText().toString().isEmpty()) {
+                        startDragListener.onVoiceRequest(getAdapterPosition());
+                    } else {
+                        machineIdEditText.setText("");
+                    }
+                }
+            });
+
+            machineIdEditText.addTextChangedListener(new TextWatcher() {
+                @Override
+                public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                }
+
+                @Override
+                public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                    if (machineIdEditText.getText() != null) {
+                        String value = machineIdEditText.getText().toString();
+                        editTextData.get(getAdapterPosition()).setEditTextValue(value);
+                        if (value.isEmpty()) {
+                            machineIdLayout.setEndIconDrawable(R.drawable.outline_mic_24);
+                        } else {
+                            machineIdLayout.setEndIconDrawable(R.drawable.ic_cancel_black_24dp);
+                        }
+                    }
+                }
+
+                @Override
+                public void afterTextChanged(Editable editable) {
+                }
+            });
         }
     }
 
@@ -220,19 +273,29 @@ public class DraggableRecyclerAdapter extends RecyclerView.Adapter<DraggableRecy
         void requestDrag(RecyclerView.ViewHolder viewHolder);
         void onSubmitButtonClick();
         void onSubmitScan();
+        void onVoiceRequest(int id);
     }
 
-    public static class EditModel {
-
+    public static class EditTextModel {
         private String editTextValue;
-
+        public EditTextModel(String val) { this.editTextValue = val; }
         public String getEditTextValue() {
             return editTextValue;
         }
-
         public void setEditTextValue(String editTextValue) {
             this.editTextValue = editTextValue;
         }
+    }
+
+    public List<String> getData() {
+        List<String> ret = new ArrayList<>();
+        for (EditTextModel i : editTextData) {
+//            if (!i.getEditTextValue().trim().isEmpty()) {
+//                ret.add(i.getEditTextValue());
+//            }
+            ret.add(i.getEditTextValue());
+        }
+        return ret;
     }
 
 }
