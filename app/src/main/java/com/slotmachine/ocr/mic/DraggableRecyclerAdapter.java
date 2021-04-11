@@ -11,7 +11,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import androidx.recyclerview.widget.RecyclerView;
-import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 
@@ -25,7 +24,6 @@ public class DraggableRecyclerAdapter extends RecyclerView.Adapter<DraggableRecy
 
     private static final int ITEM_MACHINE_ID = 1;
     private static final int ITEM_PROGRESSIVE = 2;
-    private static final int ITEM_BUTTONS = 3;
 
     StartDragListener startDragListener;
 
@@ -48,8 +46,6 @@ public class DraggableRecyclerAdapter extends RecyclerView.Adapter<DraggableRecy
     public int getItemViewType(int position) {
         if (position == 0) {
             return ITEM_MACHINE_ID;
-        } else if (position == editTextData.size()) {
-            return ITEM_BUTTONS;
         } else {
             return ITEM_PROGRESSIVE;
         }
@@ -59,10 +55,8 @@ public class DraggableRecyclerAdapter extends RecyclerView.Adapter<DraggableRecy
     public @NotNull ParentViewHolder onCreateViewHolder(@NotNull ViewGroup parent, int viewType) {
         if (viewType == ITEM_PROGRESSIVE) {
             return new ProgressiveHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.item_draggable_progressive, parent, false));
-        } else if (viewType == ITEM_MACHINE_ID) {
-            return new MachineIdViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.item_machine_id, parent, false));
         } else {
-            return new ButtonsViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.item_buttons, parent, false));
+            return new MachineIdViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.item_machine_id, parent, false));
         }
     }
 
@@ -71,9 +65,9 @@ public class DraggableRecyclerAdapter extends RecyclerView.Adapter<DraggableRecy
         if (holder instanceof ProgressiveHolder) {
             ((ProgressiveHolder)holder).bind();
             ((ProgressiveHolder) holder).progressiveEditText.setText(editTextData.get(position).getEditTextValue());
-        } else if (holder instanceof ButtonsViewHolder) {
-            ((ButtonsViewHolder) holder).button.setOnClickListener(view -> startDragListener.onSubmitButtonClick());
-            ((ButtonsViewHolder) holder).button2.setOnClickListener(view -> startDragListener.onSubmitScan());
+//        } else if (holder instanceof ButtonsViewHolder) {
+//            ((ButtonsViewHolder) holder).button.setOnClickListener(view -> startDragListener.onSubmitButtonClick());
+//            ((ButtonsViewHolder) holder).button2.setOnClickListener(view -> startDragListener.onSubmitScan());
         } else if (holder instanceof MachineIdViewHolder) {
             ((MachineIdViewHolder) holder).bind();
             ((MachineIdViewHolder) holder).machineIdEditText.setText(editTextData.get(position).getEditTextValue());
@@ -82,7 +76,7 @@ public class DraggableRecyclerAdapter extends RecyclerView.Adapter<DraggableRecy
 
     @Override
     public int getItemCount() {
-        return editTextData.size() + 1;
+        return editTextData.size();
     }
 
     @Override
@@ -101,7 +95,7 @@ public class DraggableRecyclerAdapter extends RecyclerView.Adapter<DraggableRecy
 
     public void setMachineId(String id) {
         editTextData.get(0).setEditTextValue(id);
-        notifyDataSetChanged();
+        notifyItemChanged(0);
     }
 
     public void setItems(List<String> progressives) {
@@ -113,21 +107,17 @@ public class DraggableRecyclerAdapter extends RecyclerView.Adapter<DraggableRecy
         notifyDataSetChanged();
     }
 
-//    public String getMachineId() {
-//        return progs.get(0).getEditTextValue();
-//    }
+    public void setItem(int pos, String value) {
+        editTextData.get(pos).setEditTextValue(value);
+        notifyItemChanged(pos);
+    }
 
-//    @Override
-//    public void onRowSelected(MyViewHolder myViewHolder) {
-//        //myViewHolder.rowView.setBackgroundColor(Color.GRAY);
-//
-//    }
-//
-//    @Override
-//    public void onRowClear(MyViewHolder myViewHolder) {
-//        //myViewHolder.rowView.setBackgroundColor(Color.WHITE);
-//
-//    }
+    public void resetItems() {
+        for (EditTextModel i : editTextData) {
+            i.setEditTextValue("");
+        }
+        notifyDataSetChanged();
+    }
 
     public static class ParentViewHolder extends RecyclerView.ViewHolder {
         public ParentViewHolder(View itemView) {
@@ -259,20 +249,20 @@ public class DraggableRecyclerAdapter extends RecyclerView.Adapter<DraggableRecy
         }
     }
 
-    public static class ButtonsViewHolder extends ParentViewHolder {
-        MaterialButton button;
-        MaterialButton button2;
-        public ButtonsViewHolder(View itemView) {
-            super(itemView);
-            button = itemView.findViewById(R.id.mButton2);
-            button2 = itemView.findViewById(R.id.submit_button);
-        }
-    }
+//    public static class ButtonsViewHolder extends ParentViewHolder {
+//        MaterialButton button;
+//        MaterialButton button2;
+//        public ButtonsViewHolder(View itemView) {
+//            super(itemView);
+//            button = itemView.findViewById(R.id.mButton2);
+//            button2 = itemView.findViewById(R.id.submit_button);
+//        }
+//    }
 
     interface StartDragListener {
         void requestDrag(RecyclerView.ViewHolder viewHolder);
-        void onSubmitButtonClick();
-        void onSubmitScan();
+        //void onSubmitButtonClick();
+        //void onSubmitScan();
         void onVoiceRequest(int id);
     }
 
@@ -290,9 +280,6 @@ public class DraggableRecyclerAdapter extends RecyclerView.Adapter<DraggableRecy
     public List<String> getData() {
         List<String> ret = new ArrayList<>();
         for (EditTextModel i : editTextData) {
-//            if (!i.getEditTextValue().trim().isEmpty()) {
-//                ret.add(i.getEditTextValue());
-//            }
             ret.add(i.getEditTextValue());
         }
         return ret;

@@ -18,7 +18,7 @@ class ItemMoveCallback(private val mAdapter: ItemTouchHelperContract) : ItemTouc
 
     override fun onMove(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder,
                         target: RecyclerView.ViewHolder): Boolean {
-        if (target.adapterPosition in 1..6) { // Replace 6 with dynamic val
+        if (target.adapterPosition in 1..UserSettings.getNumberOfProgressives(recyclerView.context)) { // Replace 6 with dynamic val
             mAdapter.onRowMoved(viewHolder.adapterPosition, target.adapterPosition)
         }
         return true
