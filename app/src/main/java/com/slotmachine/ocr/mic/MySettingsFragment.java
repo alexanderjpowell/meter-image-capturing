@@ -60,6 +60,7 @@ public class MySettingsFragment extends PreferenceFragmentCompat {
         Preference terms_and_conditions_button = findPreference("legal_disclaimer");
         Preference version_number_preference = findPreference("version_number_preference");
         Preference add_remove_users = findPreference("add_remove_users");
+        //ListPreference progressive_hint_text_from_todo = findPreference("progressive_hint_text_from_todo");
 
         SwitchPreference reject_duplicates = findPreference("reject_duplicates");
         final SeekBarPreference reject_duplicates_duration = findPreference("reject_duplicates_duration");
@@ -286,6 +287,20 @@ public class MySettingsFragment extends PreferenceFragmentCompat {
                     }
             );
         }
+
+//        if (progressive_hint_text_from_todo != null) {
+//            progressive_hint_text_from_todo.setOnPreferenceChangeListener(
+//                    new Preference.OnPreferenceChangeListener() {
+//                        @Override
+//                        public boolean onPreferenceChange(Preference preference, Object newValue) {
+//                            SharedPreferences.Editor editor = sharedPref.edit();
+//                            editor.putString("progressive_hint_text_from_todo", newValue.toString());
+//                            editor.apply();
+//                            return true;
+//                        }
+//                    }
+//            );
+//        }
     }
 }
 

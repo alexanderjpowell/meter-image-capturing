@@ -1,6 +1,7 @@
 package com.slotmachine.ocr.mic;
 
 import android.annotation.SuppressLint;
+import android.app.ProgressDialog;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -20,9 +21,9 @@ import android.net.Uri;
 import android.provider.MediaStore;
 import androidx.annotation.NonNull;
 
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.material.badge.BadgeDrawable;
 import com.google.android.material.badge.BadgeUtils;
-import com.google.android.material.button.MaterialButton;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.textfield.TextInputEditText;
@@ -32,11 +33,13 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import androidx.appcompat.widget.Toolbar;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
@@ -56,10 +59,12 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.ml.vision.FirebaseVision;
 import com.google.firebase.ml.vision.common.FirebaseVisionImage;
 import com.google.firebase.ml.vision.document.FirebaseVisionDocumentText;
 import com.google.firebase.ml.vision.document.FirebaseVisionDocumentTextRecognizer;
+//import com.slotmachine.ocr.mic.viewmodel.MainActivityViewModel;
 
 import android.speech.RecognizerIntent;
 
@@ -70,22 +75,18 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Set;
 
 import timber.log.Timber;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, DraggableRecyclerAdapter.StartDragListener {
 
-    public static final int REQUEST_TAKE_PHOTO_PROGRESSIVES = 0;
-    public static final int MY_PERMISSIONS_REQUEST_CODE = 1;
-    public static final int REQUEST_TAKE_PHOTO_MACHINE_ID = 2;
-    public static final int REQUEST_SETTINGS_ACTIVITY = 3;
-    public static final int REQUEST_DATA_REPORT_ACTIVITY = 4;
-    private static final int REQ_CODE_SPEECH_INPUT = 100;
+    private static final int REQUEST_TAKE_PHOTO_PROGRESSIVES = 100;
+    private static final int MY_PERMISSIONS_REQUEST_CODE = 200;
+    private static final int REQUEST_SETTINGS_ACTIVITY = 300;
+    private static final int REQ_CODE_SPEECH_INPUT = 400;
 
     public String mCurrentPhotoPath;
     public int progressive = 1;
@@ -96,12 +97,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private FirebaseAuth firebaseAuth;
     private FirebaseFirestore database;
 
+    //private MainActivityViewModel mainActivityViewModel;
+
     private Double minimumProgressiveValue;
 
     private List<String> progressiveDescriptions = null;
 
     private Intent intent;
     private Toolbar toolbar;
+    private ProgressDialog progressDialog;
 
     private int REJECT_DUPLICATES_DURATION_MILLIS, REJECT_DUPLICATES_DURATION_HOURS;
     private boolean REJECT_DUPLICATES;
@@ -152,6 +156,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         View headerView = navigationView.getHeaderView(0);
         headerView.setBackgroundColor(Color.parseColor("#2196F3"));
 
+        progressDialog = new ProgressDialog(this);
+        progressDialog.setMessage("Checking for potential duplicates...");
+
         intent = getIntent();
         // Also check if coming from login activity and send verification email if necessary
         boolean comingFromLogin = intent.getBooleanExtra("comingFromLogin", false);
@@ -173,21 +180,30 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         findViewById(R.id.button_submit).setOnClickListener(v -> onSubmit());
         //
 
+        String machine_id = intent.getStringExtra("machine_id");
+
         progressiveDescriptions = intent.getStringArrayListExtra("progressiveDescriptionTitles");
         RecyclerView recyclerView = findViewById(R.id.drag_recycler);
         int num = UserSettings.getNumberOfProgressives(this);
-        adapter = new DraggableRecyclerAdapter(num, progressiveDescriptions,this);
+        adapter = new DraggableRecyclerAdapter(machine_id == null, this, num, progressiveDescriptions,this);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         ItemTouchHelper.Callback callback = new ItemMoveCallback(adapter);
         touchHelper = new ItemTouchHelper(callback);
         touchHelper.attachToRecyclerView(recyclerView);
         recyclerView.setAdapter(adapter);
 
-        String machine_id = intent.getStringExtra("machine_id");
+        //mainActivityViewModel = new ViewModelProvider(this).get(MainActivityViewModel.class);
+
+
         if (machine_id != null) {
             adapter.setMachineId(machine_id);
+            //initPrevScanObserver(machine_id);
         }
     }
+
+//    private void initPrevScanObserver(String machine_id) {
+//        mainActivityViewModel.getPrevDayValues(firebaseAuth.getUid(), machine_id).observe(this, values -> adapter.setPrevItems(values));
+//    }
 
     @Override
     public void onVoiceRequest(int code) {
@@ -196,7 +212,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     public void onScan() {
-        dispatchTakePictureIntent(REQUEST_TAKE_PHOTO_PROGRESSIVES);
+        dispatchTakePictureIntent();
     }
 
     public void onSubmit() {
@@ -298,7 +314,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         return super.onOptionsItemSelected(item);
     }
 
-    private void dispatchTakePictureIntent(Integer request) {
+    private void dispatchTakePictureIntent() {
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         // Ensure that there's a camera activity to handle the intent
         if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
@@ -317,8 +333,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         "com.slotmachine.ocr.mic.fileprovider",
                         photoFile);
                 takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
-                startActivityForResult(takePictureIntent, request);
+                startActivityForResult(takePictureIntent, REQUEST_TAKE_PHOTO_PROGRESSIVES);
             }
+        } else {
+            showToast("Unable to open camera");
         }
     }
 
@@ -430,7 +448,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 }
             }
         } catch (Exception error) {
-            error.printStackTrace();
+            Timber.e(error);
             showToast("Error");
         }
     }
@@ -460,11 +478,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                 List<FirebaseVisionDocumentText.Paragraph> paragraphs = block.getParagraphs();
                                 for (FirebaseVisionDocumentText.Paragraph paragraph : paragraphs) {
                                     List<FirebaseVisionDocumentText.Word> words = paragraph.getWords();
-                                    if (getNumberOfOccurrences(paragraph.getText()) == 2) {
-                                        int firstIndex = paragraph.getText().indexOf('#');
-                                        int secondIndex = paragraph.getText().indexOf('#', firstIndex + 1);
+                                    //if (getNumberOfOccurrences(paragraph.getText()) == 2) {
+                                        //int firstIndex = paragraph.getText().indexOf('#');
+                                        //int secondIndex = paragraph.getText().indexOf('#', firstIndex + 1);
                                         //machineCode = paragraph.getText().substring(firstIndex+1, secondIndex).trim();
-                                    }
+                                    //}
                                     for (FirebaseVisionDocumentText.Word word : words) {
                                         if (!isAlpha(word.getText())) {
                                             sb.append(word.getText().trim());
@@ -658,8 +676,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
             //
 
-            if (REJECT_DUPLICATES) {
-                // Optimize to only search the last n hours
+            //
+            if (REJECT_DUPLICATES) { // Check if possible duplicate
+                progressDialog.show();
                 Date time = new Date(System.currentTimeMillis() - REJECT_DUPLICATES_DURATION_MILLIS);
                 Query query = database.collection("users")
                         .document(firebaseAuth.getUid())
@@ -669,73 +688,74 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         .orderBy("timestamp", Query.Direction.DESCENDING)
                         .limit(1);
                 query.get().addOnCompleteListener(task -> {
+                    progressDialog.dismiss();
                     if (task.isSuccessful()) {
                         List<DocumentSnapshot> documents = task.getResult().getDocuments();
                         if (documents.size() == 1) {
-                            Timestamp timestamp = (Timestamp)documents.get(0).get("timestamp");
-                            long delta = Math.abs((timestamp.getSeconds() * 1000) - System.currentTimeMillis());
-                            if (delta <= REJECT_DUPLICATES_DURATION_MILLIS) {
-                                AlertDialog alertDialog = new AlertDialog.Builder(MainActivity.this).create();
-                                String message = String.format(Locale.US, "This machine has already been scanned in the past %d hour(s).", REJECT_DUPLICATES_DURATION_HOURS);
-                                alertDialog.setMessage(message);
-                                alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, "CANCEL",
-                                        (dialog, i) -> dialog.dismiss());
-                                alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "SUBMIT ANYWAY",
-                                        (dialog, i) -> {
-                                            insertToDatabase(userId, progressiveText1, progressiveText2, progressiveText3, progressiveText4, progressiveText5, progressiveText6, progressiveText7, progressiveText8, progressiveText9, progressiveText10, descriptionValuesArray.get(0), descriptionValuesArray.get(1), descriptionValuesArray.get(2), descriptionValuesArray.get(3), descriptionValuesArray.get(4), descriptionValuesArray.get(5), descriptionValuesArray.get(6), descriptionValuesArray.get(7), descriptionValuesArray.get(8), descriptionValuesArray.get(9), baseValuesArray.get(0), baseValuesArray.get(1), baseValuesArray.get(2), baseValuesArray.get(3), baseValuesArray.get(4), baseValuesArray.get(5), baseValuesArray.get(6), baseValuesArray.get(7), baseValuesArray.get(8), baseValuesArray.get(9), incrementValuesArray.get(0), incrementValuesArray.get(1), incrementValuesArray.get(2), incrementValuesArray.get(3), incrementValuesArray.get(4), incrementValuesArray.get(5), incrementValuesArray.get(6), incrementValuesArray.get(7), incrementValuesArray.get(8), incrementValuesArray.get(9), machineIdText, FieldValue.serverTimestamp(), userName, notesText, locationText);
-                                            adapter.resetItems();
-                                            showToast("Progressive(s) submitted successfully");
-                                            hideKeyboard();
-                                            dialog.dismiss();
-                                        });
+                            AlertDialog alertDialog = new AlertDialog.Builder(MainActivity.this).create();
+                            String message = String.format(Locale.US, "This machine has already been scanned in the past %d hour(s).", REJECT_DUPLICATES_DURATION_HOURS);
+                            alertDialog.setMessage(message);
+                            alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, "CANCEL",
+                                    (dialog, i) -> dialog.dismiss());
+                            alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "SUBMIT ANYWAY",
+                                    (dialog, i) -> {
+                                        insertToDatabase(userId, progressiveText1, progressiveText2, progressiveText3, progressiveText4, progressiveText5, progressiveText6, progressiveText7, progressiveText8, progressiveText9, progressiveText10, descriptionValuesArray.get(0), descriptionValuesArray.get(1), descriptionValuesArray.get(2), descriptionValuesArray.get(3), descriptionValuesArray.get(4), descriptionValuesArray.get(5), descriptionValuesArray.get(6), descriptionValuesArray.get(7), descriptionValuesArray.get(8), descriptionValuesArray.get(9), baseValuesArray.get(0), baseValuesArray.get(1), baseValuesArray.get(2), baseValuesArray.get(3), baseValuesArray.get(4), baseValuesArray.get(5), baseValuesArray.get(6), baseValuesArray.get(7), baseValuesArray.get(8), baseValuesArray.get(9), incrementValuesArray.get(0), incrementValuesArray.get(1), incrementValuesArray.get(2), incrementValuesArray.get(3), incrementValuesArray.get(4), incrementValuesArray.get(5), incrementValuesArray.get(6), incrementValuesArray.get(7), incrementValuesArray.get(8), incrementValuesArray.get(9), machineIdText, FieldValue.serverTimestamp(), userName, notesText, locationText);
+                                        adapter.resetItems();
+                                        showToast("Progressive(s) submitted successfully");
+                                        hideKeyboard();
+                                        dialog.dismiss();
+                                        notes = "";
+                                        removeFromUploadArray();
+                                        navigateBackToUploadFile();
+                                    });
+                            if (!isFinishing()) {
                                 alertDialog.show();
                             } else {
-                                insertToDatabase(userId, progressiveText1, progressiveText2, progressiveText3, progressiveText4, progressiveText5, progressiveText6, progressiveText7, progressiveText8, progressiveText9, progressiveText10, descriptionValuesArray.get(0), descriptionValuesArray.get(1), descriptionValuesArray.get(2), descriptionValuesArray.get(3), descriptionValuesArray.get(4), descriptionValuesArray.get(5), descriptionValuesArray.get(6), descriptionValuesArray.get(7), descriptionValuesArray.get(8), descriptionValuesArray.get(9), baseValuesArray.get(0), baseValuesArray.get(1), baseValuesArray.get(2), baseValuesArray.get(3), baseValuesArray.get(4), baseValuesArray.get(5), baseValuesArray.get(6), baseValuesArray.get(7), baseValuesArray.get(8), baseValuesArray.get(9), incrementValuesArray.get(0), incrementValuesArray.get(1), incrementValuesArray.get(2), incrementValuesArray.get(3), incrementValuesArray.get(4), incrementValuesArray.get(5), incrementValuesArray.get(6), incrementValuesArray.get(7), incrementValuesArray.get(8), incrementValuesArray.get(9), machineIdText, FieldValue.serverTimestamp(), userName, notesText, locationText);
-                                adapter.resetItems();
-                                showToast("Progressive(s) submitted successfully");
-                                hideKeyboard();
+                                Timber.e("trying to show dialog after destroy");
                             }
-                        } else {
+                        } else { // No Dups Found
                             insertToDatabase(userId, progressiveText1, progressiveText2, progressiveText3, progressiveText4, progressiveText5, progressiveText6, progressiveText7, progressiveText8, progressiveText9, progressiveText10, descriptionValuesArray.get(0), descriptionValuesArray.get(1), descriptionValuesArray.get(2), descriptionValuesArray.get(3), descriptionValuesArray.get(4), descriptionValuesArray.get(5), descriptionValuesArray.get(6), descriptionValuesArray.get(7), descriptionValuesArray.get(8), descriptionValuesArray.get(9), baseValuesArray.get(0), baseValuesArray.get(1), baseValuesArray.get(2), baseValuesArray.get(3), baseValuesArray.get(4), baseValuesArray.get(5), baseValuesArray.get(6), baseValuesArray.get(7), baseValuesArray.get(8), baseValuesArray.get(9), incrementValuesArray.get(0), incrementValuesArray.get(1), incrementValuesArray.get(2), incrementValuesArray.get(3), incrementValuesArray.get(4), incrementValuesArray.get(5), incrementValuesArray.get(6), incrementValuesArray.get(7), incrementValuesArray.get(8), incrementValuesArray.get(9),  machineIdText, FieldValue.serverTimestamp(), userName, notesText, locationText);
                             adapter.resetItems();
                             showToast("Progressive(s) submitted successfully");
                             hideKeyboard();
+                            notes = "";
+                            removeFromUploadArray();
+                            navigateBackToUploadFile();
                         }
                     } else {
-                        showToast(task.getException().getMessage());
+                        showToast("Error submitting data");
                     }
                 });
-                //
-            } else {
+            } else { // Proceed to save scan
                 insertToDatabase(userId, progressiveText1, progressiveText2, progressiveText3, progressiveText4, progressiveText5, progressiveText6, progressiveText7, progressiveText8, progressiveText9, progressiveText10, descriptionValuesArray.get(0), descriptionValuesArray.get(1), descriptionValuesArray.get(2), descriptionValuesArray.get(3), descriptionValuesArray.get(4), descriptionValuesArray.get(5), descriptionValuesArray.get(6), descriptionValuesArray.get(7), descriptionValuesArray.get(8), descriptionValuesArray.get(9), baseValuesArray.get(0), baseValuesArray.get(1), baseValuesArray.get(2), baseValuesArray.get(3), baseValuesArray.get(4), baseValuesArray.get(5), baseValuesArray.get(6), baseValuesArray.get(7), baseValuesArray.get(8), baseValuesArray.get(9), incrementValuesArray.get(0), incrementValuesArray.get(1), incrementValuesArray.get(2), incrementValuesArray.get(3), incrementValuesArray.get(4), incrementValuesArray.get(5), incrementValuesArray.get(6), incrementValuesArray.get(7), incrementValuesArray.get(8), incrementValuesArray.get(9),  machineIdText, FieldValue.serverTimestamp(), userName, notesText, locationText);
                 adapter.resetItems();
                 showToast("Progressive(s) submitted successfully");
                 hideKeyboard();
+                notes = "";
+                removeFromUploadArray();
+                navigateBackToUploadFile();
             }
-
-            // Reset Notes
-            notes = "";
-
-            // Remove element from uploadArray
-            if (intent.hasExtra("hashMap")) {
-                HashMap<String, Object> hashMap = (HashMap<String, Object>)intent.getSerializableExtra("hashMap");
-                DocumentReference documentReference = database.collection("formUploads").document(userId);
-                documentReference.update("uploadArray", FieldValue.arrayRemove(hashMap))
-                        .addOnSuccessListener(aVoid -> Timber.d("DocumentSnapshot successfully updated!"))
-                        .addOnFailureListener(e -> showToast("Error updating to do list. " + e.getMessage()));
-            }
-            //
-
-            // if coming from to do activity - go back and
-            if (intent.hasExtra("machine_id")) {
-                setResult(RESULT_OK, getIntent());
-                this.onBackPressed();
-                finish();
-            }
-            //
         } catch (Exception ex) {
             Timber.e(ex);
             showToast(ex.getMessage());
+        }
+    }
+
+    private void removeFromUploadArray() {
+        if (intent.hasExtra("hashMap")) {
+            HashMap<String, Object> hashMap = (HashMap<String, Object>)intent.getSerializableExtra("hashMap");
+            DocumentReference documentReference = database.collection("formUploads").document(firebaseAuth.getUid());
+            documentReference.update("uploadArray", FieldValue.arrayRemove(hashMap))
+                    .addOnSuccessListener(aVoid -> Timber.d("DocumentSnapshot successfully updated!"))
+                    .addOnFailureListener(e -> showToast("Error updating to do list. " + e.getMessage()));
+        }
+    }
+
+    private void navigateBackToUploadFile() {
+        if (intent.hasExtra("machine_id")) {
+            setResult(RESULT_OK, getIntent());
+            this.onBackPressed();
+            finish();
         }
     }
 

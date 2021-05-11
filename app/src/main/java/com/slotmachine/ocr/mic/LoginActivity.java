@@ -12,14 +12,11 @@ import android.text.method.LinkMovementMethod;
 import android.text.style.ClickableSpan;
 import android.view.View;
 import android.widget.Toast;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.checkbox.MaterialCheckBox;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textview.MaterialTextView;
 import com.google.firebase.analytics.FirebaseAnalytics;
-import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 
 public class LoginActivity extends BaseActivity implements View.OnClickListener {
@@ -81,19 +78,16 @@ public class LoginActivity extends BaseActivity implements View.OnClickListener 
         progressDialog.show();
 
         firebaseAuth.signInWithEmailAndPassword(email, password)
-                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        progressDialog.dismiss();
-                        if (task.isSuccessful()) {
-                            onEvent(FirebaseAnalytics.Event.LOGIN, task.getResult().getUser().getUid());
-                            Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                            intent.putExtra("comingFromLogin", true);
-                            startActivity(intent);
-                            finish();
-                        } else {
-                            showToast("Incorrect username or password.  Try again.");
-                        }
+                .addOnCompleteListener(this, task -> {
+                    progressDialog.dismiss();
+                    if (task.isSuccessful()) {
+                        onEvent(FirebaseAnalytics.Event.LOGIN, task.getResult().getUser().getUid());
+                        Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                        intent.putExtra("comingFromLogin", true);
+                        startActivity(intent);
+                        finish();
+                    } else {
+                        showToast("Incorrect username or password.  Try again.");
                     }
                 });
     }

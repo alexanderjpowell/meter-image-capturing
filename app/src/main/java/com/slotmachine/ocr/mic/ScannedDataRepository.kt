@@ -3,6 +3,8 @@ package com.slotmachine.ocr.mic
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.Query
+import java.util.*
 
 class ScannedDataRepository {
 
@@ -22,5 +24,25 @@ class ScannedDataRepository {
                 .collection("displayNames")
                 .document(name)
                 .delete()
+    }
+
+    fun getLatestScansById(uid: String, machineId: String) : Query {
+        return database.collection("users")
+                .document(uid)
+                .collection("scans")
+                .whereEqualTo("machine_id", machineId)
+                .orderBy("timestamp", Query.Direction.DESCENDING)
+                .limit(1)
+    }
+
+    fun getLastScanByIdInTimeRange(uid: String, machineId: String, rejectDurationMillis: Int) : Query {
+        val time = Date(System.currentTimeMillis() - rejectDurationMillis)
+        return database.collection("users")
+                .document(uid)
+                .collection("scans")
+                .whereEqualTo("machine_id", machineId)
+                .whereGreaterThan("timestamp", time)
+                .orderBy("timestamp", Query.Direction.DESCENDING)
+                .limit(1)
     }
 }

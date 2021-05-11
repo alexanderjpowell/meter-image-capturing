@@ -1,7 +1,6 @@
 package com.slotmachine.ocr.mic;
 
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
@@ -81,7 +80,6 @@ public class DataReportActivity extends AppCompatActivity {
         if (getSupportActionBar() != null)
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        // Ensure user is signed in
         firebaseAuth = FirebaseAuth.getInstance();
         if (firebaseAuth.getCurrentUser() == null) {
             startActivity(new Intent(DataReportActivity.this, LoginActivity.class));
@@ -95,13 +93,10 @@ public class DataReportActivity extends AppCompatActivity {
         database = FirebaseFirestore.getInstance();
         swipeRefreshLayout = findViewById(R.id.swipeRefresh);
         swipeRefreshLayout.setOnRefreshListener(
-                new SwipeRefreshLayout.OnRefreshListener() {
-                    @Override
-                    public void onRefresh() {
-                        // This method performs the actual data-refresh operation.
-                        // The method calls setRefreshing(false) when it's finished.
-                        executeQuery(dateRange);
-                    }
+                () -> {
+                    // This method performs the actual data-refresh operation.
+                    // The method calls setRefreshing(false) when it's finished.
+                    executeQuery(dateRange);
                 }
         );
 
@@ -146,21 +141,15 @@ public class DataReportActivity extends AppCompatActivity {
                 AlertDialog alertDialog = new AlertDialog.Builder(DataReportActivity.this).create();
                 alertDialog.setMessage("Are you sure you want to delete this scan?");
                 alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "Yes",
-                        new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int i) {
-                                deleteScanFromDatabase(rowData.getDocumentId());
-                                rowDataList.remove(position);
-                                mAdapter.notifyItemRemoved(position);
-                                mAdapter.notifyItemRangeChanged(position, rowDataList.size());
-                                dialog.dismiss();
-                            }
+                        (dialog, i) -> {
+                            deleteScanFromDatabase(rowData.getDocumentId());
+                            rowDataList.remove(position);
+                            mAdapter.notifyItemRemoved(position);
+                            mAdapter.notifyItemRangeChanged(position, rowDataList.size());
+                            dialog.dismiss();
                         });
                 alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, "CANCEL",
-                        new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int i) {
-                                dialog.dismiss();
-                            }
-                        });
+                        (dialog, i) -> dialog.dismiss());
                 alertDialog.show();
             }
         }));
@@ -211,38 +200,31 @@ public class DataReportActivity extends AppCompatActivity {
         searchView.setOnQueryTextListener(new MaterialSearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                //backupData.clear();
-                //backupData.addAll(rowDataList);
-                //Toast.makeText(getApplicationContext(), "onQueryTextSubmit", Toast.LENGTH_SHORT).show();
-                //doSearch(query);
-                progressBar.setVisibility(View.VISIBLE);
-                CollectionReference usersCollection = database.collection("users")
-                        .document(firebaseAuth.getCurrentUser().getUid())
-                        .collection("scans");
-                Query scansQuery = usersCollection.whereEqualTo("machine_id", query)
-                        .orderBy("timestamp", Query.Direction.DESCENDING);
-                        //.limit(QUERY_LIMIT_SIZE);
-                scansQuery.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        if (task.isSuccessful()) {
-                            prepareData(task.getResult(), false);
-                        } else {
-                            showToast("Unable to refresh.  Check your connection.");
-                        }
-                        progressBar.setVisibility(View.INVISIBLE);
-                    }
-                });
                 return true;
             }
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                /*if (!newText.trim().isEmpty()) {
-                    //doSearch(newText);
-                } else {
-                    //revertRecyclerViewToNormal();
-                }*/
+                if (!newText.trim().isEmpty()) {
+                    progressBar.setVisibility(View.VISIBLE);
+                    CollectionReference usersCollection = database.collection("users")
+                            .document(firebaseAuth.getCurrentUser().getUid())
+                            .collection("scans");
+                    Query scansQuery = usersCollection
+                            .whereGreaterThanOrEqualTo("machine_id", newText.trim())
+                            .whereLessThanOrEqualTo("machine_id", newText.trim() + "\uF7FF")
+                            .orderBy("machine_id")
+                            .orderBy("timestamp", Query.Direction.DESCENDING)
+                            .limit(10);
+                    scansQuery.get().addOnCompleteListener(task -> {
+                        if (task.isSuccessful()) {
+                            prepareData(task.getResult(), false);
+                        } else {
+                            showToast("Unable to refresh.  Check your connection.");
+                        }
+                        progressBar.setVisibility(View.GONE);
+                    });
+                }
                 return false;
             }
         });
@@ -263,7 +245,6 @@ public class DataReportActivity extends AppCompatActivity {
             }
         });
 
-        //return super.onCreateOptionsMenu(menu);
         return true;
     }
 
@@ -295,31 +276,12 @@ public class DataReportActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    /*private int getOffsetFromDateRange(DateRange dateRange) {
-        int ret = 86400;
-        if (dateRange.equals(DateRange.HOUR))
-            ret = 3600;
-        else if (dateRange.equals(DateRange.DAY))
-            ret = 86400;
-        else if (dateRange.equals(DateRange.WEEK))
-            ret = offset = 604800;
-        return ret;
-    }*/
-
     private void loadMoreRecords() {
         Date time = new Date(System.currentTimeMillis() - offset * 1000);
-
-        //CollectionReference scansCollection = database.collection("scans");
 
         CollectionReference usersCollection = database.collection("users")
                 .document(firebaseAuth.getCurrentUser().getUid())
                 .collection("scans");
-
-        /*Query query = scansCollection.whereEqualTo("uid", firebaseAuth.getCurrentUser().getUid())
-                .whereGreaterThan("timestamp", time)
-                .orderBy("timestamp", Query.Direction.DESCENDING)
-                .startAfter(lastDocumentSnapshot)
-                .limit(QUERY_LIMIT_SIZE);*/
 
         Query query = usersCollection
                 .whereGreaterThan("timestamp", time)
@@ -327,16 +289,13 @@ public class DataReportActivity extends AppCompatActivity {
                 .startAfter(lastDocumentSnapshot)
                 .limit(QUERY_LIMIT_SIZE);
 
-        query.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                if (task.isSuccessful()) {
-                    prepareData(task.getResult(), true);
-                } else {
-                    showToast("Unable to refresh.  Check your connection.");
-                }
-                LOADING = true;
+        query.get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                prepareData(task.getResult(), true);
+            } else {
+                showToast("Unable to refresh.  Check your connection.");
             }
+            LOADING = true;
         });
     }
 
@@ -356,16 +315,13 @@ public class DataReportActivity extends AppCompatActivity {
         Query query = usersCollection.whereGreaterThan("timestamp", time)
                 .orderBy("timestamp", Query.Direction.DESCENDING)
                 .limit(QUERY_LIMIT_SIZE);
-        query.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                if (task.isSuccessful()) {
-                    prepareData(task.getResult(), false);
-                } else {
-                    showToast("Unable to refresh.  Check your connection.");
-                }
-                swipeRefreshLayout.setRefreshing(false);
+        query.get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                prepareData(task.getResult(), false);
+            } else {
+                showToast("Unable to refresh.  Check your connection.");
             }
+            swipeRefreshLayout.setRefreshing(false);
         });
     }
 

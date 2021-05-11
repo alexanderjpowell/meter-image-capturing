@@ -9,7 +9,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ProgressBar;
-import android.widget.TextView;
 import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -19,8 +18,6 @@ import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -40,7 +37,6 @@ public class TodoListActivity extends AppCompatActivity {
     private List<ToDoListData> toDoDataListAll;
     private RecyclerView recyclerView;
     private ToDoListDataAdapter mAdapter;
-    private enum EmptyState { NO_FILE_UPLOAD, ALL_COMPLETED, NONE_COMPLETED, NORMAL }
 
     private FirebaseAuth firebaseAuth;
     private FirebaseFirestore database;
@@ -49,9 +45,6 @@ public class TodoListActivity extends AppCompatActivity {
 
     private DocumentReference uploadFormDataDocumentReference;
 
-    private TextView empty_state_text_view;
-    private TextView empty_state_completed_text_view;
-    private TextView empty_state_uncompleted_text_view;
     private ProgressBar progressBar;
 
     private MaterialSearchView searchView;
@@ -80,9 +73,6 @@ public class TodoListActivity extends AppCompatActivity {
         sharedPref = getApplicationContext().getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
         SORT_BY_FIELD = sharedPref.getInt("SORT_BY_FIELD", 0); // 0 is original, 1 machine_id, 2 is location
 
-        empty_state_text_view = findViewById(R.id.empty_state_no_file_text_view);
-        empty_state_completed_text_view = findViewById(R.id.empty_state_completed_text_view);
-        empty_state_uncompleted_text_view = findViewById(R.id.empty_state_uncompleted_text_view);
         progressBar = findViewById(R.id.progress_bar);
 
         database = FirebaseFirestore.getInstance();
@@ -90,16 +80,7 @@ public class TodoListActivity extends AppCompatActivity {
                 .document(firebaseAuth.getCurrentUser().getUid());
 
         swipeRefreshLayout = findViewById(R.id.swipeRefresh);
-        swipeRefreshLayout.setOnRefreshListener(
-                new SwipeRefreshLayout.OnRefreshListener() {
-                    @Override
-                    public void onRefresh() {
-                        // This method performs the actual data-refresh operation.
-                        // The method calls setRefreshing(false) when it's finished.
-                        populateRecyclerView("");
-                    }
-                }
-        );
+        swipeRefreshLayout.setOnRefreshListener(() -> populateRecyclerView(""));
 
         recyclerView = findViewById(R.id.recycler_view_to_do_list);
         toDoDataList = new ArrayList<>();
@@ -156,83 +137,45 @@ public class TodoListActivity extends AppCompatActivity {
     }
 
     private void populateRecyclerView(final String machineIdQuery) {
-        recyclerView.setVisibility(View.GONE);
-        empty_state_text_view.setVisibility(View.GONE);
         progressBar.setVisibility(View.VISIBLE);
         toDoDataListAll.clear();
         toDoDataList.clear();
-        uploadFormDataDocumentReference.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                if (task.isSuccessful()) {
-                    DocumentSnapshot document = task.getResult();
-                    if ((document != null) && document.exists()) {
-                        if (document.contains("uploadArray")) {
+        uploadFormDataDocumentReference.get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                DocumentSnapshot document = task.getResult();
+                if ((document != null) && document.exists() && document.contains("uploadArray")) {
+                    List<Map<String, Object>> mapList = (List<Map<String, Object>>) document.get("uploadArray");
 
-                            List<Map<String, Object>> mapList = (List<Map<String, Object>>)document.get("uploadArray");
-
-                            for (int i = 0; i < mapList.size(); i++) {
-                                Map<String, Object> map = mapList.get(i);
-                                ToDoListData row = new ToDoListData(i, map);
-                                if (machineIdQuery.isEmpty()) {
-                                    toDoDataList.add(row);
-                                } else {
-                                    if (row.getMachineId().equals(machineIdQuery)) {
-                                        toDoDataList.add(row);
-                                    }
-                                }
+                    for (int i = 0; i < mapList.size(); i++) {
+                        Map<String, Object> map = mapList.get(i);
+                        ToDoListData row = new ToDoListData(i, map);
+                        if (machineIdQuery.isEmpty()) {
+                            toDoDataList.add(row);
+                        } else {
+                            if (row.getMachineId().equals(machineIdQuery)) {
+                                toDoDataList.add(row);
                             }
-                            //
-                            if (SORT_BY_FIELD == 0) {
-                                Collections.sort(toDoDataList, ToDoListData.indexComparator);
-                            } else if (SORT_BY_FIELD == 1) {
-                                Collections.sort(toDoDataList, ToDoListData.machineIdComparator);
-                            } else if (SORT_BY_FIELD == 2) {
-                                Collections.sort(toDoDataList, ToDoListData.locationComparator);
-                            }
-                            toDoDataListAll.clear();
-                            toDoDataListAll.addAll(toDoDataList);
-                            mAdapter.notifyDataSetChanged();
-                            //
-                            toggleEmptyStateDisplays(EmptyState.NORMAL);
                         }
-                        mAdapter.notifyDataSetChanged();
-                    } else {
-                        toggleEmptyStateDisplays(EmptyState.NO_FILE_UPLOAD);
                     }
-                } else {
-                    showToast(task.getException().getMessage());
+                    if (SORT_BY_FIELD == 0) {
+                        Collections.sort(toDoDataList, ToDoListData.indexComparator);
+                    } else if (SORT_BY_FIELD == 1) {
+                        Collections.sort(toDoDataList, ToDoListData.machineIdComparator);
+                    } else if (SORT_BY_FIELD == 2) {
+                        Collections.sort(toDoDataList, ToDoListData.locationComparator);
+                    }
+                    toDoDataListAll.clear();
+                    toDoDataListAll.addAll(toDoDataList);
+                    mAdapter.notifyDataSetChanged();
                 }
-
-                // Finish things up
-                progressBar.setVisibility(View.GONE);
-                swipeRefreshLayout.setRefreshing(false);
+            } else {
+                showToast(task.getException().getMessage());
             }
-        });
-    }
 
-    private void toggleEmptyStateDisplays(EmptyState state) {
-        if (state.equals(EmptyState.NO_FILE_UPLOAD)) {
-            recyclerView.setVisibility(View.GONE);
-            empty_state_text_view.setVisibility(View.VISIBLE);
-            empty_state_completed_text_view.setVisibility(View.GONE);
-            empty_state_uncompleted_text_view.setVisibility(View.GONE);
-        } else if (state.equals(EmptyState.ALL_COMPLETED)) {
-            recyclerView.setVisibility(View.GONE);
-            empty_state_text_view.setVisibility(View.GONE);
-            empty_state_completed_text_view.setVisibility(View.VISIBLE);
-            empty_state_uncompleted_text_view.setVisibility(View.GONE);
-        } else if (state.equals(EmptyState.NONE_COMPLETED)) {
-            recyclerView.setVisibility(View.GONE);
-            empty_state_text_view.setVisibility(View.GONE);
-            empty_state_completed_text_view.setVisibility(View.GONE);
-            empty_state_uncompleted_text_view.setVisibility(View.VISIBLE);
-        } else if (state.equals(EmptyState.NORMAL)) {
-            recyclerView.setVisibility(View.VISIBLE);
-            empty_state_text_view.setVisibility(View.GONE);
-            empty_state_completed_text_view.setVisibility(View.GONE);
-            empty_state_uncompleted_text_view.setVisibility(View.GONE);
-        }
+            // Finish things up
+            progressBar.setVisibility(View.GONE);
+            swipeRefreshLayout.setRefreshing(false);
+        });
     }
 
     @Override
@@ -274,25 +217,12 @@ public class TodoListActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.to_do_list_action_bar, menu);
-
-        //
         MenuItem searchItem = menu.findItem(R.id.action_search);
-        //MenuItem sortMachineIdItem = menu.findItem(R.id.sort_machine_id);
-        //MenuItem sortLocationItem = menu.findItem(R.id.sort_location);
-
-
-
         searchView = findViewById(R.id.search_view);
-        //final EditText editText = searchView.findViewById(com.miguelcatalan.materialsearchview.R.id.searchTextView);
-        //editText.setInputType(InputType.TYPE_CLASS_NUMBER);
         searchView.setMenuItem(searchItem);
-        //
         searchView.setOnQueryTextListener(new MaterialSearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                //Do some magic
-                //Toast.makeText(getApplicationContext(), "onQueryTextSubmit", Toast.LENGTH_SHORT).show();
-                //doSearch(query);
                 return true;
             }
 

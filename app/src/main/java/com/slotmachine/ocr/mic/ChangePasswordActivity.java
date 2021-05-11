@@ -66,25 +66,19 @@ public class ChangePasswordActivity extends AppCompatActivity implements View.On
             }
 
             firebaseAuth.signInWithEmailAndPassword(email, currentPassword)
-                    .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-                        @Override
-                        public void onComplete(@NonNull Task<AuthResult> task) {
-                            if (task.isSuccessful()) {
-                                firebaseAuth.getCurrentUser().updatePassword(newPassword1)
-                                        .addOnCompleteListener(new OnCompleteListener<Void>() {
-                                            @Override
-                                            public void onComplete(@NonNull Task<Void> task) {
-                                                if (task.isSuccessful()) {
-                                                    showToast("Password changed successfully");
-                                                    startActivity(new Intent(ChangePasswordActivity.this, SettingsActivity.class));
-                                                } else {
-                                                    showToast(task.getException().getMessage());
-                                                }
-                                            }
-                                        });
-                            } else {
-                                showToast("Current password is incorrect. Try again.");
-                            }
+                    .addOnCompleteListener(task -> {
+                        if (task.isSuccessful()) {
+                            firebaseAuth.getCurrentUser().updatePassword(newPassword1)
+                                    .addOnCompleteListener(task1 -> {
+                                        if (task1.isSuccessful()) {
+                                            showToast("Password changed successfully");
+                                            startActivity(new Intent(ChangePasswordActivity.this, SettingsActivity.class));
+                                        } else {
+                                            showToast(task1.getException().getMessage());
+                                        }
+                                    });
+                        } else {
+                            showToast("Current password is incorrect. Try again.");
                         }
                     });
         }

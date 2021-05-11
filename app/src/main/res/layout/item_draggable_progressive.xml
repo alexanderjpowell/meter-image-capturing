@@ -9,13 +9,13 @@
         android:id="@+id/progressive_layout"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/drag_icon"
         app:startIconDrawable="@drawable/baseline_attach_money_24"
         app:endIconDrawable="@drawable/outline_mic_24"
         app:endIconMode="custom"
+        app:expandedHintEnabled="true"
         style="@style/TextInputLayoutStyle">
 
         <com.google.android.material.textfield.TextInputEditText
@@ -34,9 +34,9 @@
         android:paddingStart="6dp"
         android:paddingEnd="6dp"
         android:src="@drawable/baseline_drag_handle_24"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintTop_toTopOf="@id/progressive_layout"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toBottomOf="@id/progressive_layout"
         tools:ignore="ContentDescription" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

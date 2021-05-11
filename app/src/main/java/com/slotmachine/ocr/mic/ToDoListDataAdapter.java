@@ -16,9 +16,9 @@ import java.util.Locale;
 
 public class ToDoListDataAdapter extends RecyclerView.Adapter<ToDoListDataAdapter.ToDoListDataHolder> implements Filterable {
 
-    private Context context;
-    private List<ToDoListData> rowDataList;
-    private List<ToDoListData> rowDataListAll;
+    private final Context context;
+    private final List<ToDoListData> rowDataList;
+    private final List<ToDoListData> rowDataListAll;
 
     public ToDoListDataAdapter(Context context, List<ToDoListData> rowDataList) {
         this.context = context;
@@ -38,7 +38,7 @@ public class ToDoListDataAdapter extends RecyclerView.Adapter<ToDoListDataAdapte
         return filter;
     }
 
-    private Filter filter = new Filter() {
+    private final Filter filter = new Filter() {
         @Override
         protected FilterResults performFiltering(CharSequence charSequence) {
             List<ToDoListData> filteredList = new ArrayList<>();
@@ -85,14 +85,14 @@ public class ToDoListDataAdapter extends RecyclerView.Adapter<ToDoListDataAdapte
             holder.userTextView.setVisibility(View.GONE);
         }
 
-        String progressiveDescriptions = "";
+        StringBuilder progressiveDescriptions = new StringBuilder();
         int len = toDoListData.getDescriptionsLength();
         for (int i = 0; i < len; i++) {
             if ((toDoListData.getProgressiveDescriptionsList().get(i) != null) && !toDoListData.getProgressiveDescriptionsList().isEmpty()) {
-                progressiveDescriptions += toDoListData.getProgressiveDescriptionsList().get(i) + " ";
+                progressiveDescriptions.append(toDoListData.getProgressiveDescriptionsList().get(i)).append(" ");
             }
         }
-        holder.progressiveDescriptionTitles.setText(progressiveDescriptions.trim());
+        holder.progressiveDescriptionTitles.setText(progressiveDescriptions.toString().trim());
     }
 
     @Override

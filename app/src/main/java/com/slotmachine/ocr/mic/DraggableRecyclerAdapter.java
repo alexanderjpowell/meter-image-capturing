@@ -1,6 +1,8 @@
 package com.slotmachine.ocr.mic;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.text.Editable;
@@ -10,15 +12,17 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+
+import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 
-import org.jetbrains.annotations.NotNull;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
+import timber.log.Timber;
 
 public class DraggableRecyclerAdapter extends RecyclerView.Adapter<DraggableRecyclerAdapter.ParentViewHolder> implements ItemMoveCallback.ItemTouchHelperContract {
 
@@ -29,17 +33,19 @@ public class DraggableRecyclerAdapter extends RecyclerView.Adapter<DraggableRecy
 
     private final List<EditTextModel> editTextData = new ArrayList<>();
     private final List<String> descriptions;
+    private final int progressiveCount;
+    //private final SharedPreferences sharedPreferences;
+    private final boolean showHint;
 
-    public DraggableRecyclerAdapter(int progressiveCount, StartDragListener startDragListener) {
-        this(progressiveCount, null, startDragListener);
-    }
-
-    public DraggableRecyclerAdapter(int progressiveCount, List<String> descriptions, StartDragListener startDragListener) {
+    public DraggableRecyclerAdapter(boolean showHint, Context context, int progressiveCount, List<String> descriptions, StartDragListener startDragListener) {
         this.descriptions = descriptions;
         this.startDragListener = startDragListener;
+        this.progressiveCount = progressiveCount;
         for (int i = 0; i < progressiveCount + 1; i++) { // Add 1 for machine id
-            editTextData.add(new EditTextModel(""));
+            editTextData.add(new EditTextModel("", ""));
         }
+        this.showHint = showHint;
+        //this.sharedPreferences = context.getSharedPreferences(context.getString(R.string.preference_file_key), Context.MODE_PRIVATE);
     }
 
     @Override
@@ -51,8 +57,9 @@ public class DraggableRecyclerAdapter extends RecyclerView.Adapter<DraggableRecy
         }
     }
 
+    @NonNull
     @Override
-    public @NotNull ParentViewHolder onCreateViewHolder(@NotNull ViewGroup parent, int viewType) {
+    public ParentViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         if (viewType == ITEM_PROGRESSIVE) {
             return new ProgressiveHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.item_draggable_progressive, parent, false));
         } else {
@@ -61,13 +68,11 @@ public class DraggableRecyclerAdapter extends RecyclerView.Adapter<DraggableRecy
     }
 
     @Override
-    public void onBindViewHolder(@NotNull ParentViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull ParentViewHolder holder, int position) {
         if (holder instanceof ProgressiveHolder) {
             ((ProgressiveHolder)holder).bind();
             ((ProgressiveHolder) holder).progressiveEditText.setText(editTextData.get(position).getEditTextValue());
-//        } else if (holder instanceof ButtonsViewHolder) {
-//            ((ButtonsViewHolder) holder).button.setOnClickListener(view -> startDragListener.onSubmitButtonClick());
-//            ((ButtonsViewHolder) holder).button2.setOnClickListener(view -> startDragListener.onSubmitScan());
+//            ((ProgressiveHolder) holder).progressiveEditText.setHint(editTextData.get(position).getPreviousValue());
         } else if (holder instanceof MachineIdViewHolder) {
             ((MachineIdViewHolder) holder).bind();
             ((MachineIdViewHolder) holder).machineIdEditText.setText(editTextData.get(position).getEditTextValue());
@@ -99,9 +104,18 @@ public class DraggableRecyclerAdapter extends RecyclerView.Adapter<DraggableRecy
     }
 
     public void setItems(List<String> progressives) {
-        for (int i = 0; i < Math.min(6, progressives.size()); i++) {
+        for (int i = 0; i < Math.min(progressiveCount, progressives.size()); i++) {
             if (!progressives.get(i).isEmpty()) {
                 editTextData.get(i + 1).setEditTextValue(progressives.get(i));
+            }
+        }
+        notifyDataSetChanged();
+    }
+
+    public void setPrevItems(List<String> values) {
+        for (int i = 0; i < Math.min(progressiveCount, values.size()); i++) {
+            if (!values.get(i).isEmpty()) {
+                editTextData.get(i + 1).setPreviousValue(values.get(i));
             }
         }
         notifyDataSetChanged();
@@ -149,12 +163,14 @@ public class DraggableRecyclerAdapter extends RecyclerView.Adapter<DraggableRecy
                 return false;
             });
 
-            progressiveLayout.setHint("Progressive " + getAdapterPosition());
+            //String hint = "Prog " + getBindingAdapterPosition() + " - " + editTextData.get(getBindingAdapterPosition()).getPreviousValue();
+//            progressiveLayout.setHint("Progressive " + getBindingAdapterPosition());
+            //progressiveLayout.setHint(editTextData.get(getBindingAdapterPosition()).getPreviousValue());
 
             progressiveLayout.setEndIconOnClickListener(view -> {
                 if (progressiveEditText.getText() != null) {
                     if (progressiveEditText.getText().toString().isEmpty()) {
-                        startDragListener.onVoiceRequest(getAdapterPosition());
+                        startDragListener.onVoiceRequest(getBindingAdapterPosition());
                     } else {
                         progressiveEditText.setText("");
                     }
@@ -170,7 +186,7 @@ public class DraggableRecyclerAdapter extends RecyclerView.Adapter<DraggableRecy
                 public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
                     if (progressiveEditText.getText() != null) {
                         String value = progressiveEditText.getText().toString();
-                        editTextData.get(getAdapterPosition()).setEditTextValue(value);
+                        editTextData.get(getBindingAdapterPosition()).setEditTextValue(value);
                         if (value.isEmpty()) {
                             progressiveLayout.setEndIconDrawable(R.drawable.outline_mic_24);
                         } else {
@@ -184,22 +200,33 @@ public class DraggableRecyclerAdapter extends RecyclerView.Adapter<DraggableRecy
                 }
             });
 
-            if (descriptions != null && descriptions.size() >= getAdapterPosition()) {
-                int[][] states = new int[][] {
-                        new int[] { android.R.attr.state_enabled }, // enabled
-                        new int[] { -android.R.attr.state_enabled }, // disabled
-                        new int[] { -android.R.attr.state_checked }, // unchecked
-                        new int[] { android.R.attr.state_pressed }  // pressed
-                };
-                int[] colors = new int[] {
-                        Color.GREEN,
-                        Color.GREEN,
-                        Color.GREEN,
-                        Color.GREEN
-                };
-                progressiveLayout.setHint(descriptions.get(getAdapterPosition() - 1)); // Subtract 1 for machine id
-                ColorStateList colorStateList = new ColorStateList(states, colors);
-                progressiveLayout.setDefaultHintTextColor(colorStateList);
+            if (showHint) {
+                progressiveLayout.setHint("Progressive " + getBindingAdapterPosition());
+            } else {
+//                String hint = sharedPreferences.getString("progressive_hint_text_from_todo", "Description");
+//                if (hint.equals("Description")) {
+                if (true) {
+                    if (descriptions != null && descriptions.size() >= getBindingAdapterPosition()) {
+                        int[][] states = new int[][]{
+                                new int[]{android.R.attr.state_enabled}, // enabled
+                                new int[]{-android.R.attr.state_enabled}, // disabled
+                                new int[]{-android.R.attr.state_checked}, // unchecked
+                                new int[]{android.R.attr.state_pressed}  // pressed
+                        };
+                        int[] colors = new int[]{
+                                Color.GREEN,
+                                Color.GREEN,
+                                Color.GREEN,
+                                Color.GREEN
+                        };
+                        progressiveLayout.setHint(descriptions.get(getBindingAdapterPosition() - 1)); // Subtract 1 for machine id
+                        ColorStateList colorStateList = new ColorStateList(states, colors);
+                        progressiveLayout.setDefaultHintTextColor(colorStateList);
+                    }
+                }
+//                else {
+//                    progressiveEditText.setHint(editTextData.get(getBindingAdapterPosition()).getPreviousValue());
+//                }
             }
         }
     }
@@ -217,7 +244,7 @@ public class DraggableRecyclerAdapter extends RecyclerView.Adapter<DraggableRecy
             machineIdLayout.setEndIconOnClickListener(view -> {
                 if (machineIdEditText.getText() != null) {
                     if (machineIdEditText.getText().toString().isEmpty()) {
-                        startDragListener.onVoiceRequest(getAdapterPosition());
+                        startDragListener.onVoiceRequest(getBindingAdapterPosition());
                     } else {
                         machineIdEditText.setText("");
                     }
@@ -233,7 +260,7 @@ public class DraggableRecyclerAdapter extends RecyclerView.Adapter<DraggableRecy
                 public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
                     if (machineIdEditText.getText() != null) {
                         String value = machineIdEditText.getText().toString();
-                        editTextData.get(getAdapterPosition()).setEditTextValue(value);
+                        editTextData.get(getBindingAdapterPosition()).setEditTextValue(value);
                         if (value.isEmpty()) {
                             machineIdLayout.setEndIconDrawable(R.drawable.outline_mic_24);
                         } else {
@@ -249,31 +276,29 @@ public class DraggableRecyclerAdapter extends RecyclerView.Adapter<DraggableRecy
         }
     }
 
-//    public static class ButtonsViewHolder extends ParentViewHolder {
-//        MaterialButton button;
-//        MaterialButton button2;
-//        public ButtonsViewHolder(View itemView) {
-//            super(itemView);
-//            button = itemView.findViewById(R.id.mButton2);
-//            button2 = itemView.findViewById(R.id.submit_button);
-//        }
-//    }
-
     interface StartDragListener {
         void requestDrag(RecyclerView.ViewHolder viewHolder);
-        //void onSubmitButtonClick();
-        //void onSubmitScan();
         void onVoiceRequest(int id);
     }
 
     public static class EditTextModel {
         private String editTextValue;
-        public EditTextModel(String val) { this.editTextValue = val; }
+        private String previousValue;
+        public EditTextModel(String val, String prevVal) {
+            this.editTextValue = val;
+            this.previousValue = prevVal;
+        }
         public String getEditTextValue() {
             return editTextValue;
         }
+        public String getPreviousValue() {
+            return previousValue;
+        }
         public void setEditTextValue(String editTextValue) {
             this.editTextValue = editTextValue;
+        }
+        public void setPreviousValue(String previousValue) {
+            this.previousValue = previousValue;
         }
     }
 
