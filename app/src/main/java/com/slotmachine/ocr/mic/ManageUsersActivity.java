@@ -8,6 +8,7 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -28,8 +29,6 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -37,15 +36,16 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class ManageUsersActivity extends AppCompatActivity implements MyRecyclerViewAdapter.ItemClickListener {
+public class ManageUsersActivity extends AppCompatActivity implements UsersAdapter.ItemClickListener {
 
-    private MyRecyclerViewAdapter adapter;
+    private UsersAdapter adapter;
     private RecyclerView recyclerView;
     private List<String> usersList;
     private FirebaseAuth firebaseAuth;
     private FirebaseFirestore database;
     private boolean adminMode;
     private String USERNAME;
+    private UsersViewModel mUsersViewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,6 +53,8 @@ public class ManageUsersActivity extends AppCompatActivity implements MyRecycler
         setContentView(R.layout.activity_manage_users);
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        mUsersViewModel = new ViewModelProvider(this).get(UsersViewModel.class);
 
         firebaseAuth = FirebaseAuth.getInstance();
         if (firebaseAuth.getCurrentUser() == null) {
@@ -79,7 +81,7 @@ public class ManageUsersActivity extends AppCompatActivity implements MyRecycler
         //
 
         usersList = new ArrayList<>();
-        adapter = new MyRecyclerViewAdapter(this, usersList);
+        adapter = new UsersAdapter(this, usersList);
 
         recyclerView = findViewById(R.id.users_recycler_view);
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
@@ -90,20 +92,7 @@ public class ManageUsersActivity extends AppCompatActivity implements MyRecycler
         adapter.setClickListener(this);
         recyclerView.setAdapter(adapter);
 
-        database.collection("users")
-                .document(firebaseAuth.getCurrentUser().getUid())
-                .collection("displayNames")
-                .get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        if (task.isSuccessful()) {
-                            prepareData(task.getResult());
-                        } else {
-                            showToast("Error getting users");
-                        }
-                    }
-                });
+        mUsersViewModel.getUserNames(firebaseAuth.getCurrentUser().getUid()).observe(this, this::prepareData);
 
         recyclerView.addOnItemTouchListener(new RecyclerTouchListener(getApplicationContext(), recyclerView, new RecyclerTouchListener.ClickListener() {
             @Override
@@ -111,66 +100,49 @@ public class ManageUsersActivity extends AppCompatActivity implements MyRecycler
                 // 1. Get pin code from database
                 // 2. Start PinCodeActivity and if correct pin is entered, then return to this activity
 
-                if (adminMode) {
-                    //
-                } else {
+                if (!adminMode) {
                     final String username = usersList.get(position);
                     database.collection("users")
                             .document(firebaseAuth.getCurrentUser().getUid())
                             .collection("displayNames")
                             .document(username)
-                            .get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                        @Override
-                        public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                            if (task.isSuccessful()) {
-                                DocumentSnapshot document = task.getResult();
-                                if (document.exists()) {
-                                    Map<String, Object> map = document.getData();
-                                    if (document.contains("pinCode")) {
-                                        displayPinCodeActivity(map.get("pinCode").toString(), username);
+                            .get().addOnCompleteListener(task -> {
+                                if (task.isSuccessful()) {
+                                    DocumentSnapshot document = task.getResult();
+                                    if (document.exists()) {
+                                        Map<String, Object> map = document.getData();
+                                        if (document.contains("pinCode")) {
+                                            displayPinCodeActivity(map.get("pinCode").toString(), username);
+                                        } else {
+                                            showToast("no pin found");
+                                        }
                                     } else {
-                                        showToast("no pin found");
+                                        showToast("No document");
                                     }
-                                    //String displayName = map.get("displayName").toString();
-                                    //map.get("pinCode");
-                                    //showToast(document.getData().toString());
                                 } else {
-                                    showToast("No document");
+                                    showToast("Failed to get username");
                                 }
-                            } else {
-                                showToast("Failed to get username");
-                            }
-                        }
-                    });
+                            });
                 }
             }
 
             @Override
             public void onLongClick(View view, final int position) {
-                //showToast("long click on " + Integer.toString(position));
                 if (adminMode) {
                     AlertDialog alertDialog = new AlertDialog.Builder(ManageUsersActivity.this).create();
                     alertDialog.setMessage("Do you want to delete " + usersList.get(position) + "?");
                     alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "YES",
-                            new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int i) {
-                                    deleteUserFromDatabase(usersList.get(position), position);
-                                    usersList.remove(position);
-                                    adapter.notifyItemRemoved(position);
-                                    adapter.notifyItemRangeChanged(position, usersList.size());
-                                    dialog.dismiss();
-                                }
+                            (dialog, i) -> {
+                                deleteUserFromDatabase(usersList.get(position));
+                                usersList.remove(position);
+                                adapter.notifyItemRemoved(position);
+                                adapter.notifyItemRangeChanged(position, usersList.size());
+                                dialog.dismiss();
                             });
                     alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, "CANCEL",
-                            new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int i) {
-                                    dialog.dismiss();
-                                }
-                            });
+                            (dialog, i) -> dialog.dismiss());
                     alertDialog.show();
-                } //else {
-                    // Pass?
-                //}
+                }
             }
         }));
 
@@ -197,11 +169,10 @@ public class ManageUsersActivity extends AppCompatActivity implements MyRecycler
     public void onBackPressed() {
         if (adminMode) {
             startActivity(new Intent(ManageUsersActivity.this, SettingsActivity.class));
-            finish();
         } else {
             startActivity(new Intent(ManageUsersActivity.this, MainActivity.class));
-            finish();
         }
+        finish();
     }
 
     @Override
@@ -247,23 +218,20 @@ public class ManageUsersActivity extends AppCompatActivity implements MyRecycler
                     .document(firebaseAuth.getCurrentUser().getUid())
                     .collection("displayNames")
                     .document(USERNAME)
-                    .get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                        @Override
-                        public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                            if (task.isSuccessful()) {
-                                DocumentSnapshot document = task.getResult();
-                                if (document.exists()) {
-                                    Map<String, Object> map = document.getData();
-                                    String pinCode = map.get("pinCode").toString();
-                                    changePinCodeActivity(pinCode, USERNAME);
-                                } else {
-                                    showToast("No pin found");
-                                }
+                    .get().addOnCompleteListener(task -> {
+                        if (task.isSuccessful()) {
+                            DocumentSnapshot document = task.getResult();
+                            if (document.exists()) {
+                                Map<String, Object> map = document.getData();
+                                String pinCode = map.get("pinCode").toString();
+                                changePinCodeActivity(pinCode, USERNAME);
                             } else {
-                                showToast("No document");
+                                showToast("No pin found");
                             }
+                        } else {
+                            showToast("No document");
                         }
-            });
+                    });
         }
         return super.onOptionsItemSelected(item);
     }
@@ -292,7 +260,6 @@ public class ManageUsersActivity extends AppCompatActivity implements MyRecycler
 
         AlertDialog alertDialog = new AlertDialog.Builder(ManageUsersActivity.this).create();
         alertDialog.setMessage("Create new user with name and pin code");
-        //alertDialog.setView(input, 100, 70, 100, 0);
         alertDialog.setView(layout, 100, 70, 100, 0);
         alertDialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
         alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "ADD",
@@ -318,30 +285,19 @@ public class ManageUsersActivity extends AppCompatActivity implements MyRecycler
                     }
                 });
         alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, "CANCEL",
-                new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int i) {
-                        dialog.dismiss();
-                    }
-                });
+                (dialog, i) -> dialog.dismiss());
         alertDialog.show();
     }
 
-    private void prepareData(QuerySnapshot snapshot) {
+    private void prepareData(List<String> users) {
         usersList.clear();
-        for (QueryDocumentSnapshot document : snapshot) {
-            usersList.add(document.get("displayName").toString());
-        }
+        usersList.addAll(users);
         Collections.sort(usersList);
         adapter.notifyDataSetChanged();
     }
 
-    private void deleteUserFromDatabase(String name, Integer position) {
-        // Remove from database
-        database.collection("users")
-                .document(firebaseAuth.getCurrentUser().getUid())
-                .collection("displayNames")
-                .document(name)
-                .delete();
+    private void deleteUserFromDatabase(String name) {
+        mUsersViewModel.deleteUserName(firebaseAuth.getCurrentUser().getUid(), name);
     }
 
     private void showToast(String message) {

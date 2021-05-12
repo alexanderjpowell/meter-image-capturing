@@ -41,14 +41,13 @@ public class TextParser {
             }
             if (hasReachedFirstDollarSign) {
                 if (word.getText().contains("$")) {
-                    if (tmp.toString().equals("")) {
+                    if (tmp.toString().trim().isEmpty()) {
                         tmp.append(word.getText());
-                        dollarSignRect = word.getBoundingBox();
                     } else { // tmp not "" so add to ret and then clear tmp
-                        ret.add(tmp.toString());
+                        ret.add(tmp.toString().trim());
                         tmp = new StringBuilder(word.getText());
-                        dollarSignRect = word.getBoundingBox();
                     }
+                    dollarSignRect = word.getBoundingBox();
                 } else { // Not dollar sign
                     double dollarSignMidpoint = (dollarSignRect.bottom - dollarSignRect.top) / 2.0 + dollarSignRect.top;
                     int dollarSignHeight = dollarSignRect.bottom - dollarSignRect.top;
@@ -67,13 +66,16 @@ public class TextParser {
         }
 
         // add the last remaining tmp
-        if (!tmp.toString().equals("")) {
-            ret.add(tmp.toString());
+        if (!tmp.toString().trim().isEmpty()) {
+            ret.add(tmp.toString().trim());
         }
 
         // Format dollar values
         for (int i = 0; i < ret.size(); i++) {
-            ret.set(i, formatProgressives(ret.get(i)));
+            String formatted = formatProgressives(ret.get(i)).trim();
+            if (!formatted.isEmpty()) {
+                ret.set(i, formatProgressives(ret.get(i)));
+            }
         }
 
         return ret;

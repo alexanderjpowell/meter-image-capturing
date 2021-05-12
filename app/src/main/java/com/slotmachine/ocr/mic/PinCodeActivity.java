@@ -8,7 +8,6 @@ import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.VibrationEffect;
-import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -21,6 +20,8 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import timber.log.Timber;
+
 public class PinCodeActivity extends AppCompatActivity {
 
     private PFCodeView mCodeView;
@@ -30,7 +31,7 @@ public class PinCodeActivity extends AppCompatActivity {
     private FirebaseAuth firebaseAuth;
     private FirebaseFirestore database;
     private boolean authModeEnabled = false;
-    private boolean reenterPin;// = false;
+    private boolean reenterPin;
     private boolean changePin = false;
     private String username;
     private String pinCode;
@@ -51,7 +52,6 @@ public class PinCodeActivity extends AppCompatActivity {
 
         Intent intent = getIntent();
         authModeEnabled = intent.getBooleanExtra("authMode", false);
-        //reenterPin = intent.getBooleanExtra("reenterPin", false);
         pinCode = intent.getStringExtra("pinCode");
         username = intent.getStringExtra("username");
         changePin = intent.getBooleanExtra("changePin", false);
@@ -99,7 +99,6 @@ public class PinCodeActivity extends AppCompatActivity {
     private final View.OnClickListener mOnKeyClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
-            //showToast("click");
             final String string = ((TextView) view).getText().toString();
             if (string.length() != 1) {
                 return;
@@ -174,7 +173,6 @@ public class PinCodeActivity extends AppCompatActivity {
         SharedPreferences sharedPref = context.getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPref.edit();
         editor.putString("username", username);
-        //editor.commit();
         editor.apply();
     }
 
@@ -234,7 +232,7 @@ public class PinCodeActivity extends AppCompatActivity {
                 }
             }
         } catch (Exception ex) {
-            Log.d("PinCodeActivity", "Error performing vibration");
+            Timber.d("Error performing vibration");
         }
     }
 }

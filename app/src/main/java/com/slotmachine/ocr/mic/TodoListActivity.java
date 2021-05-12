@@ -5,14 +5,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.text.InputType;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.EditText;
 import android.widget.ProgressBar;
-import android.widget.TextView;
 import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -22,8 +18,6 @@ import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -43,7 +37,6 @@ public class TodoListActivity extends AppCompatActivity {
     private List<ToDoListData> toDoDataListAll;
     private RecyclerView recyclerView;
     private ToDoListDataAdapter mAdapter;
-    private enum EmptyState { NO_FILE_UPLOAD, ALL_COMPLETED, NONE_COMPLETED, NORMAL }
 
     private FirebaseAuth firebaseAuth;
     private FirebaseFirestore database;
@@ -52,17 +45,12 @@ public class TodoListActivity extends AppCompatActivity {
 
     private DocumentReference uploadFormDataDocumentReference;
 
-    private TextView empty_state_text_view;
-    private TextView empty_state_completed_text_view;
-    private TextView empty_state_uncompleted_text_view;
     private ProgressBar progressBar;
 
     private MaterialSearchView searchView;
 
     private SharedPreferences sharedPref;
     private int SORT_BY_FIELD;
-
-    private String TAG = "TodoListActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,11 +71,8 @@ public class TodoListActivity extends AppCompatActivity {
         }
 
         sharedPref = getApplicationContext().getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
-        SORT_BY_FIELD = sharedPref.getInt("SORT_BY_FIELD", 0); // 0 is machine id, 1 is location
+        SORT_BY_FIELD = sharedPref.getInt("SORT_BY_FIELD", 0); // 0 is original, 1 machine_id, 2 is location
 
-        empty_state_text_view = findViewById(R.id.empty_state_no_file_text_view);
-        empty_state_completed_text_view = findViewById(R.id.empty_state_completed_text_view);
-        empty_state_uncompleted_text_view = findViewById(R.id.empty_state_uncompleted_text_view);
         progressBar = findViewById(R.id.progress_bar);
 
         database = FirebaseFirestore.getInstance();
@@ -95,16 +80,7 @@ public class TodoListActivity extends AppCompatActivity {
                 .document(firebaseAuth.getCurrentUser().getUid());
 
         swipeRefreshLayout = findViewById(R.id.swipeRefresh);
-        swipeRefreshLayout.setOnRefreshListener(
-                new SwipeRefreshLayout.OnRefreshListener() {
-                    @Override
-                    public void onRefresh() {
-                        // This method performs the actual data-refresh operation.
-                        // The method calls setRefreshing(false) when it's finished.
-                        populateRecyclerView("");
-                    }
-                }
-        );
+        swipeRefreshLayout.setOnRefreshListener(() -> populateRecyclerView(""));
 
         recyclerView = findViewById(R.id.recycler_view_to_do_list);
         toDoDataList = new ArrayList<>();
@@ -131,19 +107,24 @@ public class TodoListActivity extends AppCompatActivity {
                 intent.putExtra("position", positionAll);
                 ArrayList<String> progressiveDescriptionTitlesList = toDoDataList.get(position).getProgressiveDescriptionsList();
                 intent.putStringArrayListExtra("progressiveDescriptionTitles", progressiveDescriptionTitlesList);
+                ArrayList<String> baseValuesList = toDoDataList.get(position).getBaseValuesList();
+                if (baseValuesList != null) {
+                    intent.putStringArrayListExtra("baseValuesArray", toDoDataList.get(position).getBaseValuesList());
+                }
+                ArrayList<String> incrementValuesList = toDoDataList.get(position).getIncrementValuesList();
+                if (incrementValuesList != null) {
+                    intent.putStringArrayListExtra("incrementValuesArray", toDoDataList.get(position).getIncrementValuesList());
+                }
                 intent.putExtra("hashMap", (HashMap)toDoDataList.get(position).getMap());
                 startActivityForResult(intent, SUBMIT_PROGRESSIVE_RECORD);
             }
 
             @Override
             public void onLongClick(View view, final int position) {
-                // TODO
             }
         }));
 
         populateRecyclerView("");
-
-        //handleIntent(getIntent());
     }
 
     private int getListPositionFromMachineId(String id) {
@@ -156,84 +137,45 @@ public class TodoListActivity extends AppCompatActivity {
     }
 
     private void populateRecyclerView(final String machineIdQuery) {
-        recyclerView.setVisibility(View.GONE);
-        empty_state_text_view.setVisibility(View.GONE);
         progressBar.setVisibility(View.VISIBLE);
         toDoDataListAll.clear();
         toDoDataList.clear();
-        uploadFormDataDocumentReference.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                if (task.isSuccessful()) {
-                    DocumentSnapshot document = task.getResult();
-                    if ((document != null) && document.exists()) {
-                        if (document.contains("uploadArray")) {
+        uploadFormDataDocumentReference.get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                DocumentSnapshot document = task.getResult();
+                if ((document != null) && document.exists() && document.contains("uploadArray")) {
+                    List<Map<String, Object>> mapList = (List<Map<String, Object>>) document.get("uploadArray");
 
-                            List<Map<String, Object>> mapList = (List<Map<String, Object>>)document.get("uploadArray");
-
-                            for (int i = 0; i < mapList.size(); i++) {
-                                Map<String, Object> map = mapList.get(i);
-                                ToDoListData row = new ToDoListData(map);
-                                if (machineIdQuery.isEmpty()) {
-                                    toDoDataList.add(row);
-                                } else {
-                                    if (row.getMachineId().equals(machineIdQuery)) {
-                                        toDoDataList.add(row);
-                                    }
-                                }
+                    for (int i = 0; i < mapList.size(); i++) {
+                        Map<String, Object> map = mapList.get(i);
+                        ToDoListData row = new ToDoListData(i, map);
+                        if (machineIdQuery.isEmpty()) {
+                            toDoDataList.add(row);
+                        } else {
+                            if (row.getMachineId().equals(machineIdQuery)) {
+                                toDoDataList.add(row);
                             }
-                            //toDoDataListAll.addAll(toDoDataList);
-                            //
-                            if (SORT_BY_FIELD == 0) {
-                                Collections.sort(toDoDataList, ToDoListData.machineIdComparator);
-                            } else { // SORT_BY_FIELD == 1
-                                Collections.sort(toDoDataList, ToDoListData.locationComparator);
-                            }
-                            toDoDataListAll.clear();
-                            toDoDataListAll.addAll(toDoDataList);
-                            mAdapter.notifyDataSetChanged();
-                            //
-                            toggleEmptyStateDisplays(EmptyState.NORMAL);
                         }
-                        mAdapter.notifyDataSetChanged();
-                    } else {
-                        toggleEmptyStateDisplays(EmptyState.NO_FILE_UPLOAD);
-                        Log.d(TAG, "No such document");
                     }
-                } else {
-                    showToast(task.getException().getMessage());
-                    Log.d(TAG, "get failed with ", task.getException());
+                    if (SORT_BY_FIELD == 0) {
+                        Collections.sort(toDoDataList, ToDoListData.indexComparator);
+                    } else if (SORT_BY_FIELD == 1) {
+                        Collections.sort(toDoDataList, ToDoListData.machineIdComparator);
+                    } else if (SORT_BY_FIELD == 2) {
+                        Collections.sort(toDoDataList, ToDoListData.locationComparator);
+                    }
+                    toDoDataListAll.clear();
+                    toDoDataListAll.addAll(toDoDataList);
+                    mAdapter.notifyDataSetChanged();
                 }
-
-                // Finish things up
-                progressBar.setVisibility(View.GONE);
-                swipeRefreshLayout.setRefreshing(false);
+            } else {
+                showToast(task.getException().getMessage());
             }
-        });
-    }
 
-    private void toggleEmptyStateDisplays(EmptyState state) {
-        if (state.equals(EmptyState.NO_FILE_UPLOAD)) {
-            recyclerView.setVisibility(View.GONE);
-            empty_state_text_view.setVisibility(View.VISIBLE);
-            empty_state_completed_text_view.setVisibility(View.GONE);
-            empty_state_uncompleted_text_view.setVisibility(View.GONE);
-        } else if (state.equals(EmptyState.ALL_COMPLETED)) {
-            recyclerView.setVisibility(View.GONE);
-            empty_state_text_view.setVisibility(View.GONE);
-            empty_state_completed_text_view.setVisibility(View.VISIBLE);
-            empty_state_uncompleted_text_view.setVisibility(View.GONE);
-        } else if (state.equals(EmptyState.NONE_COMPLETED)) {
-            recyclerView.setVisibility(View.GONE);
-            empty_state_text_view.setVisibility(View.GONE);
-            empty_state_completed_text_view.setVisibility(View.GONE);
-            empty_state_uncompleted_text_view.setVisibility(View.VISIBLE);
-        } else if (state.equals(EmptyState.NORMAL)) {
-            recyclerView.setVisibility(View.VISIBLE);
-            empty_state_text_view.setVisibility(View.GONE);
-            empty_state_completed_text_view.setVisibility(View.GONE);
-            empty_state_uncompleted_text_view.setVisibility(View.GONE);
-        }
+            // Finish things up
+            progressBar.setVisibility(View.GONE);
+            swipeRefreshLayout.setRefreshing(false);
+        });
     }
 
     @Override
@@ -248,37 +190,18 @@ public class TodoListActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
         super.onActivityResult(requestCode, resultCode, intent);
-
         if (resultCode == RESULT_OK) {
             if (requestCode == SUBMIT_PROGRESSIVE_RECORD) {
-                //showToast(Integer.toString(toDoDataListAll.size()));
                 int recyclerViewPosition = intent.getIntExtra("position", 0);
-                //previousMachineId = intent.getStringExtra("machine_id");
-
                 if (searchView.hasFocus()) {
                     searchView.clearFocus();
                     searchView.closeSearch();
                 }
-
-                //showToast(Integer.toString(recyclerViewPosition));
                 recyclerView.scrollToPosition(recyclerViewPosition);
                 removeRowFromRecyclerView(recyclerViewPosition);
             }
         }
     }
-
-    /*private String incrementMachineIdString(String machine_id) {
-        if (machine_id == null || machine_id.isEmpty()) {
-            return "";
-        }
-        try {
-            Integer newMachineIdInteger = Integer.valueOf(machine_id) + 1;
-            return Integer.toString(newMachineIdInteger);
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            return "";
-        }
-    }*/
 
     private void removeRowFromRecyclerView(int position) {
         toDoDataList.remove(position);
@@ -291,34 +214,15 @@ public class TodoListActivity extends AppCompatActivity {
         toDoDataListAll.addAll(toDoDataList);
     }
 
-    /*private void removeMachineIdFromRecyclerView(String machineId) {
-        int pos = getDataListPositionFromMachineId(machineId);
-        toDoDataList.remove(pos);
-        mAdapter.notifyDataSetChanged();
-    }*/
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.to_do_list_action_bar, menu);
-
-        //
         MenuItem searchItem = menu.findItem(R.id.action_search);
-        //MenuItem sortMachineIdItem = menu.findItem(R.id.sort_machine_id);
-        //MenuItem sortLocationItem = menu.findItem(R.id.sort_location);
-
-
-
         searchView = findViewById(R.id.search_view);
-        //final EditText editText = searchView.findViewById(com.miguelcatalan.materialsearchview.R.id.searchTextView);
-        //editText.setInputType(InputType.TYPE_CLASS_NUMBER);
         searchView.setMenuItem(searchItem);
-        //
         searchView.setOnQueryTextListener(new MaterialSearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                //Do some magic
-                //Toast.makeText(getApplicationContext(), "onQueryTextSubmit", Toast.LENGTH_SHORT).show();
-                //doSearch(query);
                 return true;
             }
 
@@ -379,9 +283,19 @@ public class TodoListActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         SharedPreferences.Editor editor = sharedPref.edit();
         switch (item.getItemId()) {
-            case R.id.sort_machine_id:
+            case R.id.sort_upload_file:
                 //
                 editor.putInt("SORT_BY_FIELD", 0);
+                editor.apply();
+                //
+                Collections.sort(toDoDataList, ToDoListData.indexComparator);
+                toDoDataListAll.clear();
+                toDoDataListAll.addAll(toDoDataList);
+                mAdapter.notifyDataSetChanged();
+                return true;
+            case R.id.sort_machine_id:
+                //
+                editor.putInt("SORT_BY_FIELD", 1);
                 editor.apply();
                 //
                 Collections.sort(toDoDataList, ToDoListData.machineIdComparator);
@@ -391,7 +305,7 @@ public class TodoListActivity extends AppCompatActivity {
                 return true;
             case R.id.sort_location:
                 //
-                editor.putInt("SORT_BY_FIELD", 1);
+                editor.putInt("SORT_BY_FIELD", 2);
                 editor.apply();
                 //
                 Collections.sort(toDoDataList, ToDoListData.locationComparator);

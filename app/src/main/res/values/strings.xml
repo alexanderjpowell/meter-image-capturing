@@ -135,6 +135,22 @@
         <item>10</item>
     </string-array>
 
+    <string-array name="progressive_hint_entries">
+        <item>Description</item>
+        <item>Previous value</item>
+    </string-array>
+
+    <string-array name="progressive_hint_entries_values">
+        <item>Description</item>
+        <item>Previous value</item>
+    </string-array>
+
     <string name="Search">Search</string>
     <string name="search_hint">Search by machine id</string>
+
+    <string name="upload_file_sort_original">Original order</string>
+    <string name="upload_file_sort_machine_id">Sort by machine id</string>
+    <string name="upload_file_sort_location">Sort by location</string>
+    <string name="notes_dialog_hint">Add machine notes here</string>
+    <string name="machine_id_hint">Machine ID</string>
 </resources>

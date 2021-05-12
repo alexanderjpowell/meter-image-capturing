@@ -3,46 +3,25 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:showIn="navigation_view">
 
-    <!--<group android:checkableBehavior="single">-->
-        <item
-            android:id="@+id/nav_gallery"
-            android:icon="@drawable/sharp_description_black_48"
-            android:title="@string/completed_scans_nav_bar" />
-        <item
-            android:id="@+id/to_do_list"
-            android:icon="@drawable/sharp_announcement_black_48"
-            android:title="@string/to_do_list_nav_bar" />
-        <item
-            android:id="@+id/nav_slideshow"
-            android:icon="@drawable/sharp_people_black_48"
-            android:title="@string/manage_users_nav_bar" />
-        <item
-            android:id="@+id/nav_settings"
-            android:icon="@drawable/round_settings_24"
-            android:title="@string/settings_nav_bar" />
-
-        <!--<item
-            android:id="@+id/admin"
-            android:title="Admin" />-->
-    <!--</group>-->
-
-    <!--<item android:title="Users">
-        <menu>
-            <group
-                android:id="@+id/userGroup"
-                android:checkableBehavior="single">
-                <item
-                    android:id="@+id/nav_share"
-                    android:icon="@drawable/ic_menu_share"
-                    android:orderInCategory="100"
-                    android:title="Share" />
-                <item
-                    android:id="@+id/nav_send"
-                    android:icon="@drawable/ic_menu_send"
-                    android:orderInCategory="300"
-                    android:title="Send" />
-            </group>
-        </menu>
-    </item>-->
+    <item
+        android:id="@+id/nav_gallery"
+        android:icon="@drawable/sharp_description_black_48"
+        android:title="@string/completed_scans_nav_bar" />
+    <item
+        android:id="@+id/to_do_list"
+        android:icon="@drawable/sharp_announcement_black_48"
+        android:title="@string/to_do_list_nav_bar" />
+    <item
+        android:id="@+id/nav_slideshow"
+        android:icon="@drawable/sharp_people_black_48"
+        android:title="@string/manage_users_nav_bar" />
+    <item
+        android:id="@+id/nav_settings"
+        android:icon="@drawable/round_settings_24"
+        android:title="@string/settings_nav_bar" />
+    <item
+        android:id="@+id/nav_sign_out"
+        android:icon="@drawable/baseline_logout_24"
+        android:title="Sign Out" />
 
 </menu>

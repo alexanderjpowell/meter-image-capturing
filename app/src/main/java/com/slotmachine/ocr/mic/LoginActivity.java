@@ -3,7 +3,6 @@ package com.slotmachine.ocr.mic;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.SpannableString;
 import android.text.Spanned;
@@ -12,23 +11,21 @@ import android.text.TextUtils;
 import android.text.method.LinkMovementMethod;
 import android.text.style.ClickableSpan;
 import android.view.View;
-import android.widget.Button;
-import android.widget.CheckBox;
-import android.widget.EditText;
-import android.widget.TextView;
 import android.widget.Toast;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.AuthResult;
+import com.google.android.material.button.MaterialButton;
+import com.google.android.material.checkbox.MaterialCheckBox;
+import com.google.android.material.textfield.TextInputEditText;
+import com.google.android.material.textview.MaterialTextView;
+import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.firebase.auth.FirebaseAuth;
 
-public class LoginActivity extends AppCompatActivity implements View.OnClickListener {
+public class LoginActivity extends BaseActivity implements View.OnClickListener {
 
     private FirebaseAuth firebaseAuth;
-    private EditText emailEditText;
-    private EditText passwordEditText;
-    private Button loginButton;
-    private CheckBox checkBox;
+    private TextInputEditText emailEditText;
+    private TextInputEditText passwordEditText;
+    private MaterialButton loginButton;
+    private MaterialCheckBox checkBox;
     private ProgressDialog progressDialog;
 
     @Override
@@ -39,15 +36,15 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         firebaseAuth = FirebaseAuth.getInstance();
 
         if (firebaseAuth.getCurrentUser() != null) {
-            finish();
             startActivity(new Intent(LoginActivity.this, MainActivity.class));
+            finish();
         }
 
-        emailEditText = findViewById(R.id.emailEditText);
-        passwordEditText = findViewById(R.id.passwordEditText);
-        loginButton = findViewById(R.id.loginButton);
-        checkBox = findViewById(R.id.checkBox);
-        TextView textView = findViewById(R.id.textView);
+        emailEditText = findViewById(R.id.email_edit_text);
+        passwordEditText = findViewById(R.id.password_edit_text);
+        loginButton = findViewById(R.id.login_button);
+        checkBox = findViewById(R.id.check_box);
+        MaterialTextView textView = findViewById(R.id.tac_text_view);
 
         String message = "I have read and agree to the terms and conditions";
         SpannableString ss = new SpannableString(message);
@@ -81,18 +78,16 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         progressDialog.show();
 
         firebaseAuth.signInWithEmailAndPassword(email, password)
-                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        progressDialog.dismiss();
-                        if (task.isSuccessful()) {
-                            finish();
-                            Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                            intent.putExtra("comingFromLogin", true);
-                            startActivity(intent);
-                        } else {
-                            showToast("Incorrect username or password.  Try again.");
-                        }
+                .addOnCompleteListener(this, task -> {
+                    progressDialog.dismiss();
+                    if (task.isSuccessful()) {
+                        onEvent(FirebaseAnalytics.Event.LOGIN, task.getResult().getUser().getUid());
+                        Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                        intent.putExtra("comingFromLogin", true);
+                        startActivity(intent);
+                        finish();
+                    } else {
+                        showToast("Incorrect username or password.  Try again.");
                     }
                 });
     }

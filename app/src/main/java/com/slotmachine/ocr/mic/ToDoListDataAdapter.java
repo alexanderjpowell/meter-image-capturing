@@ -16,9 +16,9 @@ import java.util.Locale;
 
 public class ToDoListDataAdapter extends RecyclerView.Adapter<ToDoListDataAdapter.ToDoListDataHolder> implements Filterable {
 
-    private Context context;
-    private List<ToDoListData> rowDataList;
-    private List<ToDoListData> rowDataListAll;
+    private final Context context;
+    private final List<ToDoListData> rowDataList;
+    private final List<ToDoListData> rowDataListAll;
 
     public ToDoListDataAdapter(Context context, List<ToDoListData> rowDataList) {
         this.context = context;
@@ -35,23 +35,19 @@ public class ToDoListDataAdapter extends RecyclerView.Adapter<ToDoListDataAdapte
 
     @Override
     public Filter getFilter() {
-        //this.rowDataListAll = new ArrayList<>(rowDataList);
         return filter;
     }
 
-    private Filter filter = new Filter() {
+    private final Filter filter = new Filter() {
         @Override
         protected FilterResults performFiltering(CharSequence charSequence) {
-            //rowDataListAll =
             List<ToDoListData> filteredList = new ArrayList<>();
 
             if (charSequence.toString().trim().isEmpty()) {
                 filteredList.addAll(rowDataListAll);
-                //Toast.makeText(context, rowDataListAll.toString(), Toast.LENGTH_SHORT).show();
             } else {
                 for (ToDoListData i : rowDataListAll) {
                     if (i.getMachineId().startsWith(charSequence.toString().trim())) {
-                        //Toast.makeText(context, "here", Toast.LENGTH_SHORT).show();
                         filteredList.add(i);
                     }
                 }
@@ -82,17 +78,6 @@ public class ToDoListDataAdapter extends RecyclerView.Adapter<ToDoListDataAdapte
         holder.descriptionTextView.setText(toDoListData.getDescription());
         holder.locationTextView.setText(String.format(Locale.US, "%s: %s", context.getString(R.string.location_text), toDoListData.getLocation()));
 
-        /*if (toDoListData.getNumberOfProgressives() != null) {
-            if (toDoListData.getNumberOfProgressives() == 1) {
-                holder.numberOfProgressivesTextView.setText(String.format(Locale.US,"%d %s", toDoListData.getNumberOfProgressives(), context.getString(R.string.progressive_values_row_label_singular)));
-            } else {
-                holder.numberOfProgressivesTextView.setText(String.format(Locale.US,"%d %s", toDoListData.getNumberOfProgressives(), context.getString(R.string.progressive_values_row_label)));
-            }
-            holder.numberOfProgressivesTextView.setVisibility(View.VISIBLE);
-        } else {
-            holder.numberOfProgressivesTextView.setVisibility(View.GONE);
-        }*/
-
         if ((toDoListData.getUser() != null) && (!toDoListData.getUser().trim().isEmpty())) {
             holder.userTextView.setText(String.format(Locale.US, "%s %s", context.getString(R.string.assigned_to_text), toDoListData.getUser()));
             holder.userTextView.setVisibility(View.VISIBLE);
@@ -100,29 +85,20 @@ public class ToDoListDataAdapter extends RecyclerView.Adapter<ToDoListDataAdapte
             holder.userTextView.setVisibility(View.GONE);
         }
 
-        String progressiveDescriptions = "";
-        //int len = toDoListData.getProgressiveDescriptions().length;
+        StringBuilder progressiveDescriptions = new StringBuilder();
         int len = toDoListData.getDescriptionsLength();
-        //for (int i = 0; i < 6; i++) {
-        //for (int i = 0; i < 10; i++) {
         for (int i = 0; i < len; i++) {
-            //if ((toDoListData.getProgressiveDescriptions()[i] != null) && !toDoListData.getProgressiveDescriptions()[i].isEmpty()) {
             if ((toDoListData.getProgressiveDescriptionsList().get(i) != null) && !toDoListData.getProgressiveDescriptionsList().isEmpty()) {
-                progressiveDescriptions += toDoListData.getProgressiveDescriptionsList().get(i) + " ";
+                progressiveDescriptions.append(toDoListData.getProgressiveDescriptionsList().get(i)).append(" ");
             }
         }
-        holder.progressiveDescriptionTitles.setText(progressiveDescriptions.trim());
+        holder.progressiveDescriptionTitles.setText(progressiveDescriptions.toString().trim());
     }
 
     @Override
     public int getItemCount() {
         return rowDataList.size();
     }
-
-    /*public void removeItem(int position) {
-        rowDataList.remove(position);
-        notifyItemRemoved(position);
-    }*/
 
     public static class ToDoListDataHolder extends RecyclerView.ViewHolder{
 
@@ -141,8 +117,4 @@ public class ToDoListDataAdapter extends RecyclerView.Adapter<ToDoListDataAdapte
             progressiveDescriptionTitles = itemView.findViewById(R.id.progressiveDescriptionTitles);
         }
     }
-
-    /*public List<RowData> getRowDataList(){
-        return rowDataList;
-    }*/
 }

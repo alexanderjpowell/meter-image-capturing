@@ -10,13 +10,18 @@
         app:showAsAction="ifRoom" />
 
     <item
+        android:id="@+id/sort_upload_file"
+        android:title="@string/upload_file_sort_original"
+        app:showAsAction="never" />
+
+    <item
         android:id="@+id/sort_machine_id"
-        android:title="Sort by machine id"
+        android:title="@string/upload_file_sort_machine_id"
         app:showAsAction="never" />
 
     <item
         android:id="@+id/sort_location"
-        android:title="Sort by location"
+        android:title="@string/upload_file_sort_location"
         app:showAsAction="never" />
 
 </menu>

@@ -46,13 +46,13 @@
         app:entryValues="@array/entryValues_list"
         app:defaultValue="6"/>
 
-    <!--<SeekBarPreference
-        app:key="minimum_value2"
-        app:title="Minimum Value"
-        app:summary="Smallest value recognized by the OCR"
-        app:max="100"/>-->
-
-    <!-- -->
+<!--    <ListPreference-->
+<!--        app:key="progressive_hint_text_from_todo"-->
+<!--        app:title="Description or Prev Val"-->
+<!--        app:summary="Display progressive description or prev scanned value as hint"-->
+<!--        app:entries="@array/progressive_hint_entries"-->
+<!--        app:entryValues="@array/progressive_hint_entries_values"-->
+<!--        app:defaultValue="Description" />-->
 
     <PreferenceCategory
         app:key="notifications_category"
@@ -80,11 +80,6 @@
         <Preference
             app:key="change_password_button"
             app:title="Change Password"/>
-
-        <!--<Preference
-            app:key="delete_account_button"
-            app:title="Delete Account"
-            app:summary="Permanently delete your account. This cannot be undone."/>-->
 
         <Preference
             app:key="version_number_preference"

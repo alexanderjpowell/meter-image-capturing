@@ -102,16 +102,8 @@ public class PFCodeView extends LinearLayout {
         }
     }
 
-    public int getInputCodeLength() {
-        return mCode.length();
-    }
-
     public String getCode() {
         return mCode;
-    }
-
-    public void setListener(OnPFCodeListener listener) {
-        mListener = listener;
     }
 
     public interface OnPFCodeListener {
