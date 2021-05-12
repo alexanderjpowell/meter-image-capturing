@@ -5,7 +5,14 @@ buildscript {
 
     repositories {
         google()
-        jcenter() // Must be removed before February 1, 2022
+        mavenCentral()
+        jcenter() {
+            content {
+                includeModule("com.miguelcatalan", "materialsearchview")
+                includeModule("com.firebaseui", "firebase-ui-auth")
+            }
+        }
+        //jcenter() // Must be removed before February 1, 2022
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:4.2.0'
@@ -19,7 +26,14 @@ buildscript {
 allprojects {
     repositories {
         google()
-        jcenter() // Must be removed before February 1, 2022
+        mavenCentral()
+        jcenter() {
+            content {
+                includeModule("com.miguelcatalan", "materialsearchview")
+                includeModule("com.firebaseui", "firebase-ui-auth")
+            }
+        }
+        //jcenter() // Must be removed before February 1, 2022
     }
 }
 
