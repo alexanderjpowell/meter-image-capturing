@@ -3,6 +3,7 @@ package com.slotmachine.ocr.mic
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.slotmachine.ocr.mic.repository.ScannedDataRepository
 
 class UsersViewModel : ViewModel() {
 
