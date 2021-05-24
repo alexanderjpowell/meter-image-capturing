@@ -136,13 +136,13 @@
     </string-array>
 
     <string-array name="progressive_hint_entries">
-        <item>Description</item>
         <item>Previous value</item>
+        <item>p_# value</item>
     </string-array>
 
     <string-array name="progressive_hint_entries_values">
-        <item>Description</item>
-        <item>Previous value</item>
+        <item>previous</item>
+        <item>description</item>
     </string-array>
 
     <string name="Search">Search</string>

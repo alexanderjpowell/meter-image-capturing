@@ -9,8 +9,8 @@ android {
         applicationId "com.slotmachine.ocr.mic"
         minSdkVersion 23
         targetSdkVersion 30
-        versionCode 217
-        versionName "2.1.7"
+        versionCode 219
+        versionName "2.1.9"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
     buildTypes {

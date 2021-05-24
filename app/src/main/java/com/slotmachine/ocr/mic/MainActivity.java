@@ -64,6 +64,7 @@ import com.google.firebase.ml.vision.FirebaseVision;
 import com.google.firebase.ml.vision.common.FirebaseVisionImage;
 import com.google.firebase.ml.vision.document.FirebaseVisionDocumentText;
 import com.google.firebase.ml.vision.document.FirebaseVisionDocumentTextRecognizer;
+import com.slotmachine.ocr.mic.viewmodel.MainActivityViewModel;
 //import com.slotmachine.ocr.mic.viewmodel.MainActivityViewModel;
 
 import android.speech.RecognizerIntent;
@@ -97,7 +98,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private FirebaseAuth firebaseAuth;
     private FirebaseFirestore database;
 
-    //private MainActivityViewModel mainActivityViewModel;
+    private MainActivityViewModel mainActivityViewModel;
 
     private Double minimumProgressiveValue;
 
@@ -192,18 +193,21 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         touchHelper.attachToRecyclerView(recyclerView);
         recyclerView.setAdapter(adapter);
 
-        //mainActivityViewModel = new ViewModelProvider(this).get(MainActivityViewModel.class);
+        mainActivityViewModel = new ViewModelProvider(this).get(MainActivityViewModel.class);
 
 
         if (machine_id != null) {
             adapter.setMachineId(machine_id);
-            //initPrevScanObserver(machine_id);
+            String hint = sharedPref.getString("progressive_hint_text_from_todo", "description");
+            if (hint.equals("previous")) {
+                initPrevScanObserver(machine_id);
+            }
         }
     }
 
-//    private void initPrevScanObserver(String machine_id) {
-//        mainActivityViewModel.getPrevDayValues(firebaseAuth.getUid(), machine_id).observe(this, values -> adapter.setPrevItems(values));
-//    }
+    private void initPrevScanObserver(String machine_id) {
+        mainActivityViewModel.getPrevDayValues(firebaseAuth.getUid(), machine_id).observe(this, values -> adapter.setPrevItems(values));
+    }
 
     @Override
     public void onVoiceRequest(int code) {

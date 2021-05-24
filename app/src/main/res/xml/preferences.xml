@@ -46,13 +46,14 @@
         app:entryValues="@array/entryValues_list"
         app:defaultValue="6"/>
 
-<!--    <ListPreference-->
-<!--        app:key="progressive_hint_text_from_todo"-->
-<!--        app:title="Description or Prev Val"-->
-<!--        app:summary="Display progressive description or prev scanned value as hint"-->
-<!--        app:entries="@array/progressive_hint_entries"-->
-<!--        app:entryValues="@array/progressive_hint_entries_values"-->
-<!--        app:defaultValue="Description" />-->
+<!--    app:summary="Display progressive description or prev scanned value as hint"-->
+    <ListPreference
+        app:key="progressive_hint_text_from_todo"
+        app:title="Progressive Display"
+
+        app:entries="@array/progressive_hint_entries"
+        app:entryValues="@array/progressive_hint_entries_values"
+        app:defaultValue="Description" />
 
     <PreferenceCategory
         app:key="notifications_category"

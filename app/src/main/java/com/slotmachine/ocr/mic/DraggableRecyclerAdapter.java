@@ -34,7 +34,7 @@ public class DraggableRecyclerAdapter extends RecyclerView.Adapter<DraggableRecy
     private final List<EditTextModel> editTextData = new ArrayList<>();
     private final List<String> descriptions;
     private final int progressiveCount;
-    //private final SharedPreferences sharedPreferences;
+    private final SharedPreferences sharedPreferences;
     private final boolean showHint;
 
     public DraggableRecyclerAdapter(boolean showHint, Context context, int progressiveCount, List<String> descriptions, StartDragListener startDragListener) {
@@ -45,7 +45,7 @@ public class DraggableRecyclerAdapter extends RecyclerView.Adapter<DraggableRecy
             editTextData.add(new EditTextModel("", ""));
         }
         this.showHint = showHint;
-        //this.sharedPreferences = context.getSharedPreferences(context.getString(R.string.preference_file_key), Context.MODE_PRIVATE);
+        this.sharedPreferences = context.getSharedPreferences(context.getString(R.string.preference_file_key), Context.MODE_PRIVATE);
     }
 
     @Override
@@ -200,33 +200,36 @@ public class DraggableRecyclerAdapter extends RecyclerView.Adapter<DraggableRecy
                 }
             });
 
+            //
+            int[][] states = new int[][]{
+                    new int[]{android.R.attr.state_enabled}, // enabled
+                    new int[]{-android.R.attr.state_enabled}, // disabled
+                    new int[]{-android.R.attr.state_checked}, // unchecked
+                    new int[]{android.R.attr.state_pressed}  // pressed
+            };
+            int[] colors = new int[]{
+                    Color.GREEN,
+                    Color.GREEN,
+                    Color.GREEN,
+                    Color.GREEN
+            };
+            ColorStateList colorStateList = new ColorStateList(states, colors);
+            //
+
             if (showHint) {
                 progressiveLayout.setHint("Progressive " + getBindingAdapterPosition());
             } else {
-//                String hint = sharedPreferences.getString("progressive_hint_text_from_todo", "Description");
-//                if (hint.equals("Description")) {
-                if (true) {
+                String hint = sharedPreferences.getString("progressive_hint_text_from_todo", "description");
+                if (hint.equals("description")) {
                     if (descriptions != null && descriptions.size() >= getBindingAdapterPosition()) {
-                        int[][] states = new int[][]{
-                                new int[]{android.R.attr.state_enabled}, // enabled
-                                new int[]{-android.R.attr.state_enabled}, // disabled
-                                new int[]{-android.R.attr.state_checked}, // unchecked
-                                new int[]{android.R.attr.state_pressed}  // pressed
-                        };
-                        int[] colors = new int[]{
-                                Color.GREEN,
-                                Color.GREEN,
-                                Color.GREEN,
-                                Color.GREEN
-                        };
                         progressiveLayout.setHint(descriptions.get(getBindingAdapterPosition() - 1)); // Subtract 1 for machine id
-                        ColorStateList colorStateList = new ColorStateList(states, colors);
                         progressiveLayout.setDefaultHintTextColor(colorStateList);
                     }
                 }
-//                else {
-//                    progressiveEditText.setHint(editTextData.get(getBindingAdapterPosition()).getPreviousValue());
-//                }
+                else if (hint.equals("previous")) {
+                    progressiveLayout.setHint(editTextData.get(getBindingAdapterPosition()).getPreviousValue());
+                    progressiveLayout.setDefaultHintTextColor(colorStateList);
+                }
             }
         }
     }
