@@ -1,7 +1,7 @@
 # Meter Image Capturing
-[![version](https://img.shields.io/badge/version-2.0.2-success.svg)](https://semver.org)
+[![version](https://img.shields.io/badge/version-2.1.9-success.svg)](https://semver.org)
 
-MiC is a mobile application designed for the Android operating system written in the Java programming language.  An iOS version does not exist at this time.  The main use case for the app is to use OCR (optical character recognition) to extract the progressive dollar values from images of slot machines.  The objective here is to save the casino employees time so they don't have to manually log all progressive values for each slot machine they monitor.  
+MiC is a mobile application designed for the Android operating system written in the Java programming language.  The main use case for the app is to use OCR (optical character recognition) to extract the progressive dollar values from images of slot machines.  The objective here is to save the casino employees time so they don't have to manually log all progressive values for each slot machine they monitor.  
 
 ## OCR ##
 
@@ -11,32 +11,48 @@ Note the current version of ML Kit used by the application is 23.0.0.  Also, MiC
 
 ## Database ##
 
-The backend database is powered by Cloud Firestore which is a NoSQL cloud database provided by Google Firebase.  It is document based and designed to be fast and scalable.  In the Firestore model, documents are stored in collections and can contain fields as well as other collections.  The current schema contains two collections: scans and users.  The scans collection contains documents with details about each image capture, and the users collection stores data specific to each user account.  
-
-scans
- * email
- * machine_id
- * notes
- * progressive1
- * progressive2
- * progressive3
- * progressive4
- * progressive5
- * progressive6
- * timestamp
- * uid
- * userName
+The backend database is powered by Cloud Firestore which is a NoSQL cloud database provided by Google Firebase.  It is document based and designed to be fast and scalable.  In the Firestore model, documents are stored in collections and can contain fields as well as other collections.  The current schema contains two main collections: `users` and `toDoFileData`.  The scans collection contains documents with details about each image capture, and the users collection stores data specific to each user account.  
 
 users
- * displayNames
+	- uid
+		- displayNames
+		- scans
+			- machine_id
+			- progressive1
+			- progressive2
+			- ...
+			- progressive10
+			- timestamp
+			- userName
+			- notes
+			- location
+			- description
 
-formUploads
- * uploadFormData
+toDoFileData
+	- uploadDate
+	- initializedScanning
+	- machines
+		- machine_id
+		- location
+		- isScanned
+		- description
+		- fileIndex
+		- descriptions (array)
+		- increments (array)
+		- bases (array)
 
-Note the current version of cloud firestore used by the application is 21.0.0.  
 
 ### Indexes ###
-There is a composite index on the scans collection with uid ascending and timestamp descending.  
+There are a number of composite indices to make complex querying possible.  These are:
+
+| Collection ID	 | Fields indexed         | Query scope 
+| -------------- | ---------------------- | -----------
+| machines       | isScanned : machineId  | Collection
+| uploadFormData | completed : location   | Collection
+| scans          | uid : timestamp        | Collection
+| machines       | isScanned : location   | Collection
+| machines       | isScanned : fileIndex  | Collection
+| scans          | machine_id : timestamp | Collection
 
 ### Rules ###
 The following security rules are in place to ensure data stored in our database is secure.  
@@ -44,18 +60,18 @@ The following security rules are in place to ensure data stored in our database 
 ```
 rules_version = '2';
 service cloud.firestore {
-	match /databases/{database}/documents {    
-		match /scans/{documentId} {
-			allow read, update, delete: if request.auth.uid == resource.data.uid;
-			allow create: if request.auth.uid != null;
-		}
-		match /users/{document=**} {
-			allow read, write: if request.auth.uid != null;
-		}
-		match /formUploads/{document=**} {
-			allow read, write: if request.auth.uid != null;
-		}
-	}
+  match /databases/{database}/documents {    
+    match /scans/{documentId} {
+    	allow read, update, delete: if request.auth.uid == resource.data.uid;
+    	allow create: if request.auth.uid != null;
+    }
+    match /users/{document=**} {
+    	allow read, write: if request.auth.uid != null;
+    }
+    match /formUploads/{document=**} {
+    	allow read, write: if request.auth.uid != null;
+    }
+  }
 }
 ```
 
@@ -70,34 +86,47 @@ Note the current version of the google-services api used by the application is 4
 The following dependencies are necessary in the app level gradle file
 
 ```
-implementation fileTree(dir: 'libs', include: ['*.jar'])
-implementation 'androidx.appcompat:appcompat:1.1.0'
-implementation 'androidx.legacy:legacy-support-v4:1.0.0'
-implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
-testImplementation 'junit:junit:4.12'
-androidTestImplementation 'androidx.test:runner:1.2.0'
-androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
+implementation platform('com.google.firebase:firebase-bom:26.5.0')
+implementation 'com.google.firebase:firebase-analytics'
+implementation 'com.google.firebase:firebase-analytics-ktx'
+implementation 'com.google.firebase:firebase-auth'
+implementation 'com.google.firebase:firebase-firestore'
+implementation 'com.google.firebase:firebase-firestore-ktx'
+implementation 'com.google.firebase:firebase-functions'
+implementation 'com.google.firebase:firebase-ml-vision'
+implementation 'com.google.firebase:firebase-crashlytics'
+implementation 'com.google.firebase:firebase-crashlytics-ktx'
 
-implementation 'com.google.firebase:firebase-ml-vision:24.0.1'
-implementation 'com.google.firebase:firebase-auth:19.2.0'
-implementation 'com.google.firebase:firebase-firestore:21.3.1'
 implementation 'com.firebaseui:firebase-ui-auth:6.0.2'
 
-implementation 'com.google.android.material:material:1.0.0'
-implementation 'androidx.recyclerview:recyclerview:1.1.0'
+implementation 'com.google.android.gms:play-services-vision:20.1.3'
+implementation 'com.google.android.gms:play-services-vision-common:19.1.3'
+
+implementation 'com.google.android.material:material:1.3.0'
+
+implementation 'androidx.recyclerview:recyclerview:1.2.0'
 implementation 'androidx.cardview:cardview:1.0.0'
 
-implementation 'androidx.core:core:1.1.0'
-implementation 'androidx.preference:preference:1.1.0'
-implementation 'androidx.exifinterface:exifinterface:1.1.0'
+implementation 'androidx.core:core-ktx:1.5.0'
+implementation 'androidx.preference:preference-ktx:1.1.1'
+implementation 'androidx.exifinterface:exifinterface:1.3.2'
+
+implementation 'org.jetbrains.kotlinx:kotlinx-serialization-json:1.2.1'
+
+implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.4.32"
+
+// 3rd party libraries
+implementation 'com.miguelcatalan:materialsearchview:1.4.0'
+implementation 'com.jakewharton.timber:timber:4.7.1'
 ```
 
 The current gradle and google-services repositories are:
 
 ```
 dependencies {
-	classpath 'com.android.tools.build:gradle:3.5.3'
-	classpath 'com.google.gms:google-services:4.3.3'
+	classpath 'com.android.tools.build:gradle:4.2.0'
+    classpath 'com.google.gms:google-services:4.3.5'
+    classpath 'com.google.firebase:firebase-crashlytics-gradle:2.5.2'
 }
 ```
 
@@ -120,6 +149,8 @@ The MiC app requires the following permissions to be granted by the user to prop
  * CAMERA
  * READ_EXTERNAL_STORAGE
  * WRITE_EXTERNAL_STORAGE
+ * ACCESS_NETWORK_STATE
+ * WAKE_LOCK
 
 ## Admin Permissions ##
 
