@@ -2,10 +2,7 @@ package com.slotmachine.ocr.mic;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.SearchManager;
-import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -14,46 +11,29 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.activity.result.ActivityResult;
-import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
-import androidx.viewpager2.adapter.FragmentStateAdapter;
-import androidx.viewpager2.widget.ViewPager2;
-
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
-import com.google.android.material.tabs.TabLayout;
-import com.google.android.material.tabs.TabLayoutMediator;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.functions.FirebaseFunctions;
 import com.miguelcatalan.materialsearchview.MaterialSearchView;
-import com.slotmachine.ocr.mic.adapter.DemoCollectionAdapter;
 import com.slotmachine.ocr.mic.model.ToDoListItem;
 import com.slotmachine.ocr.mic.viewmodel.ToDoListViewModel;
 
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -74,6 +54,7 @@ public class TodoListActivity extends AppCompatActivity implements OnAdapterItem
     private FirebaseFirestore database;
 
     private ProgressBar progressBar;
+    private SwipeRefreshLayout swipeRefreshLayout;
 
     private MaterialSearchView searchView;
 
@@ -113,19 +94,7 @@ public class TodoListActivity extends AppCompatActivity implements OnAdapterItem
                             data.put("doc_id", latestCollectionId);
                             mFunctions.getHttpsCallable("resetUploadFile").call(data);
                         }
-
-//                        if (searchView.isSearchOpen()) {
-//                            searchView.closeSearch();
-//                        }
                     }
-
-//                        int recyclerViewPosition = result.getData().getIntExtra("position", 0);
-//                        if (searchView.hasFocus()) {
-//                            searchView.clearFocus();
-//                            searchView.closeSearch();
-//                        }
-//                        recyclerView.scrollToPosition(recyclerViewPosition);
-//                        removeRowFromRecyclerView(recyclerViewPosition);
                 }
             });
 
@@ -155,6 +124,8 @@ public class TodoListActivity extends AppCompatActivity implements OnAdapterItem
         progressBar = findViewById(R.id.progress_bar);
         constraintLayout = findViewById(R.id.constraint_layout);
         statusTextview = findViewById(R.id.status_textview);
+        swipeRefreshLayout = findViewById(R.id.swipe_refresh_layout);
+        swipeRefreshLayout.setOnRefreshListener(() -> queryDatabase(orderBy));
 
         database = FirebaseFirestore.getInstance();
 
@@ -189,58 +160,6 @@ public class TodoListActivity extends AppCompatActivity implements OnAdapterItem
         };
 
         recyclerView.addOnScrollListener(onScrollListener);
-
-//        recyclerView.addOnItemTouchListener(new RecyclerTouchListener(getApplicationContext(), recyclerView, new RecyclerTouchListener.ClickListener() {
-//            @Override
-//            public void onClick(View view, int position) {
-//                //
-//                //
-//                String machineId = toDoDataList.get(position).getMachine_id();
-//                int positionAll = getListPositionFromMachineId(machineId);
-//                //
-//                Intent intent = new Intent(TodoListActivity.this, MainActivity.class);
-//                intent.putExtra("machine_id", machineId);
-//                intent.putExtra("numberOfProgressives", toDoDataList.get(position).getDescriptions().size());
-//                intent.putExtra("location", toDoDataList.get(position).getLocation());
-//                intent.putExtra("position", positionAll);
-//                ArrayList<String> progressiveDescriptionTitlesList = toDoDataList.get(position).getProgressiveDescriptionsList();
-//                intent.putStringArrayListExtra("progressiveDescriptionTitles", progressiveDescriptionTitlesList);
-//                List<String> baseValuesList = toDoDataList.get(position).getBases();
-//                if (baseValuesList != null) {
-//                    intent.putStringArrayListExtra("baseValuesArray", (ArrayList<String>) toDoDataList.get(position).getBases());
-//                }
-//                List<String> incrementValuesList = toDoDataList.get(position).getIncrements();
-//                if (incrementValuesList != null) {
-//                    intent.putStringArrayListExtra("incrementValuesArray", (ArrayList<String>) toDoDataList.get(position).getIncrements());
-//                }
-//                intent.putExtra("hashMap", (HashMap)toDoDataList.get(position).getMap());
-////                startActivityForResult(intent, SUBMIT_PROGRESSIVE_RECORD);
-//
-//                //
-//                ActivityResultLauncher<Intent> activityResultLauncher = registerForActivityResult(
-//                        new ActivityResultContracts.StartActivityForResult(),
-//                        result -> {
-//                            if (result.getResultCode() == Activity.RESULT_OK) {
-//                                int recyclerViewPosition = result.getData().getIntExtra("position", 0);
-//                                if (searchView.hasFocus()) {
-//                                    searchView.clearFocus();
-//                                    searchView.closeSearch();
-//                                }
-//                                recyclerView.scrollToPosition(recyclerViewPosition);
-//                                removeRowFromRecyclerView(recyclerViewPosition);
-//                            }
-//                        }
-//                );
-//
-//                activityResultLauncher.launch(intent);
-//            }
-//
-//            @Override
-//            public void onLongClick(View view, final int position) {
-//            }
-//        }));
-
-//        populateRecyclerView("");
     }
 
     public void loadMoreDocs() {
@@ -287,22 +206,6 @@ public class TodoListActivity extends AppCompatActivity implements OnAdapterItem
     }
 
     private void getToDoMachines() {
-//        toDoListViewModel.getAllUnscannedToDoItems(firebaseAuth.getUid()).observe(this, docs -> {
-//            toDoDataList.clear();
-//            toDoDataList.addAll(docs);
-//
-//            toDoDataListAll.clear();
-//            toDoDataListAll.addAll(docs);
-//
-//            mAdapter.notifyDataSetChanged();
-//        });
-
-//        toDoListViewModel.userHasUploadFile(firebaseAuth.getUid()).observe(this, exists -> {
-//            if (exists) {
-//
-//            }
-//        });
-
         progressBar.setVisibility(View.VISIBLE);
 
         toDoListViewModel.getLatestUploadCollectionId(mFirebaseUserId).observe(this, doc -> {
@@ -316,6 +219,8 @@ public class TodoListActivity extends AppCompatActivity implements OnAdapterItem
                 if (initialized) {
                     AlertDialog alertDialog = new AlertDialog.Builder(this).create();
                     alertDialog.setMessage("You are about to begin processing your account's to do checklist");
+                    alertDialog.setButton(androidx.appcompat.app.AlertDialog.BUTTON_NEGATIVE, "Go back",
+                            (dialog, i) -> onBackPressed());
                     alertDialog.setButton(androidx.appcompat.app.AlertDialog.BUTTON_POSITIVE, "OK",
                             (dialog, i) -> dialog.dismiss());
                     alertDialog.show();
@@ -355,50 +260,9 @@ public class TodoListActivity extends AppCompatActivity implements OnAdapterItem
                 .addOnFailureListener(e -> {
                     Toast.makeText(this, "Connection error", Toast.LENGTH_SHORT).show();
                     Timber.e(e);
-                });
+                })
+                .addOnCompleteListener(task -> swipeRefreshLayout.setRefreshing(false));
     }
-
-//    private void populateRecyclerView(final String machineIdQuery) {
-//        progressBar.setVisibility(View.VISIBLE);
-//        toDoDataListAll.clear();
-//        toDoDataList.clear();
-//        uploadFormDataDocumentReference.get().addOnCompleteListener(task -> {
-//            if (task.isSuccessful()) {
-//                DocumentSnapshot document = task.getResult();
-//                if ((document != null) && document.exists() && document.contains("uploadArray")) {
-//                    List<Map<String, Object>> mapList = (List<Map<String, Object>>) document.get("uploadArray");
-//
-//                    for (int i = 0; i < mapList.size(); i++) {
-//                        Map<String, Object> map = mapList.get(i);
-//                        ToDoListItem row = new ToDoListItem(i, map);
-//                        if (machineIdQuery.isEmpty()) {
-//                            toDoDataList.add(row);
-//                        } else {
-//                            if (row.getMachineId().equals(machineIdQuery)) {
-//                                toDoDataList.add(row);
-//                            }
-//                        }
-//                    }
-//                    if (SORT_BY_FIELD == 0) {
-//                        Collections.sort(toDoDataList, ToDoListData.indexComparator);
-//                    } else if (SORT_BY_FIELD == 1) {
-//                        Collections.sort(toDoDataList, ToDoListData.machineIdComparator);
-//                    } else if (SORT_BY_FIELD == 2) {
-//                        Collections.sort(toDoDataList, ToDoListData.locationComparator);
-//                    }
-//                    toDoDataListAll.clear();
-//                    toDoDataListAll.addAll(toDoDataList);
-//                    mAdapter.notifyDataSetChanged();
-//                }
-//            } else {
-//                showToast(task.getException().getMessage());
-//            }
-//
-//            // Finish things up
-//            progressBar.setVisibility(View.GONE);
-//            swipeRefreshLayout.setRefreshing(false);
-//        });
-//    }
 
     @Override
     public void onBackPressed() {
@@ -408,33 +272,6 @@ public class TodoListActivity extends AppCompatActivity implements OnAdapterItem
             super.onBackPressed();
         }
     }
-
-//    @Override
-//    protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
-//        super.onActivityResult(requestCode, resultCode, intent);
-//        if (resultCode == RESULT_OK) {
-//            if (requestCode == SUBMIT_PROGRESSIVE_RECORD) {
-//                int recyclerViewPosition = intent.getIntExtra("position", 0);
-//                if (searchView.hasFocus()) {
-//                    searchView.clearFocus();
-//                    searchView.closeSearch();
-//                }
-//                recyclerView.scrollToPosition(recyclerViewPosition);
-//                removeRowFromRecyclerView(recyclerViewPosition);
-//            }
-//        }
-//    }
-
-//    private void removeRowFromRecyclerView(int position) {
-//        toDoDataList.remove(position);
-//        mAdapter.notifyDataSetChanged();
-//        syncDataLists();
-//    }
-
-//    private void syncDataLists() {
-//        toDoDataListAll.clear();
-//        toDoDataListAll.addAll(toDoDataList);
-//    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -485,23 +322,6 @@ public class TodoListActivity extends AppCompatActivity implements OnAdapterItem
         return true;
     }
 
-//    @Override
-//    public void onNewIntent(Intent intent) {
-//        if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
-//            String query = intent.getStringExtra(SearchManager.QUERY);
-//            if (query != null) {
-//                searchView.setQuery(query.replaceAll("\\s+", ""), false);
-//            }
-//        }
-//        super.onNewIntent(intent);
-//    }
-
-//    private void revertRecyclerViewToNormal() {
-//        toDoDataList.clear();
-//        toDoDataList.addAll(toDoDataListAll);
-//        mAdapter.notifyDataSetChanged();
-//    }
-
     private void doSearch(String searchPattern) {
 
         toDoListViewModel.searchForToDoItemsById(mFirebaseUserId,
@@ -511,16 +331,6 @@ public class TodoListActivity extends AppCompatActivity implements OnAdapterItem
                     toDoDataList.addAll(docs);
                     mAdapter.notifyDataSetChanged();
         });
-
-//        List<ToDoListItem> filteredList = new ArrayList<>();
-//        for (ToDoListItem i : toDoDataListAll) {
-//            if (i.getMachine_id().startsWith(searchPattern.trim())) {
-//                filteredList.add(i);
-//            }
-//        }
-//        toDoDataList.clear();
-//        toDoDataList.addAll(filteredList);
-//        mAdapter.notifyDataSetChanged();
     }
 
     @Override
