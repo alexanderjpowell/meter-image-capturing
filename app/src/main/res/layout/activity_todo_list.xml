@@ -7,64 +7,50 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".TodoListActivity">
 
-    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-        android:id="@+id/swipeRefresh"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:paddingTop="?attr/actionBarSize">
+<!--    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout-->
+<!--        android:id="@+id/swipeRefresh"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="match_parent"-->
+<!--        android:paddingTop="?attr/actionBarSize">-->
 
         <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/recycler_view_to_do_list"
+            android:paddingTop="?attr/actionBarSize"
+            android:id="@+id/recycler_view"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:background="?android:selectableItemBackground"
             android:clickable="true"
             android:focusable="true"
             android:scrollbars="vertical"
             android:layout_below="@id/toolbar"
-            android:visibility="visible" />
+            android:visibility="visible"
+            tools:visibility="gone" />
 
-    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+<!--    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>-->
 
-<!--    <TextView-->
-<!--        android:id="@+id/empty_state_no_file_text_view"-->
-<!--        android:drawableTop="@drawable/round_cloud_upload_black_48"-->
-<!--        android:layout_width="wrap_content"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:text="@string/upload_file_empty_state_no_file_message"-->
-<!--        android:textSize="28sp"-->
-<!--        android:textAlignment="center"-->
-<!--        android:layout_gravity="center"-->
-<!--        android:visibility="gone"/>-->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/constraint_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:visibility="gone">
 
-<!--    <TextView-->
-<!--        android:id="@+id/empty_state_completed_text_view"-->
-<!--        android:drawableTop="@drawable/round_done_black_48"-->
-<!--        android:layout_width="wrap_content"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:text="@string/upload_file_empty_state_completed_message"-->
-<!--        android:textSize="28sp"-->
-<!--        android:textAlignment="center"-->
-<!--        android:layout_gravity="center"-->
-<!--        android:visibility="gone"/>-->
-
-<!--    <TextView-->
-<!--        android:id="@+id/empty_state_uncompleted_text_view"-->
-<!--        android:drawableTop="@drawable/round_clear_black_48"-->
-<!--        android:layout_width="wrap_content"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:text="@string/upload_file_empty_state_incomplete_message"-->
-<!--        android:textSize="28sp"-->
-<!--        android:textAlignment="center"-->
-<!--        android:layout_gravity="center"-->
-<!--        android:visibility="gone"/>-->
+        <TextView
+            android:id="@+id/status_textview"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <ProgressBar
         android:id="@+id/progress_bar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:visibility="visible"/>
+        android:visibility="gone"/>
 
     <FrameLayout
         android:id="@+id/toolbar_container"

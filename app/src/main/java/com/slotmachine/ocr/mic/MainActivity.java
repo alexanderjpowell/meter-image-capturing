@@ -65,6 +65,7 @@ import com.google.firebase.ml.vision.common.FirebaseVisionImage;
 import com.google.firebase.ml.vision.document.FirebaseVisionDocumentText;
 import com.google.firebase.ml.vision.document.FirebaseVisionDocumentTextRecognizer;
 import com.slotmachine.ocr.mic.viewmodel.MainActivityViewModel;
+import com.slotmachine.ocr.mic.model.ToDoListItem;
 //import com.slotmachine.ocr.mic.viewmodel.MainActivityViewModel;
 
 import android.speech.RecognizerIntent;
@@ -181,12 +182,16 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         findViewById(R.id.button_submit).setOnClickListener(v -> onSubmit());
         //
 
-        String machine_id = intent.getStringExtra("machine_id");
+        ToDoListItem item = (ToDoListItem) intent.getSerializableExtra("toDoItem");
+        String machineId = null;
+        if (item != null) {
+            machineId = item.getMachineId();
+            progressiveDescriptions = item.getDescriptions();
+        }
 
-        progressiveDescriptions = intent.getStringArrayListExtra("progressiveDescriptionTitles");
+//        progressiveDescriptions = intent.getStringArrayListExtra("progressiveDescriptionTitles");
         RecyclerView recyclerView = findViewById(R.id.drag_recycler);
-        int num = UserSettings.getNumberOfProgressives(this);
-        adapter = new DraggableRecyclerAdapter(machine_id == null, this, num, progressiveDescriptions,this);
+        adapter = new DraggableRecyclerAdapter(machineId == null, this, UserSettings.getNumberOfProgressives(this), progressiveDescriptions,this);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         ItemTouchHelper.Callback callback = new ItemMoveCallback(adapter);
         touchHelper = new ItemTouchHelper(callback);
@@ -196,11 +201,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         mainActivityViewModel = new ViewModelProvider(this).get(MainActivityViewModel.class);
 
 
-        if (machine_id != null) {
-            adapter.setMachineId(machine_id);
+        if (machineId != null) {
+            adapter.setMachineId(machineId);
             String hint = sharedPref.getString("progressive_hint_text_from_todo", "description");
             if (hint.equals("previous")) {
-                initPrevScanObserver(machine_id);
+                initPrevScanObserver(machineId);
             }
         }
     }
@@ -219,6 +224,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         dispatchTakePictureIntent();
     }
 
+//    public void onSubmit() {
+////        Intent i = new Intent();
+////        i.putExtra("val", 5);
+//        setResult(RESULT_OK, getIntent());
+//
+//        finish();
+//    }
     public void onSubmit() {
         if (allProgressivesEmpty()) {
             AlertDialog alertDialog = new AlertDialog.Builder(MainActivity.this).create();
@@ -709,7 +721,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                         hideKeyboard();
                                         dialog.dismiss();
                                         notes = "";
-                                        removeFromUploadArray();
+                                        //removeFromUploadArray();
                                         navigateBackToUploadFile();
                                     });
                             if (!isFinishing()) {
@@ -723,7 +735,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                             showToast("Progressive(s) submitted successfully");
                             hideKeyboard();
                             notes = "";
-                            removeFromUploadArray();
+                            //removeFromUploadArray();
                             navigateBackToUploadFile();
                         }
                     } else {
@@ -736,7 +748,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 showToast("Progressive(s) submitted successfully");
                 hideKeyboard();
                 notes = "";
-                removeFromUploadArray();
+                //removeFromUploadArray();
                 navigateBackToUploadFile();
             }
         } catch (Exception ex) {
@@ -745,20 +757,19 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
     }
 
-    private void removeFromUploadArray() {
-        if (intent.hasExtra("hashMap")) {
-            HashMap<String, Object> hashMap = (HashMap<String, Object>)intent.getSerializableExtra("hashMap");
-            DocumentReference documentReference = database.collection("formUploads").document(firebaseAuth.getUid());
-            documentReference.update("uploadArray", FieldValue.arrayRemove(hashMap))
-                    .addOnSuccessListener(aVoid -> Timber.d("DocumentSnapshot successfully updated!"))
-                    .addOnFailureListener(e -> showToast("Error updating to do list. " + e.getMessage()));
-        }
-    }
+//    private void removeFromUploadArray() {
+//        if (intent.hasExtra("hashMap")) {
+//            HashMap<String, Object> hashMap = (HashMap<String, Object>)intent.getSerializableExtra("hashMap");
+//            DocumentReference documentReference = database.collection("formUploads").document(firebaseAuth.getUid());
+//            documentReference.update("uploadArray", FieldValue.arrayRemove(hashMap))
+//                    .addOnSuccessListener(aVoid -> Timber.d("DocumentSnapshot successfully updated!"))
+//                    .addOnFailureListener(e -> showToast("Error updating to do list. " + e.getMessage()));
+//        }
+//    }
 
     private void navigateBackToUploadFile() {
-        if (intent.hasExtra("machine_id")) {
+        if (intent.hasExtra("toDoItem")) {
             setResult(RESULT_OK, getIntent());
-            this.onBackPressed();
             finish();
         }
     }
