@@ -65,6 +65,7 @@ public class TodoListActivity extends AppCompatActivity implements OnAdapterItem
     private DocumentSnapshot snapshotCursor;
     private boolean LOADING = true;
     private String orderBy;
+    private int QUERY_BATCH_SIZE = 100;
 
     private final ActivityResultLauncher<Intent> activityResultLauncher = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),
@@ -172,7 +173,7 @@ public class TodoListActivity extends AppCompatActivity implements OnAdapterItem
                     .whereEqualTo("isScanned", false)
                     .orderBy(orderBy)
                     .startAfter(snapshotCursor)
-                    .limit(10)
+                    .limit(QUERY_BATCH_SIZE)
                     .get()
                     .addOnSuccessListener(queryDocumentSnapshots -> {
                         if (queryDocumentSnapshots.size() > 0) {
@@ -199,10 +200,14 @@ public class TodoListActivity extends AppCompatActivity implements OnAdapterItem
 
     @Override
     public void onItemClick(int position) {
-        Intent intent = new Intent(this, MainActivity.class);
-        intent.putExtra("position", position);
-        intent.putExtra("toDoItem", toDoDataList.get(position));
-        activityResultLauncher.launch(intent);
+        try {
+            Intent intent = new Intent(this, MainActivity.class);
+            intent.putExtra("position", position);
+            intent.putExtra("toDoItem", toDoDataList.get(position));
+            activityResultLauncher.launch(intent);
+        } catch (Exception ex) {
+            Toast.makeText(this, "Error retrieving machine data", Toast.LENGTH_LONG).show();
+        }
     }
 
     private void getToDoMachines() {
@@ -239,7 +244,7 @@ public class TodoListActivity extends AppCompatActivity implements OnAdapterItem
                 .collection("machines")
                 .whereEqualTo("isScanned", false)
                 .orderBy(orderBy)
-                .limit(10)
+                .limit(QUERY_BATCH_SIZE)
                 .get()
                 .addOnSuccessListener(queryDocumentSnapshots -> {
                     snapshotCursor = queryDocumentSnapshots.getDocuments()

@@ -514,13 +514,16 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                             if (minimumProgressiveValue != null) {
                                 List<String> newDollarValues = new ArrayList<>();
                                 for (int i = 0; i < dollarValues.size(); i++) {
-                                    if (Double.parseDouble(dollarValues.get(i)) >= minimumProgressiveValue) {
-                                        newDollarValues.add(dollarValues.get(i));
+                                    try {
+                                        if (Double.parseDouble(dollarValues.get(i)) >= minimumProgressiveValue) {
+                                            newDollarValues.add(dollarValues.get(i));
+                                        }
+                                    } catch (Exception ignore) {
+
                                     }
                                 }
                                 dollarValues = newDollarValues;
                             }
-
                             adapter.setItems(dollarValues);
                         })
                         .addOnFailureListener(e -> showToast("Error with cloud OCR"));
@@ -622,47 +625,45 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             final String progressiveText10 = formatted.get(9);
             final String notesText = notes;
 
-            //
-            String location = getIntent().getStringExtra("location");
-            final String locationText = location == null ? "" : location;
-            //
-
-            // Descriptions
+            // Description and Location
+            final StringBuilder description = new StringBuilder();
+            final StringBuilder location = new StringBuilder();
+            // p_descriptions
             final ArrayList<String> descriptionValuesArray = new ArrayList<>();
-            for (int i = 0; i < 10; i++) { // Populate with 10 null entries
-                descriptionValuesArray.add(null);
-            }
-            if (getIntent().hasExtra("progressiveDescriptionTitles")) {
-                ArrayList<String> descriptions = getIntent().getStringArrayListExtra("progressiveDescriptionTitles");
-                for (int i = 0; i < descriptions.size(); i++) {
-                    if (descriptions.get(i) != null && !descriptions.get(i).isEmpty()) {
-                        descriptionValuesArray.add(i, descriptions.get(i));
-                    }
-                }
-            }
             // Bases
             final ArrayList<String> baseValuesArray = new ArrayList<>();
-            for (int i = 0; i < 10; i++) { // Populate with 10 null entries
-                baseValuesArray.add(null);
-            }
-            if (getIntent().hasExtra("baseValuesArray")) {
-                ArrayList<String> bases = getIntent().getStringArrayListExtra("baseValuesArray");
-                for (int i = 0; i < bases.size(); i++) {
-                    if (bases.get(i) != null && !bases.get(i).isEmpty()) {
-                        baseValuesArray.add(i, bases.get(i));
-                    }
-                }
-            }
             // Increments
             final ArrayList<String> incrementValuesArray = new ArrayList<>();
+
             for (int i = 0; i < 10; i++) { // Populate with 10 null entries
+                descriptionValuesArray.add(null);
+                baseValuesArray.add(null);
                 incrementValuesArray.add(null);
             }
-            if (getIntent().hasExtra("incrementValuesArray")) {
-                ArrayList<String> increments = getIntent().getStringArrayListExtra("incrementValuesArray");
-                for (int i = 0; i < increments.size(); i++) {
-                    if (increments.get(i) != null && !increments.get(i).isEmpty()) {
-                        incrementValuesArray.add(i, increments.get(i));
+            if (getIntent().hasExtra("toDoItem")) {
+                ToDoListItem item = (ToDoListItem)getIntent().getSerializableExtra("toDoItem");
+                description.append(item.getDescription());
+                location.append(item.getLocation());
+
+                if (item.getDescriptions() != null) {
+                    for (int i = 0; i < item.getDescriptions().size(); i++) {
+                        if (item.getDescriptions().get(i) != null && !item.getDescriptions().get(i).isEmpty()) {
+                            descriptionValuesArray.add(i, item.getDescriptions().get(i));
+                        }
+                    }
+                }
+                if (item.getBases() != null) {
+                    for (int i = 0; i < item.getBases().size(); i++) {
+                        if (item.getBases().get(i) != null && !item.getBases().get(i).isEmpty()) {
+                            baseValuesArray.add(i, item.getBases().get(i));
+                        }
+                    }
+                }
+                if (item.getIncrements() != null) {
+                    for (int i = 0; i < item.getIncrements().size(); i++) {
+                        if (item.getIncrements().get(i) != null && !item.getIncrements().get(i).isEmpty()) {
+                            incrementValuesArray.add(i, item.getIncrements().get(i));
+                        }
                     }
                 }
             }
@@ -715,13 +716,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                     (dialog, i) -> dialog.dismiss());
                             alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "SUBMIT ANYWAY",
                                     (dialog, i) -> {
-                                        insertToDatabase(userId, progressiveText1, progressiveText2, progressiveText3, progressiveText4, progressiveText5, progressiveText6, progressiveText7, progressiveText8, progressiveText9, progressiveText10, descriptionValuesArray.get(0), descriptionValuesArray.get(1), descriptionValuesArray.get(2), descriptionValuesArray.get(3), descriptionValuesArray.get(4), descriptionValuesArray.get(5), descriptionValuesArray.get(6), descriptionValuesArray.get(7), descriptionValuesArray.get(8), descriptionValuesArray.get(9), baseValuesArray.get(0), baseValuesArray.get(1), baseValuesArray.get(2), baseValuesArray.get(3), baseValuesArray.get(4), baseValuesArray.get(5), baseValuesArray.get(6), baseValuesArray.get(7), baseValuesArray.get(8), baseValuesArray.get(9), incrementValuesArray.get(0), incrementValuesArray.get(1), incrementValuesArray.get(2), incrementValuesArray.get(3), incrementValuesArray.get(4), incrementValuesArray.get(5), incrementValuesArray.get(6), incrementValuesArray.get(7), incrementValuesArray.get(8), incrementValuesArray.get(9), machineIdText, FieldValue.serverTimestamp(), userName, notesText, locationText);
+                                        insertToDatabase(userId, progressiveText1, progressiveText2, progressiveText3, progressiveText4, progressiveText5, progressiveText6, progressiveText7, progressiveText8, progressiveText9, progressiveText10, descriptionValuesArray.get(0), descriptionValuesArray.get(1), descriptionValuesArray.get(2), descriptionValuesArray.get(3), descriptionValuesArray.get(4), descriptionValuesArray.get(5), descriptionValuesArray.get(6), descriptionValuesArray.get(7), descriptionValuesArray.get(8), descriptionValuesArray.get(9), baseValuesArray.get(0), baseValuesArray.get(1), baseValuesArray.get(2), baseValuesArray.get(3), baseValuesArray.get(4), baseValuesArray.get(5), baseValuesArray.get(6), baseValuesArray.get(7), baseValuesArray.get(8), baseValuesArray.get(9), incrementValuesArray.get(0), incrementValuesArray.get(1), incrementValuesArray.get(2), incrementValuesArray.get(3), incrementValuesArray.get(4), incrementValuesArray.get(5), incrementValuesArray.get(6), incrementValuesArray.get(7), incrementValuesArray.get(8), incrementValuesArray.get(9), description.toString(), machineIdText, FieldValue.serverTimestamp(), userName, notesText, location.toString());
                                         adapter.resetItems();
                                         showToast("Progressive(s) submitted successfully");
                                         hideKeyboard();
                                         dialog.dismiss();
                                         notes = "";
-                                        //removeFromUploadArray();
                                         navigateBackToUploadFile();
                                     });
                             if (!isFinishing()) {
@@ -730,12 +730,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                 Timber.e("trying to show dialog after destroy");
                             }
                         } else { // No Dups Found
-                            insertToDatabase(userId, progressiveText1, progressiveText2, progressiveText3, progressiveText4, progressiveText5, progressiveText6, progressiveText7, progressiveText8, progressiveText9, progressiveText10, descriptionValuesArray.get(0), descriptionValuesArray.get(1), descriptionValuesArray.get(2), descriptionValuesArray.get(3), descriptionValuesArray.get(4), descriptionValuesArray.get(5), descriptionValuesArray.get(6), descriptionValuesArray.get(7), descriptionValuesArray.get(8), descriptionValuesArray.get(9), baseValuesArray.get(0), baseValuesArray.get(1), baseValuesArray.get(2), baseValuesArray.get(3), baseValuesArray.get(4), baseValuesArray.get(5), baseValuesArray.get(6), baseValuesArray.get(7), baseValuesArray.get(8), baseValuesArray.get(9), incrementValuesArray.get(0), incrementValuesArray.get(1), incrementValuesArray.get(2), incrementValuesArray.get(3), incrementValuesArray.get(4), incrementValuesArray.get(5), incrementValuesArray.get(6), incrementValuesArray.get(7), incrementValuesArray.get(8), incrementValuesArray.get(9),  machineIdText, FieldValue.serverTimestamp(), userName, notesText, locationText);
+                            insertToDatabase(userId, progressiveText1, progressiveText2, progressiveText3, progressiveText4, progressiveText5, progressiveText6, progressiveText7, progressiveText8, progressiveText9, progressiveText10, descriptionValuesArray.get(0), descriptionValuesArray.get(1), descriptionValuesArray.get(2), descriptionValuesArray.get(3), descriptionValuesArray.get(4), descriptionValuesArray.get(5), descriptionValuesArray.get(6), descriptionValuesArray.get(7), descriptionValuesArray.get(8), descriptionValuesArray.get(9), baseValuesArray.get(0), baseValuesArray.get(1), baseValuesArray.get(2), baseValuesArray.get(3), baseValuesArray.get(4), baseValuesArray.get(5), baseValuesArray.get(6), baseValuesArray.get(7), baseValuesArray.get(8), baseValuesArray.get(9), incrementValuesArray.get(0), incrementValuesArray.get(1), incrementValuesArray.get(2), incrementValuesArray.get(3), incrementValuesArray.get(4), incrementValuesArray.get(5), incrementValuesArray.get(6), incrementValuesArray.get(7), incrementValuesArray.get(8), incrementValuesArray.get(9), description.toString(), machineIdText, FieldValue.serverTimestamp(), userName, notesText, location.toString());
                             adapter.resetItems();
                             showToast("Progressive(s) submitted successfully");
                             hideKeyboard();
                             notes = "";
-                            //removeFromUploadArray();
                             navigateBackToUploadFile();
                         }
                     } else {
@@ -743,12 +742,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     }
                 });
             } else { // Proceed to save scan
-                insertToDatabase(userId, progressiveText1, progressiveText2, progressiveText3, progressiveText4, progressiveText5, progressiveText6, progressiveText7, progressiveText8, progressiveText9, progressiveText10, descriptionValuesArray.get(0), descriptionValuesArray.get(1), descriptionValuesArray.get(2), descriptionValuesArray.get(3), descriptionValuesArray.get(4), descriptionValuesArray.get(5), descriptionValuesArray.get(6), descriptionValuesArray.get(7), descriptionValuesArray.get(8), descriptionValuesArray.get(9), baseValuesArray.get(0), baseValuesArray.get(1), baseValuesArray.get(2), baseValuesArray.get(3), baseValuesArray.get(4), baseValuesArray.get(5), baseValuesArray.get(6), baseValuesArray.get(7), baseValuesArray.get(8), baseValuesArray.get(9), incrementValuesArray.get(0), incrementValuesArray.get(1), incrementValuesArray.get(2), incrementValuesArray.get(3), incrementValuesArray.get(4), incrementValuesArray.get(5), incrementValuesArray.get(6), incrementValuesArray.get(7), incrementValuesArray.get(8), incrementValuesArray.get(9),  machineIdText, FieldValue.serverTimestamp(), userName, notesText, locationText);
+                insertToDatabase(userId, progressiveText1, progressiveText2, progressiveText3, progressiveText4, progressiveText5, progressiveText6, progressiveText7, progressiveText8, progressiveText9, progressiveText10, descriptionValuesArray.get(0), descriptionValuesArray.get(1), descriptionValuesArray.get(2), descriptionValuesArray.get(3), descriptionValuesArray.get(4), descriptionValuesArray.get(5), descriptionValuesArray.get(6), descriptionValuesArray.get(7), descriptionValuesArray.get(8), descriptionValuesArray.get(9), baseValuesArray.get(0), baseValuesArray.get(1), baseValuesArray.get(2), baseValuesArray.get(3), baseValuesArray.get(4), baseValuesArray.get(5), baseValuesArray.get(6), baseValuesArray.get(7), baseValuesArray.get(8), baseValuesArray.get(9), incrementValuesArray.get(0), incrementValuesArray.get(1), incrementValuesArray.get(2), incrementValuesArray.get(3), incrementValuesArray.get(4), incrementValuesArray.get(5), incrementValuesArray.get(6), incrementValuesArray.get(7), incrementValuesArray.get(8), incrementValuesArray.get(9), description.toString(), machineIdText, FieldValue.serverTimestamp(), userName, notesText, location.toString());
                 adapter.resetItems();
                 showToast("Progressive(s) submitted successfully");
                 hideKeyboard();
                 notes = "";
-                //removeFromUploadArray();
                 navigateBackToUploadFile();
             }
         } catch (Exception ex) {
@@ -756,16 +754,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             showToast(ex.getMessage());
         }
     }
-
-//    private void removeFromUploadArray() {
-//        if (intent.hasExtra("hashMap")) {
-//            HashMap<String, Object> hashMap = (HashMap<String, Object>)intent.getSerializableExtra("hashMap");
-//            DocumentReference documentReference = database.collection("formUploads").document(firebaseAuth.getUid());
-//            documentReference.update("uploadArray", FieldValue.arrayRemove(hashMap))
-//                    .addOnSuccessListener(aVoid -> Timber.d("DocumentSnapshot successfully updated!"))
-//                    .addOnFailureListener(e -> showToast("Error updating to do list. " + e.getMessage()));
-//        }
-//    }
 
     private void navigateBackToUploadFile() {
         if (intent.hasExtra("toDoItem")) {
@@ -785,16 +773,16 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                   String progressive8,
                                   String progressive9,
                                   String progressive10,
-                                  String description1,
-                                  String description2,
-                                  String description3,
-                                  String description4,
-                                  String description5,
-                                  String description6,
-                                  String description7,
-                                  String description8,
-                                  String description9,
-                                  String description10,
+                                  String p_1,
+                                  String p_2,
+                                  String p_3,
+                                  String p_4,
+                                  String p_5,
+                                  String p_6,
+                                  String p_7,
+                                  String p_8,
+                                  String p_9,
+                                  String p_10,
                                   String base1,
                                   String base2,
                                   String base3,
@@ -815,6 +803,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                                   String increment8,
                                   String increment9,
                                   String increment10,
+                                  String description,
                                   String machine_id,
                                   FieldValue timestamp,
                                   String userName,
@@ -832,18 +821,18 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         user.put("progressive9", progressive9);
         user.put("progressive10", progressive10);
         //
-        List<String> descriptions = new ArrayList<>();
-        descriptions.add(description1);
-        descriptions.add(description2);
-        descriptions.add(description3);
-        descriptions.add(description4);
-        descriptions.add(description5);
-        descriptions.add(description6);
-        descriptions.add(description7);
-        descriptions.add(description8);
-        descriptions.add(description9);
-        descriptions.add(description10);
-        user.put("descriptions", descriptions);
+        List<String> p_descriptions = new ArrayList<>();
+        p_descriptions.add(p_1);
+        p_descriptions.add(p_2);
+        p_descriptions.add(p_3);
+        p_descriptions.add(p_4);
+        p_descriptions.add(p_5);
+        p_descriptions.add(p_6);
+        p_descriptions.add(p_7);
+        p_descriptions.add(p_8);
+        p_descriptions.add(p_9);
+        p_descriptions.add(p_10);
+        user.put("descriptions", p_descriptions);
         //
         if (base1 != null) { user.put("base1", base1); }
         if (base2 != null) { user.put("base2", base2); }
@@ -866,6 +855,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         if (increment8 != null) { user.put("increment8", increment8); }
         if (increment9 != null) { user.put("increment9", increment9); }
         if (increment10 != null) { user.put("increment10", increment10); }
+        user.put("description", description);
         user.put("machine_id", machine_id);
         user.put("timestamp", timestamp);
         user.put("userName", userName);
