@@ -65,7 +65,7 @@ public class TodoListActivity extends AppCompatActivity implements OnAdapterItem
     private DocumentSnapshot snapshotCursor;
     private boolean LOADING = true;
     private String orderBy;
-    private int QUERY_BATCH_SIZE = 100;
+    private final int QUERY_BATCH_SIZE = 100;
 
     private final ActivityResultLauncher<Intent> activityResultLauncher = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),
@@ -86,9 +86,7 @@ public class TodoListActivity extends AppCompatActivity implements OnAdapterItem
                         }
 
                         if (toDoDataListAll.isEmpty()) {
-                            constraintLayout.setVisibility(View.VISIBLE);
-                            recyclerView.setVisibility(View.GONE);
-                            statusTextview.setText("You have finished all assigned scans");
+                            setEmptyView();
 
                             // Call firebase function to set all docs back to unscanned
                             Map<String, Object> data = new HashMap<>();
@@ -247,8 +245,13 @@ public class TodoListActivity extends AppCompatActivity implements OnAdapterItem
                 .limit(QUERY_BATCH_SIZE)
                 .get()
                 .addOnSuccessListener(queryDocumentSnapshots -> {
-                    snapshotCursor = queryDocumentSnapshots.getDocuments()
-                            .get(queryDocumentSnapshots.size() - 1);
+                    if (queryDocumentSnapshots.size() > 0) {
+                        snapshotCursor = queryDocumentSnapshots.getDocuments()
+                                .get(queryDocumentSnapshots.size() - 1);
+                    } else {
+                        snapshotCursor = null;
+                        setEmptyView();
+                    }
                     List<ToDoListItem> tmp = new ArrayList<>();
                     for (DocumentSnapshot doc : queryDocumentSnapshots.getDocuments()) {
                         tmp.add(doc.toObject(ToDoListItem.class));
@@ -267,6 +270,12 @@ public class TodoListActivity extends AppCompatActivity implements OnAdapterItem
                     Timber.e(e);
                 })
                 .addOnCompleteListener(task -> swipeRefreshLayout.setRefreshing(false));
+    }
+
+    private void setEmptyView() {
+        constraintLayout.setVisibility(View.VISIBLE);
+        recyclerView.setVisibility(View.GONE);
+        statusTextview.setText("You have finished all assigned scans");
     }
 
     @Override
